@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%; /* Cambiado de 100vw para evitar problemas con la barra de desplazamiento */
+  height: 100%;
+  overflow: hidden; /* Forzar sin scroll */
+  position: fixed; /* Evita rebotes en dispositivos móviles */
+  top: 0;
+  left: 0;
+}
+.background {
+  background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed;
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;/* Cambiado de center a flex-start */
+  align-items: center;
+  min-height: 100vh; /* Cambiado de height a min-height */
+  box-sizing: border-box;
+  overflow-y: auto; /* Permite scroll si es necesario */
+  z-index: 1;
+}
+
+
+  .particulas{
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .content-container {
+    display: flex;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 2; /* Asegura que esté sobre las partículas */
+  }
+  
+h1 {
+  text-align: center;
+  margin-top: 15px; /* Reducido */
+  font-size: clamp(32px, 8vw, 60px); /* Tamaño responsive */
+  color: #ffffff;
+  text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+}
+
+.start-button-amor, 
+.start-button-futuro, 
+.start-button-dinero {
+  padding: 15px 30px;
+  font-size: 20px;
+  color: white;
+  background: linear-gradient(135deg, #e2ac3d, #ffc552);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+  transition: all 0.3s ease;
+  margin: 10px 0;
+  width: 200px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.start-button:hover {
+    background: linear-gradient(360deg, #FAE365, #FFBA63);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
+    transform: translateY(-3px);
+}
+@media (max-height: 600px) {
+  h1 {
+      margin-top: 10px;
+      font-size: 28px;
+  }
+  
+  .content-container {
+      margin-top: 10px;
+      padding: 15px;
+      
+  }
+  
+  .start-button-amor, 
+  .start-button-futuro, 
+  .start-button-dinero {
+      padding: 10px 20px;
+      margin: 5px 0;
+  }
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PTQK3SPD');</script>
+  <!-- End Google Tag Manager -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJ8LSVRR1H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JJ8LSVRR1H');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PTQK3SPD"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div class="background">
+    <h2>Selecciona 3 cartas</h2>
+    <div  [@fadeIn] class="content-container">
+      <div class="cartas-container">
+      <div id="cardContainer" class="card-container"></div>
+    </div>
+    </div>
+  </div>
+  
+<div *ngIf="showPaymentModal" class="payment-modal-overlay">
+  <div class="payment-modal-content">
+    <p class="modal-text">Para revelar las descripciones detalladas de tus cartas y lo que los astros tienen para ti, por favor realiza una pequeña contribución.</p>
+
+    <!-- Stripe Payment Element Container -->
+    <div id="payment-element-container"></div>
+
+    <div *ngIf="isProcessingPayment && !paymentError" class="loading-container">
+      <p>{{ clientSecret ? 'Procesando pago...' : 'Inicializando pago...' }}</p>
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="paymentError" class="payment-error-message">
+      <p>Error: {{ paymentError }}</p>
+    </div>
+
+    <div class="modal-actions" *ngIf="clientSecret && !isProcessingPayment && !paymentError">
+      <button (click)="handlePaymentSubmit()" class="pay-button" [disabled]="isProcessingPayment">
+        {{ isProcessingPayment ? 'Procesando...' : 'Pagar Ahora' }}
+      </button>
+    </div>
+    <button (click)="cancelPayment()" class="cancel-button" [disabled]="isProcessingPayment">Cancelar</button>
+  </div>
+</div>
+</body>
+</html>
+
+

@@ -1,0 +1,1489 @@
+.close-chat-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  background: rgba(235, 21, 181, 0.8);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+}
+
+.close-chat-btn:hover {
+  background: rgba(214, 40, 92, 0.9);
+}
+
+.close-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Contenedor de fondo con estrellas animadas */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%);
+  z-index: -1;
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.stars::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+    radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
+}
+
+@keyframes sparkle {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-200px);
+  }
+}
+
+.twinkling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.twinkling::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(1px 1px at 25px 5px, white, transparent),
+    radial-gradient(1px 1px at 50px 25px, white, transparent),
+    radial-gradient(1px 1px at 125px 20px, white, transparent),
+    radial-gradient(1px 1px at 150px 75px, white, transparent);
+  background-repeat: repeat;
+  background-size: 250px 150px;
+  animation: twinkle 15s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+.clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.clouds::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+      circle at 20% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+  animation: float-clouds 30s ease-in-out infinite;
+}
+
+@keyframes float-clouds {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+  33% {
+    transform: translateX(10px) translateY(-10px);
+  }
+  66% {
+    transform: translateX(-10px) translateY(5px);
+  }
+}
+
+.main-content {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url("/FondoCalculadoraAmor.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Contenedor principal de la calculadora de amor */
+.love-calculator-modal {
+  font-family: "Cinzel", serif;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  max-width: 1200px;
+  width: 95%;
+  height: calc(100vh - 40px);
+  margin: 0 auto;
+  position: relative;
+  color: white;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 15px;
+}
+
+/* Header del componente de amor */
+.love-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 20, 147, 0.8) 0%,
+    rgba(199, 21, 133, 0.6) 100%
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 20, 147, 0.3);
+  border-radius: 20px;
+  position: relative;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.love-expert-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.expert-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 8px 16px rgba(255, 105, 180, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.expert-icon {
+  font-size: 20px;
+}
+
+.expert-details h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: white;
+  font-weight: 400;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.expert-details p {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Área de mensajes de chat */
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: rgba(12, 12, 38, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 0 0 12px 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px;
+  overflow-y: auto;
+  gap: 12px;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: message-appear 0.3s ease-out;
+  margin: 0 8px;
+  position: relative;
+}
+
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-message {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.expert-message {
+  justify-content: flex-start;
+}
+
+/* Avatar posicionado en la esquina del globo de texto */
+.message-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  z-index: 10;
+}
+
+/* Posicionamiento del avatar para mensajes del usuario */
+.user-message .message-avatar {
+  background: linear-gradient(45deg, #4a90e2, #357abd);
+  top: -5px;
+  right: -5px;
+}
+
+/* Posicionamiento del avatar para mensajes del experto */
+.expert-message .message-avatar {
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  top: -5px;
+  left: -5px;
+}
+
+.avatar-icon {
+  font-size: 16px;
+}
+
+.message-content {
+  max-width: 80%;
+  position: relative;
+}
+
+/* Ajustar padding del contenido para dar espacio al avatar */
+.user-message .message-content {
+  padding-right: 40px;
+}
+
+.expert-message .message-content {
+  padding-left: 40px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.sender-name {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.message-time {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.message-text {
+  padding: 12px 16px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-message .message-text {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #333;
+  padding-top: 20px;
+  padding-right: 25px;
+}
+
+.expert-message .message-text {
+  background: linear-gradient(135deg, #ff1493 0%, #c7158b 100%);
+  border: 1px solid rgba(255, 20, 147, 0.5);
+  color: white;
+  padding-top: 20px;
+  padding-left: 25px;
+}
+
+/* Overlay para contenido bloqueado */
+.blocked-content {
+  position: relative;
+}
+
+.blocked-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  z-index: 10;
+}
+
+.blocked-message {
+  text-align: center;
+  padding: 15px;
+  max-width: 200px;
+  color: #333;
+}
+
+.blocked-message mat-icon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 8px;
+  color: #ff1493;
+}
+
+.blocked-message p {
+  margin: 4px 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.blocked-message small {
+  color: #666;
+  font-size: 11px;
+}
+
+/* Loading indicator */
+.loading-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: message-appear 0.3s ease-out;
+  margin: 0 8px;
+  position: relative;
+}
+
+.loading-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff1493, #c7158b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  z-index: 10;
+}
+
+.loading-content {
+  max-width: 80%;
+  padding-left: 40px;
+}
+
+.loading-dots {
+  padding: 12px 16px;
+  padding-top: 20px;
+  padding-left: 25px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #ff1493 0%, #c7158b 100%);
+  border: 1px solid rgba(255, 20, 147, 0.5);
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.loading-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.loading-text {
+  font-size: 0.75rem;
+  color: white;
+  font-style: italic;
+  margin: 0;
+  font-family: "Berkshire Swash", cursive;
+  padding: 0 16px;
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Typing indicator */
+.typing-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: message-appear 0.3s ease-out;
+  margin: 0 8px;
+  position: relative;
+}
+
+.typing-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff1493, #c7158b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  z-index: 10;
+}
+
+.typing-content {
+  max-width: 80%;
+  padding-left: 40px;
+}
+
+.typing-dots {
+  padding: 12px 16px;
+  padding-top: 20px;
+  padding-left: 25px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #ff1493 0%, #c7158b 100%);
+  border: 1px solid rgba(255, 20, 147, 0.5);
+  display: flex;
+  gap: 3px;
+}
+
+.typing-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+/* Formulario de datos de compatibilidad */
+.data-form-container {
+  background: rgba(12, 12, 38, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 0 0 12px 0;
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.data-form h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  color: white;
+  text-align: center;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.person-section {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.person-section h5 {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: #ff69b4;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Estilos para Angular Material en el formulario */
+.data-form ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+.data-form ::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+}
+
+.data-form ::ng-deep .mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 15px;
+}
+
+.data-form ::ng-deep .mat-mdc-form-field input {
+  color: #333;
+  font-family: "Arsenal", sans-serif;
+}
+
+.data-form ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  color: #666;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  min-width: 120px;
+  font-family: "Arsenal", sans-serif;
+}
+
+/* Área de entrada de chat */
+.chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+}
+
+.message-input {
+  flex: 1;
+  position: relative;
+}
+
+.message-input textarea {
+  width: 100%;
+  min-height: 45px;
+  max-height: 120px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  padding: 12px 20px;
+  resize: none;
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.message-input textarea:focus {
+  border-color: #ff1493;
+  box-shadow: 0 2px 8px rgba(255, 20, 147, 0.2);
+}
+
+.message-input textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  font-family: "Arial", sans-serif;
+}
+
+.character-count {
+  position: absolute;
+  bottom: 5px;
+  right: 15px;
+  font-size: 11px;
+  color: #666;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Contenedor de botones */
+.input-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botón de reset */
+.reset-button {
+  width: 45px;
+  height: 45px;
+  background: white;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.reset-button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+  transform: scale(1.05);
+}
+
+.reset-button:disabled {
+  background: #f9f9f9;
+  color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  border-color: #f0f0f0;
+}
+
+/* Botón de envío */
+.send-button {
+  width: 45px;
+  height: 45px;
+  background: #ff1493;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(255, 20, 147, 0.3);
+}
+
+.send-button:hover:not(:disabled) {
+  background: #e6127a;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(255, 20, 147, 0.4);
+}
+
+.send-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal de pago específico para amor */
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modal-appear 0.3s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+}
+
+.payment-modal {
+  background: linear-gradient(
+    135deg,
+    rgba(199, 21, 133, 0.98) 0%,
+    rgba(255, 20, 147, 0.98) 50%,
+    rgba(255, 105, 180, 0.98) 100%
+  );
+  border-radius: 25px;
+  padding: 0;
+  max-width: 480px;
+  width: 92%;
+  max-height: calc(100vh - 40px);
+  color: white;
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 20, 147, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 20, 147, 0.3);
+  overflow: hidden;
+  animation: modal-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modal-scale {
+  from {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header del modal de pago */
+.payment-header {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 20, 147, 0.9) 0%,
+    rgba(199, 21, 133, 0.8) 100%
+  );
+  padding: 25px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.payment-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.payment-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: "Berkshire Swash", cursive;
+}
+
+.close-payment-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-payment-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Contenido del modal de pago */
+.payment-content {
+  padding: 30px;
+  text-align: center;
+  position: relative;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(100vh - 200px);
+}
+
+.payment-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.payment-content::-webkit-scrollbar-track {
+  background: rgba(255, 20, 147, 0.1);
+  border-radius: 4px;
+}
+
+.payment-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 20, 147, 0.4);
+  border-radius: 4px;
+}
+
+.payment-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 20, 147, 0.6);
+}
+
+.payment-info {
+  margin-bottom: 25px;
+}
+
+.love-package {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.package-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.love-package h4 {
+  margin: 15px 0 10px 0;
+  font-size: 1.3rem;
+  color: white;
+  font-family: "Berkshire Swash", cursive;
+}
+
+.package-description {
+  margin: 15px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Arsenal", sans-serif;
+}
+
+.features-list {
+  text-align: left;
+  margin: 20px 0;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Arsenal", sans-serif;
+}
+
+.feature mat-icon {
+  color: #ffd700;
+}
+
+.pricing {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 20, 147, 0.2) 0%,
+    rgba(199, 21, 133, 0.1) 100%
+  );
+  border: 2px solid rgba(255, 20, 147, 0.3);
+  border-radius: 20px;
+  padding: 25px;
+  margin: 25px 0;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.pricing::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 20, 147, 0.1) 0%,
+    transparent 70%
+  );
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.currency {
+  font-size: 1.5rem;
+  color: #ffd700;
+  font-family: "Cinzel", serif;
+  margin-right: 5px;
+}
+
+.amount {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.5);
+  font-family: "Cinzel", serif;
+}
+
+.period {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 5px;
+  font-family: "Arsenal", sans-serif;
+}
+
+.price-note {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+  font-family: "Berkshire Swash", cursive;
+}
+
+/* Formulario de pago */
+.payment-form-container {
+  margin: 25px 0;
+}
+
+.payment-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.payment-loading p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-family: "Arsenal", sans-serif;
+}
+
+.stripe-payment-element {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.stripe-payment-element:focus-within {
+  border-color: rgba(255, 20, 147, 0.5);
+  box-shadow: 0 0 20px rgba(255, 20, 147, 0.2);
+}
+
+.payment-error {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+  color: #ff8a8a;
+  font-size: 14px;
+  text-align: center;
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Acciones del modal */
+.payment-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.payment-actions button {
+  min-width: 160px;
+  font-family: "Arsenal", sans-serif;
+}
+
+/* Seguridad del pago */
+.payment-security {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.security-badges {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.security-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-family: "Arsenal", sans-serif;
+}
+
+.stripe-badge {
+  background: #6772e5;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.security-text {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  max-width: 300px;
+  margin: 0 auto;
+  font-family: "Arsenal", sans-serif;
+}
+
+/* Loading overlay general */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+}
+
+.loading-overlay .loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-overlay .loading-content p {
+  margin-top: 20px;
+  font-size: 16px;
+  font-family: "Berkshire Swash", cursive;
+}
+
+/* Scrollbar personalizado */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: rgba(255, 20, 147, 0.1);
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 20, 147, 0.3);
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 20, 147, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-modal {
+    max-width: 95%;
+    margin: 20px;
+  }
+
+  .payment-header {
+    padding: 20px 25px;
+  }
+
+  .payment-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .payment-content {
+    padding: 25px 20px;
+  }
+
+  .amount {
+    font-size: 2.5rem;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .love-calculator-modal {
+    height: calc(100vh - 30px);
+    border-radius: 20px;
+    max-width: 98%;
+    padding: 12px;
+  }
+
+  .love-header {
+    padding: 6px 15px;
+    margin-bottom: 10px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+  }
+
+  .chat-input-area {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .reset-button,
+  .send-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .message-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .user-message .message-content {
+    padding-right: 35px;
+  }
+
+  .expert-message .message-content {
+    padding-left: 35px;
+  }
+
+  .user-message .message-text {
+    padding-top: 18px;
+    padding-right: 20px;
+  }
+
+  .expert-message .message-text {
+    padding-top: 18px;
+    padding-left: 20px;
+  }
+
+  .data-form-container {
+    max-height: 300px;
+    padding: 15px;
+  }
+
+  .person-section {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-modal {
+    max-width: 98%;
+    margin: 10px;
+  }
+
+  .payment-header {
+    padding: 18px 20px;
+  }
+
+  .payment-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .payment-content {
+    padding: 20px 18px;
+  }
+
+  .pricing {
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .amount {
+    font-size: 2.2rem;
+  }
+
+  .close-payment-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+
+  .love-calculator-modal {
+    height: calc(100vh - 20px);
+    padding: 10px;
+  }
+
+  .love-header {
+    padding: 6px 12px;
+    margin-bottom: 8px;
+  }
+
+  .chat-messages {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .message {
+    margin: 0 4px;
+    gap: 8px;
+  }
+
+  .message-text {
+    padding: 10px 14px;
+  }
+
+  .message-avatar {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+
+  .chat-input-area {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .message-input textarea {
+    min-height: 40px;
+    padding: 10px 16px;
+    font-size: 16px; /* Importante: mantener 16px para evitar zoom automático */
+  }
+
+  .reset-button,
+  .send-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-message .message-content {
+    padding-right: 30px;
+  }
+
+  .expert-message .message-content,
+  .loading-content,
+  .typing-content {
+    padding-left: 30px;
+  }
+
+  .user-message .message-text {
+    padding-top: 15px;
+    padding-right: 18px;
+  }
+
+  .expert-message .message-text,
+  .loading-dots,
+  .typing-dots {
+    padding-top: 15px;
+    padding-left: 18px;
+  }
+
+  .data-form-container {
+    max-height: 250px;
+    padding: 12px;
+  }
+
+  .person-section {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions button {
+    min-width: 100px;
+    width: 100%;
+  }
+}
+
+/* Estilos adicionales para iconos de los botones */
+.reset-button i,
+.send-button i {
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .reset-button i,
+  .send-button i {
+    font-size: 14px;
+  }
+}
+
+/* Animaciones de entrada/salida para mejor UX */
+.payment-modal-overlay.ng-enter {
+  animation: modal-appear 0.3s ease-out;
+}
+
+.payment-modal-overlay.ng-leave {
+  animation: modal-disappear 0.2s ease-in;
+}
+
+@keyframes modal-disappear {
+  from {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+  to {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+}

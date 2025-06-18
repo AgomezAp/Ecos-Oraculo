@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%; /* Cambiado de 100vw para evitar problemas con la barra de desplazamiento */
+  height: 100%;
+  overflow: hidden; /* Forzar sin scroll */
+  position: fixed; /* Evita rebotes en dispositivos móviles */
+  top: 0;
+  left: 0;
+}
+.background {
+  background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed;
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;/* Cambiado de center a flex-start */
+  align-items: center;
+  min-height: 100vh; /* Cambiado de height a min-height */
+  box-sizing: border-box;
+  overflow-y: auto; /* Permite scroll si es necesario */
+  z-index: 1;
+}
+.content-container {
+  display: flex;
+  font-family: Arial, sans-serif;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 80%;
+  padding: 20px;
+  margin-top: 20px;
+  height: 80%;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 1;
+}
+.particulas{
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+}
+
+h1 {
+  font-family: Arial, sans-serif;
+  color: #fff;
+  font-size: 1.8rem;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 0 10px rgba(255, 215, 0, 0.5),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  animation: goldenGlow 5s infinite;
+}
+
+button {
+  background: linear-gradient(45deg, #ffdd44, #bb8800);
+  color: #fff;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 221, 68, 0.7);
+  transition: transform 0.3s ease, box-shadow 0.3s ease
+}
+button:hover {
+  transform: scale(1.15);
+  /* Agranda el botón ligeramente */
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    /* Sombra inicial */
+    0 0 25px rgba(203, 161, 53, 1);
+  /* Brillo dorado sutil */
+}
+
+button:active {
+  transform: scale(0.95);
+  /* Reduce ligeramente el tamaño */
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    /* Sombra reducida */
+    0 0 10px rgba(255, 255, 255, 0.6);
+  /* Brillo blanco reducido */
+  background: linear-gradient(45deg, #b68e4c, #8f6f2d);
+  /* Gradiente más oscuro para el efecto de clic */
+}

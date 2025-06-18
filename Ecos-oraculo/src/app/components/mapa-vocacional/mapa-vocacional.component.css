@@ -1,0 +1,1567 @@
+/* ===== CONFIGURACIÓN DE FUENTES BASE ===== */
+:root {
+  --font-counselor: 'Berkshire Swash', cursive;
+  --font-user: 'El Messiri', sans-serif;
+  --font-system: 'Arsenal', sans-serif;
+}
+.close-chat-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  background: rgba(80, 65, 130, 0.199);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+}
+
+.close-chat-btn:hover {
+  background: rgba(55, 10, 201, 0.178);
+}
+
+.close-icon {
+  width: 12px;
+  height: 12px;
+}
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/MapaVocacionalFondo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+
+.stars, .twinkling, .clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.stars {
+  background-image: radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: move-stars 50s linear infinite;
+}
+
+.twinkling {
+  background-image: radial-gradient(1px 1px at 10px 20px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 30px 60px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 80px 10px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 120px 50px, rgba(255, 255, 255, 0.7), transparent);
+  background-repeat: repeat;
+  background-size: 150px 100px;
+  animation: twinkling 4s linear infinite;
+}
+
+@keyframes move-stars {
+  from { transform: translateX(0); }
+  to { transform: translateX(-200px); }
+}
+
+@keyframes twinkling {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* Contenedor principal con estructura de sueños */
+.main-content {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px; /* Reducir padding exterior como sueños */
+  overflow: hidden;
+}
+
+.vocational-container {
+  font-family: 'Cinzel', serif;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  max-width: 1200px;
+  width: 95%;
+  height: calc(100vh - 40px); /* Ajustar por padding reducido como sueños */
+  margin: 0 auto;
+  position: relative;
+  color: white;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 15px; /* Reducir padding interno como sueños */
+}
+
+/* Header más compacto siguiendo estructura de sueños */
+.counselor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Reducir gap como sueños */
+  padding: 8px 20px; /* Reducir padding como sueños */
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.8) 0%, rgba(59, 130, 246, 0.6) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 20px;
+  position: relative;
+  flex-shrink: 0;
+  margin-bottom: 12px; /* Reducir margen inferior como sueños */
+}
+
+.counselor-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.counselor-avatar {
+  position: relative;
+  z-index: 1;
+  width: 45px; /* Reducir tamaño como sueños */
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #60a5fa, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px; /* Reducir tamaño del emoji como sueños */
+  box-shadow: 0 8px 16px rgba(96, 165, 250, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.counselor-details h1 {
+  margin: 0;
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+  color: white;
+  font-weight: 400;
+  font-family: var(--font-counselor);
+}
+
+.counselor-details p {
+  margin: 2px 0 0 0; /* Reducir margin como sueños */
+  font-size: 0.85rem; /* Reducir tamaño como sueños */
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+  font-family: var(--font-counselor);
+  font-weight: 300;
+}
+
+.specialty {
+  margin: 2px 0 0 0; /* Reducir margin como sueños */
+  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-system);
+  font-weight: 300;
+}
+
+/* ===== PESTAÑAS DE NAVEGACIÓN ===== */
+.navigation-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.tab-button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 12px 15px; /* Reducir padding como sueños */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  font-family: var(--font-system);
+  font-weight: 500;
+  position: relative;
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.tab-button:hover {
+  background: rgba(96, 165, 250, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tab-button.active {
+  background: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
+  border-bottom: 2px solid #60a5fa;
+}
+
+.tab-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== CONTENIDO DE PESTAÑAS ===== */
+.tab-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== SECCIÓN DE CHAT - ESTRUCTURA DE SUEÑOS ===== */
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.personal-data-section {
+  background: rgba(96, 165, 250, 0.1);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+  padding: 12px 20px; /* Reducir padding como sueños */
+  flex-shrink: 0;
+}
+
+.personal-data-section h3 {
+  margin: 0 0 10px 0; /* Reducir margin como sueños */
+  color: #60a5fa;
+  font-size: 1em; /* Reducir tamaño como sueños */
+  font-weight: 400;
+  font-family: var(--font-counselor);
+}
+
+.personal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Reducir gap como sueños */
+}
+
+.form-row {
+  display: flex;
+  gap: 10px; /* Reducir gap como sueños */
+}
+
+.half-width {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px; /* Reducir gap como sueños */
+  margin-top: 8px; /* Reducir margin como sueños */
+}
+
+/* Área de chat con estructura exacta de sueños */
+.chat-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: rgba(12, 12, 38, 0.6); /* Mismo color que sueños */
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 0 0 12px 0; /* Reducir margen inferior como sueños */
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px; /* Reducir padding interno como sueños */
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px; /* Reducir padding interno como sueños */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reducir gap entre mensajes como sueños */
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px; /* Reducir gap entre avatar y mensaje como sueños */
+  animation: message-appear 0.3s ease-out;
+  margin: 0 8px; /* Reducir margen lateral como sueños */
+}
+
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-message {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.counselor-message {
+  justify-content: flex-start;
+}
+
+.message-avatar {
+  width: 35px; /* Reducir tamaño como sueños */
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px; /* Reducir tamaño como sueños */
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(45deg, #60a5fa, #3b82f6); /* Color azul */
+}
+
+.user-message .message-avatar {
+  background: linear-gradient(45deg, #4a90e2, #357abd);
+}
+
+.counselor-message .message-avatar {
+  background: linear-gradient(45deg, #60a5fa, #3b82f6);
+}
+
+.message-content {
+  max-width: 80%; /* Aumentar ancho para más texto como sueños */
+  position: relative;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.sender-name {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-system);
+}
+
+.message-time {
+  font-size: 0.65rem; /* Reducir tamaño como sueños */
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-system);
+}
+
+.message-text {
+  padding: 12px 16px; /* Reducir padding como sueños */
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-message .message-text {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #333;
+}
+
+.user-message .message-text p {
+  color: #333 !important;
+  font-family: var(--font-user) !important;
+  font-size: 15px !important; /* Reducir tamaño como sueños */
+  font-weight: 500 !important;
+  line-height: 1.4 !important; /* Reducir line-height como sueños */
+  margin: 0;
+}
+
+.counselor-message .message-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  color: white;
+}
+
+.counselor-message .message-text p {
+  color: white !important;
+  font-family: var(--font-counselor) !important;
+  font-size: 15px !important; /* Reducir tamaño como sueños */
+  font-weight: 400 !important;
+  line-height: 1.4 !important; /* Reducir line-height como sueños */
+  margin: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== MENSAJES BLOQUEADOS ===== */
+.blocked-message {
+  position: relative;
+  overflow: hidden;
+}
+
+.blurred-content {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s ease;
+}
+
+.message-payment-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  z-index: 10;
+}
+
+.payment-prompt {
+  text-align: center;
+  padding: 15px; /* Reducir padding como sueños */
+  max-width: 200px;
+}
+
+.lock-icon {
+  font-size: 20px; /* Reducir tamaño como sueños */
+  display: block;
+  margin-bottom: 8px;
+  color: #60a5fa; /* Color azul */
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.payment-prompt p {
+  margin: 4px 0; /* Reducir margin como sueños */
+  color: #333;
+  font-size: 12px; /* Reducir tamaño como sueños */
+  line-height: 1.3;
+  font-family: var(--font-user);
+  font-weight: 500;
+}
+
+.payment-prompt p:first-of-type {
+  font-weight: 600;
+  color: #60a5fa;
+  font-size: 13px;
+}
+
+.unlock-button {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6); /* Color azul */
+  color: white;
+  border: none;
+  padding: 8px 16px; /* Reducir padding como sueños */
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px; /* Reducir tamaño como sueños */
+  font-weight: 600;
+  margin-top: 8px; /* Reducir margin como sueños */
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(96, 165, 250, 0.3);
+  width: 100%;
+  font-family: var(--font-user);
+}
+
+.unlock-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(96, 165, 250, 0.4);
+}
+
+/* ===== INDICADOR DE CARGA ===== */
+.loading-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px; /* Reducir gap como sueños */
+}
+
+.loading-avatar {
+  width: 35px; /* Reducir tamaño como sueños */
+  height: 35px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #60a5fa, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px; /* Reducir tamaño como sueños */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.loading-content {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  padding: 12px 16px; /* Reducir padding como sueños */
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.5);
+}
+
+.loading-dots {
+  display: flex;
+  gap: 3px; /* Reducir gap como sueños */
+  margin-bottom: 4px; /* Reducir margen como sueños */
+}
+
+.loading-dots span {
+  width: 5px; /* Reducir tamaño como sueños */
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+.loading-text {
+  color: white;
+  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  font-style: italic;
+  margin: 0;
+  font-family: var(--font-counselor);
+  font-weight: 300;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Área de entrada con estructura exacta de sueños */
+.chat-input-area {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 15px 20px; /* Reducir padding como sueños */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Reducir gap como sueños */
+}
+
+.data-button {
+  background: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 50%;
+  width: 40px; /* Reducir tamaño como sueños */
+  height: 40px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.data-button:hover {
+  background: rgba(96, 165, 250, 0.3);
+  transform: translateY(-1px);
+}
+
+.text-input-wrapper {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.95); /* Mismo color que sueños */
+  border-radius: 22px;
+  padding: 10px 18px; /* Reducir padding como sueños */
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(96, 165, 250, 0.2); /* Color azul */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.text-input-wrapper:focus-within {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 6px 25px rgba(96, 165, 250, 0.2);
+}
+
+.message-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #333; /* Color del texto como sueños */
+  font-size: 14px; /* Reducir tamaño como sueños */
+  line-height: 1.3; /* Reducir line-height como sueños */
+  resize: none;
+  max-height: 80px; /* Reducir altura máxima como sueños */
+  min-height: 18px;
+  font-family: var(--font-user) !important;
+  font-weight: 500 !important;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.message-input::placeholder {
+  color: rgba(0, 0, 0, 0.4); /* Color del placeholder como sueños */
+  font-family: var(--font-user) !important;
+  font-weight: 400 !important;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px; /* Reducir gap entre botones como sueños */
+  align-items: center;
+}
+
+.send-button {
+  width: 40px; /* Reducir tamaño como sueños */
+  height: 40px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(96, 165, 250, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(96, 165, 250, 0.4);
+}
+
+.send-button:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.clear-button {
+  width: 35px; /* Reducir tamaño como sueños */
+  height: 35px;
+  background: linear-gradient(135deg, #ff6b6b, #e55656);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.3);
+}
+
+.clear-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
+.input-hint {
+  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 8px; /* Reducir margen como sueños */
+  text-align: center;
+  font-family: var(--font-system);
+  font-weight: 300;
+}
+
+/* ===== SECCIÓN DE ASSESSMENT ===== */
+.assessment-section {
+  padding: 20px; /* Reducir padding como sueños */
+  overflow-y: auto;
+  flex: 1;
+}
+
+.progress-section {
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  text-align: center;
+}
+
+.progress-section h3 {
+  color: #60a5fa;
+  margin-bottom: 15px; /* Reducir margin como sueños */
+  font-family: var(--font-counselor);
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px; /* Reducir altura como sueños */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px; /* Reducir margin como sueños */
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #3b82f6);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.8rem; /* Reducir tamaño como sueños */
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-system);
+}
+
+.question-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px; /* Reducir padding como sueños */
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.question-card h4 {
+  color: white;
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+  line-height: 1.4; /* Reducir line-height como sueños */
+  font-family: var(--font-counselor);
+}
+
+.options-grid {
+  display: grid;
+  gap: 12px; /* Reducir gap como sueños */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Reducir minmax como sueños */
+}
+
+.option-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px; /* Reducir padding como sueños */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.option-button:hover {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.3);
+  transform: translateY(-2px);
+}
+
+.option-button.selected {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: #60a5fa;
+  box-shadow: 0 4px 15px rgba(96, 165, 250, 0.3);
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Reducir gap como sueños */
+}
+
+.option-icon {
+  font-size: 1.3em; /* Reducir tamaño como sueños */
+}
+
+.option-text {
+  color: white;
+  font-family: var(--font-user);
+  font-weight: 500;
+  line-height: 1.3; /* Reducir line-height como sueños */
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.assessment-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Reducir gap como sueños */
+  flex-wrap: wrap;
+}
+
+/* ===== SECCIÓN DE RESULTADOS ===== */
+.results-section {
+  padding: 20px; /* Reducir padding como sueños */
+  overflow-y: auto;
+  flex: 1;
+}
+
+.results-section h3 {
+  color: #60a5fa;
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  text-align: center;
+  font-family: var(--font-counselor);
+  font-size: 1.2rem; /* Reducir tamaño como sueños */
+}
+
+.dominant-profile {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px; /* Reducir padding como sueños */
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Reducir gap como sueños */
+  margin-bottom: 15px; /* Reducir margin como sueños */
+}
+
+.profile-emoji {
+  font-size: 2.5em; /* Reducir tamaño como sueños */
+}
+
+.profile-info h4 {
+  color: #60a5fa;
+  margin: 0 0 8px 0; /* Reducir margin como sueños */
+  font-family: var(--font-counselor);
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+}
+
+.profile-info p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.4; /* Reducir line-height como sueños */
+  font-family: var(--font-user);
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.profile-details {
+  display: grid;
+  gap: 15px; /* Reducir gap como sueños */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Reducir minmax como sueños */
+}
+
+.characteristics h5,
+.work-environments h5 {
+  color: #60a5fa;
+  margin-bottom: 12px; /* Reducir margin como sueños */
+  font-family: var(--font-system);
+  font-size: 1rem; /* Reducir tamaño como sueños */
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Reducir gap como sueños */
+}
+
+.tag {
+  background: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
+  padding: 5px 10px; /* Reducir padding como sueños */
+  border-radius: 18px;
+  font-size: 0.8rem; /* Reducir tamaño como sueños */
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  font-family: var(--font-system);
+}
+
+.tag.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.profile-distribution {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px; /* Reducir padding como sueños */
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-distribution h4 {
+  color: #60a5fa;
+  margin-bottom: 15px; /* Reducir margin como sueños */
+  font-family: var(--font-counselor);
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+}
+
+.distribution-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reducir gap como sueños */
+}
+
+.profile-bar {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px; /* Reducir padding como sueños */
+}
+
+.bar-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px; /* Reducir margin como sueños */
+}
+
+.bar-emoji {
+  font-size: 1.1em; /* Reducir tamaño como sueños */
+}
+
+.bar-label {
+  flex: 1;
+  margin-left: 8px; /* Reducir margin como sueños */
+  color: white;
+  font-family: var(--font-system);
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.bar-percentage {
+  color: #60a5fa;
+  font-weight: 600;
+  font-family: var(--font-system);
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.bar-container {
+  height: 6px; /* Reducir altura como sueños */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.career-recommendations {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px; /* Reducir padding como sueños */
+  margin-bottom: 20px; /* Reducir margin como sueños */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.career-recommendations h4 {
+  color: #60a5fa;
+  margin-bottom: 15px; /* Reducir margin como sueños */
+  font-family: var(--font-counselor);
+  font-size: 1.1rem; /* Reducir tamaño como sueños */
+}
+
+.recommendations-grid {
+  display: grid;
+  gap: 12px; /* Reducir gap como sueños */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Reducir minmax como sueños */
+}
+
+.recommendation-card {
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 10px;
+  padding: 12px; /* Reducir padding como sueños */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Reducir gap como sueños */
+  color: white;
+  font-family: var(--font-user);
+  font-size: 0.9rem; /* Reducir tamaño como sueños */
+}
+
+.recommendation-card mat-icon {
+  color: #60a5fa;
+}
+
+.results-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Reducir gap como sueños */
+  flex-wrap: wrap;
+}
+
+/* Modal de pago sin scroll - estructura exacta de sueños pero colores azules */
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modal-appear 0.3s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+}
+
+.payment-modal {
+  background: linear-gradient(135deg, 
+    rgba(28, 28, 60, 0.98) 0%, 
+    rgba(44, 44, 80, 0.98) 50%, 
+    rgba(76, 50, 130, 0.98) 100%);
+  border-radius: 25px;
+  padding: 0;
+  max-width: 480px;
+  width: 92%;
+  color: white;
+  position: relative;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(96, 165, 250, 0.3), /* Color azul */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(96, 165, 250, 0.3); /* Color azul */
+  overflow: hidden;
+  animation: modal-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modal-scale {
+  from {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.payment-header {
+  background: linear-gradient(135deg, 
+    rgba(96, 165, 250, 0.9) 0%, 
+    rgba(59, 130, 246, 0.8) 100%); /* Colores azules */
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.payment-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.payment-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-counselor);
+}
+
+.close-payment-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-payment-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.payment-content {
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.payment-content::before {
+  content: '✨';
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 20px;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+.payment-content::after {
+  content: '🎯';
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 18px;
+  opacity: 0.4;
+  animation: float 3s ease-in-out infinite 1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.payment-info {
+  margin-bottom: 20px;
+}
+
+.payment-info p {
+  margin: 6px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-user);
+}
+
+.payment-info p:first-child {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.payment-price {
+  background: linear-gradient(135deg, 
+    rgba(96, 165, 250, 0.2) 0%, 
+    rgba(59, 130, 246, 0.1) 100%); /* Colores azules */
+  border: 2px solid rgba(96, 165, 250, 0.3); /* Color azul */
+  border-radius: 20px;
+  padding: 18px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.payment-price::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, 
+    rgba(96, 165, 250, 0.1) 0%, 
+    transparent 70%);
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.price-amount {
+  display: block;
+  font-size: 2.2em;
+  font-weight: bold;
+  color: #60a5fa; /* Color azul */
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(96, 165, 250, 0.5);
+  margin-bottom: 6px;
+  font-family: var(--font-counselor);
+  position: relative;
+  z-index: 1;
+}
+
+.price-description {
+  display: block;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-counselor);
+}
+
+.payment-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+.loading-spinner {
+  width: 35px;
+  height: 35px;
+  border: 3px solid rgba(96, 165, 250, 0.3);
+  border-top: 3px solid #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.payment-loading p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-family: var(--font-user);
+}
+
+.payment-element-container {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.payment-element-container:focus-within {
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
+}
+
+.payment-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 15px 0;
+  color: #fca5a5;
+  text-align: center;
+  font-family: var(--font-user);
+  font-size: 13px;
+}
+
+.payment-actions {
+  text-align: center;
+}
+
+.pay-button {
+  background: linear-gradient(135deg, 
+    #60a5fa 0%, 
+    #3b82f6 50%, 
+    #2563eb 100%); /* Colores azules */
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 8px 25px rgba(96, 165, 250, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-user);
+  width: 100%;
+}
+
+.pay-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.pay-button:hover::before {
+  left: 100%;
+}
+
+.pay-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 12px 35px rgba(96, 165, 250, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.pay-button:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.pay-button:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pay-button:disabled::before {
+  display: none;
+}
+
+.payment-modal::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, 
+    rgba(96, 165, 250, 0.05) 0%, 
+    transparent 50%);
+  animation: rotate-bg 20s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotate-bg {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar personalizado con colores azules */
+.chat-messages::-webkit-scrollbar,
+.assessment-section::-webkit-scrollbar,
+.results-section::-webkit-scrollbar {
+  width: 6px; /* Reducir ancho como sueños */
+}
+
+.chat-messages::-webkit-scrollbar-track,
+.assessment-section::-webkit-scrollbar-track,
+.results-section::-webkit-scrollbar-track {
+  background: rgba(96, 165, 250, 0.1);
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.assessment-section::-webkit-scrollbar-thumb,
+.results-section::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.3);
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover,
+.assessment-section::-webkit-scrollbar-thumb:hover,
+.results-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.5);
+}
+
+/* Responsive con estructura exacta de sueños */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 15px; /* Reducir padding como sueños */
+  }
+
+  .vocational-container {
+    height: calc(100vh - 30px);
+    border-radius: 20px;
+    max-width: 98%;
+    padding: 12px; /* Reducir padding como sueños */
+  }
+
+  .counselor-header {
+    padding: 6px 15px; /* Reducir padding como sueños */
+    margin-bottom: 10px;
+  }
+
+  .chat-area {
+    padding: 10px; /* Reducir padding como sueños */
+  }
+
+  .chat-messages {
+    padding: 12px; /* Reducir padding como sueños */
+  }
+
+  .message {
+    margin: 0 6px; /* Reducir margen como sueños */
+  }
+
+  .chat-input-area {
+    padding: 12px 15px; /* Reducir padding como sueños */
+  }
+
+  .assessment-section,
+  .results-section {
+    padding: 15px; /* Reducir padding como sueños */
+  }
+
+  .payment-modal {
+    max-width: 95%;
+    margin: 20px;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 15px; /* Reducir padding como sueños */
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 10px;
+  }
+
+  .vocational-container {
+    height: calc(100vh - 20px);
+    padding: 10px;
+  }
+
+  .counselor-header {
+    padding: 6px 12px;
+    margin-bottom: 8px;
+  }
+
+  .counselor-avatar {
+    width: 40px; /* Reducir tamaño como sueños */
+    height: 40px;
+    font-size: 20px; /* Reducir tamaño como sueños */
+  }
+
+  .chat-area {
+    padding: 8px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+    gap: 8px; /* Reducir gap en mobile como sueños */
+  }
+
+  .message {
+    margin: 0 4px;
+    gap: 8px; /* Reducir gap como sueños */
+  }
+
+  .message-text {
+    padding: 10px 14px; /* Reducir padding como sueños */
+  }
+
+  .message-avatar {
+    width: 30px; /* Reducir tamaño en mobile como sueños */
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .chat-input-area {
+    padding: 10px 12px;
+  }
+
+  .text-input-wrapper {
+    padding: 8px 15px;
+  }
+
+  .send-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .clear-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .data-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .assessment-section,
+  .results-section {
+    padding: 12px; /* Reducir padding como sueños */
+  }
+
+  .question-card {
+    padding: 15px; /* Reducir padding como sueños */
+  }
+
+  .option-button {
+    padding: 12px; /* Reducir padding como sueños */
+  }
+
+  .option-content {
+    gap: 8px; /* Reducir gap como sueños */
+  }
+
+  .user-message .message-text p {
+    font-size: 13px !important; /* Reducir tamaño como sueños */
+  }
+
+  .counselor-message .message-text p {
+    font-size: 14px !important; /* Reducir tamaño como sueños */
+    line-height: 1.3 !important; /* Reducir line-height como sueños */
+  }
+
+  .payment-modal {
+    max-width: 98%;
+    margin: 10px;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 12px; /* Reducir padding como sueños */
+  }
+
+  .price-amount {
+    font-size: 2em; /* Reducir tamaño como sueños */
+  }
+}

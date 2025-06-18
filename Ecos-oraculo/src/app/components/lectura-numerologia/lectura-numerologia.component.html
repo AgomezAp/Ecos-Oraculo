@@ -1,0 +1,253 @@
+<div class="oracle-container">
+  <div class="content-with-navbar">
+    <div class="oracle-main">
+      <!-- Información del numerólogo -->
+      <div class="interpreter-info">
+        <div class="interpreter-avatar">
+          <div class="mystical-orb">🔢</div>
+        </div>
+        <div class="interpreter-details">
+          <h3>{{ numerologistInfo.name }}</h3>
+          <p class="interpreter-title">Guardiana de los Números Sagrados</p>
+          <p class="interpreter-specialty">{{ numerologistInfo.specialty }}</p>
+        </div>
+        <button
+          class="close-chat-btn"
+          onclick="window.location.href='/'"
+          aria-label="Cerrar"
+        >
+          <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+            <path
+              d="M1 1L11 11M1 11L11 1"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Datos personales form (opcional) -->
+      <div class="personal-data-section" *ngIf="showDataForm">
+        <h4>📋 Datos para Análisis Numerológico</h4>
+        <div class="data-form">
+          <mat-form-field class="full-width">
+            <mat-label>Nombre completo</mat-label>
+            <input
+              matInput
+              [(ngModel)]="fullName"
+              placeholder="Ej: Juan Carlos Pérez"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Fecha de nacimiento</mat-label>
+            <input matInput [(ngModel)]="birthDate" placeholder="DD/MM/AAAA" />
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="savePersonalData()"
+            >
+              Guardar datos
+            </button>
+            <button mat-button (click)="toggleDataForm()">
+              Continuar sin datos
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Números calculados preview -->
+      <div
+        class="numbers-preview"
+        *ngIf="personalNumbers.lifePath || personalNumbers.destiny"
+      >
+        <h4>🧮 Tus Números Sagrados</h4>
+        <div class="numbers-grid">
+          <div class="number-card" *ngIf="personalNumbers.lifePath">
+            <span class="number">{{ personalNumbers.lifePath }}</span>
+            <span class="label">Camino de Vida</span>
+          </div>
+          <div class="number-card" *ngIf="personalNumbers.destiny">
+            <span class="number">{{ personalNumbers.destiny }}</span>
+            <span class="label">Destino</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de conversación -->
+      <div class="chat-area">
+        <div
+          class="messages-container"
+          #scrollContainer
+          (scroll)="onScroll($event)"
+        >
+          <div
+            *ngFor="let message of messages"
+            class="message"
+            [class.user-message]="message.role === 'user'"
+            [class.interpreter-message]="message.role === 'numerologist'"
+            [class.blocked-message]="isMessageBlocked(message)"
+          >
+            <div class="message-avatar">
+              <span *ngIf="message.role === 'user'" class="user-avatar"
+                >👤</span
+              >
+              <span
+                *ngIf="message.role === 'numerologist'"
+                class="interpreter-avatar-small"
+                >🔢</span
+              >
+            </div>
+
+            <div class="message-content">
+              <div class="message-bubble">
+                <!-- CONTENIDO ORIGINAL (se difumina si está bloqueado) -->
+                <div [class.blurred-content]="isMessageBlocked(message)">
+                  <p [innerHTML]="formatMessage(message.message)"></p>
+                </div>
+
+                <!-- OVERLAY DE PAGO (solo aparece si está bloqueado) -->
+                <div
+                  *ngIf="isMessageBlocked(message)"
+                  class="message-payment-overlay"
+                >
+                  <div class="payment-prompt">
+                    <span class="lock-icon">🔒</span>
+                    <p><strong>Contenido Premium</strong></p>
+                    <p>
+                      Paga €5 para ver esta interpretación numerológica y
+                      acceder a lecturas ilimitadas
+                    </p>
+                    <button (click)="promptForPayment()" class="unlock-button">
+                      💳 Desbloquear por €5
+                    </button>
+                  </div>
+                </div>
+
+                <span class="message-time">{{
+                  getTimeString(message.timestamp)
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicador de escritura -->
+          <div
+            *ngIf="isTyping"
+            class="message interpreter-message typing-indicator"
+          >
+            <div class="message-avatar">
+              <span class="interpreter-avatar-small">🔢</span>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble typing">
+                <div class="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p class="typing-text">
+                  Maestra Pythia está consultando los números sagrados...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Área de entrada -->
+      <div class="input-area">
+        <div class="input-container">
+          <div class="text-input-wrapper">
+            <textarea
+              class="message-input"
+              [(ngModel)]="currentMessage"
+              placeholder="Pregunta sobre numerología..."
+              rows="1"
+              maxlength="1500"
+              (keydown)="onKeyPress($event)"
+              (input)="autoResize($event)"
+              [disabled]="isLoading"
+            ></textarea>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="clear-button"
+              (click)="clearConversation()"
+              [disabled]="isLoading"
+              matTooltip="Nueva consulta"
+            >
+              <i class="fas fa-redo"></i>
+            </button>
+            <button
+              class="send-button"
+              (click)="sendMessage()"
+              [disabled]="isLoading || !currentMessage.trim()"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PAGO -->
+  <div *ngIf="showPaymentModal" class="payment-modal-overlay">
+    <div class="payment-modal">
+      <div class="payment-header">
+        <h3>🔢 Desbloquea Lecturas Numerológicas Ilimitadas</h3>
+        <button (click)="cancelPayment()" class="close-payment-button">
+          ✕
+        </button>
+      </div>
+
+      <div class="payment-content">
+        <div class="payment-info">
+          <p>Primera consulta numerológica gratis completada.</p>
+          <p>Para continuar explorando los números sagrados ilimitadamente:</p>
+        </div>
+
+        <div class="payment-price">
+          <span class="price-amount">€5.00</span>
+          <span class="price-description"
+            >Acceso completo a interpretaciones numerológicas</span
+          >
+        </div>
+
+        <div *ngIf="isProcessingPayment" class="payment-loading">
+          <div class="loading-spinner"></div>
+          <p>Preparando sistema de pago...</p>
+        </div>
+
+        <div
+          id="payment-element-container"
+          class="payment-element-container"
+          [hidden]="isProcessingPayment"
+        >
+          <!-- Stripe Payment Element se monta aquí -->
+        </div>
+
+        <div *ngIf="paymentError" class="payment-error">
+          <span>{{ paymentError }}</span>
+        </div>
+
+        <div class="payment-actions">
+          <button
+            (click)="handlePaymentSubmit()"
+            [disabled]="isProcessingPayment || !paymentElement"
+            class="pay-button"
+          >
+            <span *ngIf="!isProcessingPayment">💳 Pagar y Continuar</span>
+            <span *ngIf="isProcessingPayment">Procesando...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

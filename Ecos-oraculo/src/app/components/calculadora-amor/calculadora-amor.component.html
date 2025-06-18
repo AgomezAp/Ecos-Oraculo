@@ -1,0 +1,386 @@
+<!-- Fondo con estrellas animadas -->
+<div class="background-container">
+  <div class="stars"></div>
+  <div class="twinkling"></div>
+  <div class="clouds"></div>
+</div>
+
+<!-- Contenido principal -->
+<div class="main-content">
+  <div class="love-calculator-modal">
+    <!-- Header -->
+    <div class="love-header">
+      <div class="love-expert-info">
+        <div class="expert-avatar">
+          <span class="expert-icon">💕</span>
+        </div>
+        <div class="expert-details" *ngIf="loveExpertInfo">
+          <h3>{{ loveExpertInfo.loveExpert.name }}</h3>
+          <p>{{ loveExpertInfo.loveExpert.title }}</p>
+        </div>
+        <div class="expert-details" *ngIf="!loveExpertInfo">
+          <h3>{{ loveExpertInfo_display.name }}</h3>
+          <p>{{ loveExpertInfo_display.title }}</p>
+        </div>
+      </div>
+      <button
+        class="close-chat-btn"
+        onclick="window.location.href='/'"
+        aria-label="Cerrar"
+      >
+        <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+          <path
+            d="M1 1L11 11M1 11L11 1"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages" #scrollContainer (scroll)="onScroll($event)">
+      <div
+        *ngFor="let message of conversationHistory; trackBy: trackByMessage"
+        class="message"
+        [ngClass]="{
+          'user-message': message.role === 'user',
+          'expert-message': message.role === 'love_expert'
+        }"
+      >
+        <div class="message-avatar" *ngIf="message.role === 'love_expert'">
+          <span class="avatar-icon">💕</span>
+        </div>
+
+        <div
+          class="message-content"
+          [ngClass]="{ 'blocked-content': isMessageBlocked(message) }"
+        >
+          <div class="message-header" *ngIf="message.role === 'love_expert'">
+            <span class="sender-name">{{
+              loveExpertInfo?.loveExpert?.name || loveExpertInfo_display.name
+            }}</span>
+            <span class="message-time">{{
+              formatTime(message.timestamp)
+            }}</span>
+          </div>
+
+          <div
+            class="message-text"
+            [innerHTML]="formatMessage(message.message)"
+          ></div>
+
+          <!-- Overlay para mensajes bloqueados -->
+          <div *ngIf="isMessageBlocked(message)" class="blocked-overlay">
+            <div class="blocked-message">
+              <mat-icon>lock</mat-icon>
+              <p>Contenido bloqueado</p>
+              <small>Realiza el pago para ver esta respuesta completa</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-avatar" *ngIf="message.role === 'user'">
+          <span class="avatar-icon">👤</span>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="loading-message">
+        <div class="loading-avatar">
+          <span class="avatar-icon">💕</span>
+        </div>
+        <div class="loading-content">
+          <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span class="loading-text"
+            >Maestra Valentina está consultando los números del amor...</span
+          >
+        </div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div *ngIf="isTyping && !isLoading" class="typing-message">
+        <div class="typing-avatar">
+          <span class="avatar-icon">💕</span>
+        </div>
+        <div class="typing-content">
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de datos de compatibilidad -->
+    <div *ngIf="showDataForm" class="data-form-container">
+      <div class="data-form">
+        <h4>Información para el análisis de compatibilidad</h4>
+        <form
+          [formGroup]="compatibilityForm"
+          (ngSubmit)="calculateCompatibility()"
+        >
+          <div class="person-section">
+            <h5>Primera persona</h5>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre completo</mat-label>
+              <input
+                matInput
+                formControlName="person1Name"
+                placeholder="Ej: Ana María García"
+              />
+              <mat-error *ngIf="hasFormError('person1Name', 'required')">
+                {{ getFieldErrorMessage("person1Name") }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input
+                matInput
+                [matDatepicker]="picker1"
+                formControlName="person1BirthDate"
+              />
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="picker1"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+              <mat-error *ngIf="hasFormError('person1BirthDate', 'required')">
+                {{ getFieldErrorMessage("person1BirthDate") }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="person-section">
+            <h5>Segunda persona</h5>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre completo</mat-label>
+              <input
+                matInput
+                formControlName="person2Name"
+                placeholder="Ej: Carlos Luis Mendoza"
+              />
+              <mat-error *ngIf="hasFormError('person2Name', 'required')">
+                {{ getFieldErrorMessage("person2Name") }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input
+                matInput
+                [matDatepicker]="picker2"
+                formControlName="person2BirthDate"
+              />
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="picker2"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+              <mat-error *ngIf="hasFormError('person2BirthDate', 'required')">
+                {{ getFieldErrorMessage("person2BirthDate") }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" mat-stroked-button (click)="toggleDataForm()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              mat-raised-button
+              color="primary"
+              [disabled]="compatibilityForm.invalid || isLoading"
+            >
+              <mat-icon *ngIf="!isLoading">calculate</mat-icon>
+              <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+              Calcular Compatibilidad
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <div class="message-input">
+        <textarea
+          placeholder="Pregunta sobre amor y compatibilidad..."
+          [(ngModel)]="currentMessage"
+          (keydown.enter)="onEnterPressed($any($event))"
+          [maxlength]="500"
+          rows="1"
+        ></textarea>
+        <div class="character-count">{{ currentMessage.length || 0 }}/500</div>
+      </div>
+
+      <div class="input-buttons">
+        <button
+          mat-fab
+          class="reset-button"
+          (click)="resetChat()"
+          [disabled]="isLoading"
+          matTooltip="Reiniciar chat"
+          matTooltipPosition="above"
+        >
+          <i class="fas fa-redo"></i>
+        </button>
+
+        <button
+          mat-fab
+          class="send-button"
+          (click)="sendMessage()"
+          [disabled]="!canSendMessage() || isLoading"
+          matTooltip="Enviar mensaje"
+          matTooltipPosition="above"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Pago -->
+<div
+  *ngIf="showPaymentModal"
+  class="payment-modal-overlay"
+  (click)="cancelPayment()"
+>
+  <div class="payment-modal" (click)="$event.stopPropagation()">
+    <div class="payment-header">
+      <h3>💕 Acceso Completo a Lecturas de Amor</h3>
+      <button
+        mat-icon-button
+        (click)="cancelPayment()"
+        class="close-payment-btn"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="payment-content">
+      <div class="payment-info">
+        <div class="love-package">
+          <div class="package-icon">💕</div>
+          <h4>Lecturas de Compatibilidad Ilimitadas</h4>
+          <p class="package-description">
+            Accede a todas las interpretaciones de compatibilidad amorosa con la
+            Maestra Valentina. Descubre los secretos numerológicos de tu
+            relación y obtén consejos personalizados para fortalecer tu vínculo
+            amoroso.
+          </p>
+        </div>
+
+        <div class="features-list">
+          <div class="feature">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>Análisis de compatibilidad completo</span>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>Interpretación de números del amor</span>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>Consejos personalizados para tu relación</span>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>Consultas ilimitadas</span>
+          </div>
+          <div class="feature">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <span>Acceso inmediato y permanente</span>
+          </div>
+        </div>
+
+        <div class="pricing">
+          <div class="price">
+            <span class="currency">€</span>
+            <span class="amount">5.00</span>
+            <span class="period">una sola vez</span>
+          </div>
+          <p class="price-note">Pago único para acceso ilimitado</p>
+        </div>
+      </div>
+
+      <!-- Contenedor del elemento de pago de Stripe -->
+      <div class="payment-form-container">
+        <div
+          *ngIf="isProcessingPayment && !paymentElement"
+          class="payment-loading"
+        >
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Preparando formulario de pago...</p>
+        </div>
+
+        <div
+          id="payment-element-container-love"
+          class="stripe-payment-element"
+        ></div>
+
+        <div *ngIf="paymentError" class="payment-error">
+          <mat-icon color="warn">error</mat-icon>
+          <span>{{ paymentError }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-actions">
+      <button
+        mat-stroked-button
+        (click)="cancelPayment()"
+        [disabled]="isProcessingPayment"
+      >
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="handlePaymentSubmit()"
+        [disabled]="isProcessingPayment || !paymentElement"
+      >
+        <mat-spinner *ngIf="isProcessingPayment" diameter="20"></mat-spinner>
+        <mat-icon *ngIf="!isProcessingPayment">payment</mat-icon>
+        {{ isProcessingPayment ? "Procesando..." : "Realizar Pago" }}
+      </button>
+    </div>
+
+    <div class="payment-security">
+      <div class="security-badges">
+        <div class="security-badge">
+          <mat-icon>security</mat-icon>
+          <span>Pago 100% Seguro</span>
+        </div>
+        <div class="security-badge">
+          <mat-icon>verified_user</mat-icon>
+          <span>Encriptado SSL</span>
+        </div>
+        <div class="security-badge">
+          <span class="stripe-badge">Stripe</span>
+        </div>
+      </div>
+      <p class="security-text">
+        Tus datos de pago están protegidos con la misma tecnología que utilizan
+        los bancos. No almacenamos información de tarjetas de crédito.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay General -->
+<div *ngIf="isLoading && !showPaymentModal" class="loading-overlay">
+  <div class="loading-content">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p>Conectando con las energías del amor...</p>
+  </div>
+</div>

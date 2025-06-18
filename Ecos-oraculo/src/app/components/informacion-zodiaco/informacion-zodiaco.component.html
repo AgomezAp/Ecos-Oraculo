@@ -1,0 +1,219 @@
+<div class="oracle-container">
+  <div class="content-with-navbar">
+    <div class="oracle-main">
+      <!-- Información del astrólogo -->
+      <div class="interpreter-info">
+        <div class="interpreter-avatar">
+          <div class="mystical-orb">✨</div>
+        </div>
+        <div class="interpreter-details">
+          <h3>{{ astrologerInfo.name }}</h3>
+          <p class="interpreter-title">{{ astrologerInfo.title }}</p>
+          <p class="interpreter-specialty">
+            Especialista en Astrología y Signos Zodiacales
+          </p>
+        </div>
+        <button
+          class="close-chat-btn"
+          onclick="window.location.href='/'"
+          aria-label="Cerrar"
+        >
+          <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+            <path
+              d="M1 1L11 11M1 11L11 1"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Área de conversación -->
+      <div class="chat-area">
+        <div
+          class="messages-container"
+          #scrollContainer
+          (scroll)="onScroll($event)"
+        >
+          <div *ngFor="let message of messages" class="message-container">
+            <!-- Mensajes del astrólogo -->
+            <div *ngIf="!message.isUser" class="interpreter-message-wrapper">
+              <div class="message-avatar">
+                <span class="interpreter-avatar-small"></span>
+              </div>
+
+              <div class="message-content">
+                <div
+                  class="message-bubble interpreter-message"
+                  [class.blocked-message]="isMessageBlocked(message)"
+                >
+                  <!-- CONTENIDO ORIGINAL (se difumina si está bloqueado) -->
+                  <div
+                    class="message-text"
+                    [class.blurred-content]="isMessageBlocked(message)"
+                  >
+                    <p [innerHTML]="formatMessage(message.content)"></p>
+                  </div>
+
+                  <!-- OVERLAY DE PAGO (solo aparece si está bloqueado) -->
+                  <div
+                    *ngIf="isMessageBlocked(message)"
+                    class="message-payment-overlay"
+                  >
+                    <div class="payment-prompt">
+                      <span class="lock-icon">🔒</span>
+                      <p><strong>Contenido Premium</strong></p>
+                      <p>
+                        Paga €5 para ver esta interpretación astral y acceder a
+                        consultas ilimitadas
+                      </p>
+                      <button
+                        (click)="promptForPayment()"
+                        class="unlock-button"
+                      >
+                        💳 Desbloquear por €5
+                      </button>
+                    </div>
+                  </div>
+
+                  <span class="message-time">{{
+                    message.timestamp | date : "HH:mm"
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mensajes del usuario -->
+            <div *ngIf="message.isUser" class="user-message-wrapper">
+              <div class="message-avatar">
+                <span class="user-avatar">👤</span>
+              </div>
+
+              <div class="message-content">
+                <div class="message-bubble user-message">
+                  <p [innerHTML]="formatMessage(message.content)"></p>
+                  <span class="message-time">{{
+                    message.timestamp | date : "HH:mm"
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicador de escritura -->
+          <div *ngIf="isLoading" class="message-container typing-indicator">
+            <div class="interpreter-message-wrapper">
+              <div class="message-avatar">
+                <span class="interpreter-avatar-small">🔮</span>
+              </div>
+              <div class="message-content">
+                <div class="message-bubble interpreter-message typing">
+                  <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <p class="typing-text">
+                    Maestra Celestine está consultando las estrellas...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Área de entrada -->
+      <div class="input-area">
+        <div class="input-container">
+          <div class="text-input-wrapper">
+            <textarea
+              class="message-input"
+              [(ngModel)]="currentMessage"
+              placeholder="Pregunta sobre astrología y signos zodiacales..."
+              rows="1"
+              maxlength="1500"
+              (keydown)="onKeyPress($event)"
+              (input)="autoResize($event)"
+              [disabled]="isLoading"
+            >
+            </textarea>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="clear-button"
+              (click)="clearConversation()"
+              [disabled]="isLoading"
+              title="Nueva consulta"
+            >
+              <i class="fas fa-redo"></i>
+            </button>
+            <button
+              class="send-button"
+              (click)="sendMessage()"
+              [disabled]="isLoading || !currentMessage.trim()"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <div *ngIf="isLoading" class="simple-spinner">⟳</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PAGO -->
+  <div *ngIf="showPaymentModal" class="payment-modal-overlay">
+    <div class="payment-modal">
+      <div class="payment-header">
+        <h3>🌟 Desbloquea Consultas Astrales Ilimitadas</h3>
+        <button (click)="cancelPayment()" class="close-payment-button">
+          ✕
+        </button>
+      </div>
+
+      <div class="payment-content">
+        <div class="payment-info">
+          <p>Primera consulta gratis completada.</p>
+          <p>Para continuar consultando los astros ilimitadamente:</p>
+        </div>
+
+        <div class="payment-price">
+          <span class="price-amount">€5.00</span>
+          <span class="price-description"
+            >Acceso completo a interpretaciones astrales</span
+          >
+        </div>
+
+        <div *ngIf="isProcessingPayment" class="payment-loading">
+          <div class="loading-spinner"></div>
+          <p>Preparando sistema de pago...</p>
+        </div>
+
+        <div
+          id="payment-element-container"
+          class="payment-element-container"
+          [hidden]="isProcessingPayment"
+        >
+          <!-- Stripe Payment Element se monta aquí -->
+        </div>
+
+        <div *ngIf="paymentError" class="payment-error">
+          <span>{{ paymentError }}</span>
+        </div>
+
+        <div class="payment-actions">
+          <button
+            (click)="handlePaymentSubmit()"
+            [disabled]="isProcessingPayment || !paymentElement"
+            class="pay-button"
+          >
+            <span *ngIf="!isProcessingPayment">💳 Pagar y Continuar</span>
+            <span *ngIf="isProcessingPayment">Procesando...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

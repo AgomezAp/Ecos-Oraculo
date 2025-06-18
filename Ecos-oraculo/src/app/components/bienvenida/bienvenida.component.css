@@ -1,0 +1,541 @@
+.bienvenida-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  color: white;
+  font-family: "Arsenal", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.video-background iframe {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 0;
+  gap: 0.5rem;
+}
+
+.hero-content {
+  flex: 1.2;
+  max-width: 700px;
+  padding-left: 5rem;
+}
+
+.subtitle {
+  font-style: italic;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-family: 'El Messiri', sans-serif;
+}
+
+.main-title {
+  font-size: 5.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  font-family: "Berkshire Swash", cursive;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.description {
+  font-size: 2rem;
+  margin: 1rem 0;
+  font-weight: 700;
+  font-family: 'El Messiri', sans-serif;
+}
+
+.services-text {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  margin: 2rem 0;
+  color: #ffffff;
+  font-family: "Arsenal", sans-serif;
+}
+
+.call-to-action {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  font-family: "Arsenal", sans-serif;
+}
+
+.hero-symbol {
+  flex: 0.8;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 4.5rem;
+}
+
+.mystic-symbol {
+  width: 450px;
+  height: 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.rotating-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: clockwiseRotation 90s linear infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
+
+/* Animación de rotación como manecillas del reloj */
+@keyframes clockwiseRotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.services-section {
+  max-width: 1200px;
+  margin: 4rem auto 0;
+  text-align: center;
+}
+
+.services-title {
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  font-weight: 300;
+  font-family: "Berkshire Swash", cursive;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.service-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border:1px solid rgb(87, 87, 87);
+
+  background-attachment: fixed;
+}
+
+.service-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 30, 50, 0.603);
+  z-index: 1;
+  transition: all 0.3s ease;
+  border:1px solid rgba(255, 255, 255, 0.1);
+}
+
+.service-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover::before {
+  background: rgba(30, 30, 50, 0.4);
+}
+
+.service-card:hover::after {
+  transform: scale(1.1);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.service-icon img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: brightness(0) saturate(100%) invert(1);
+}
+
+.service-card:hover .service-icon img {
+  transform: scale(1.1);
+}
+
+.service-card span {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: "Arsenal", sans-serif;
+  position: relative;
+  z-index: 2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ===== FOOTER TAMAÑO MODERADO Y HASTA LOS BORDES ===== */
+.footer-section {
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 20, 0.4) 20%, rgba(5, 5, 15, 0.8) 50%, rgba(2, 2, 8, 0.95) 75%, #000000 100%);
+  color: white;
+  padding: 80px 0 0 0; /* ✅ Sin padding inferior */
+  position: relative;
+  /* ✅ ELIMINAR TODOS LOS GAPS */
+  margin: 0;
+  margin-top: 60px;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: 0;
+  /* ✅ ASEGURAR QUE LLEGUE HASTA ABAJO */
+  padding-bottom: 0;
+  margin-bottom: 0;
+  /* ✅ FIN */
+  border: none;
+  min-height: 280px;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 50px 20px; /* ✅ Padding inferior solo en el contenido */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+  min-height: 180px;
+}
+
+/* Logo y título */
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+.logo-image {
+  width: 150px; 
+  height: 150px;
+  filter: brightness(0) saturate(100%) invert(1) brightness(1.2);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.footer-title {
+  font-family: 'El Messiri', serif;
+  font-size: 1.8rem;
+  margin: 0;
+  color: white;
+}
+
+/* Información de contacto */
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px; /* ✅ Espacio normal */
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px 20px; /* ✅ Padding normal */
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.contact-icon {
+  color: #87ceeb;
+  font-size: 20px; /* ✅ Tamaño normal */
+}
+
+.contact-text {
+  font-family: 'Arsenal', sans-serif;
+  font-size: 0.95rem; /* ✅ Tamaño normal */
+  color: #f0f0f0;
+  font-weight: 400;
+}
+
+/* Redes sociales CON MARCOS CIRCULARES */
+.social-links {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.social-link {
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 20px; /* ✅ Tamaño para iconos */
+  font-weight: bold;
+  font-family: 'Arsenal', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.social-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+/* ✅ ESTILOS PARA ICONOS SVG O FONT AWESOME */
+.social-link i {
+  font-size: 20px;
+  color: white;
+}
+
+.social-link svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+/* ✅ ESTILOS ESPECÍFICOS POR PLATAFORMA */
+.social-link.instagram:hover {
+  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  border-color: #e6683c;
+}
+
+.social-link.facebook:hover {
+  background: #1877f2;
+  border-color: #1877f2;
+}
+
+.social-link.twitter:hover {
+  background: #1da1f2;
+  border-color: #1da1f2;
+}
+
+.social-link.youtube:hover {
+  background: #ff0000;
+  border-color: #ff0000;
+}
+
+.social-link.pinterest:hover {
+  background: #bd081c;
+  border-color: #bd081c;
+}
+
+/* Menú de navegación */
+.footer-menu {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* ✅ Espacio normal */
+  align-items: center;
+}
+
+.footer-link {
+  font-family: 'Arsenal', sans-serif;
+  font-size: 1rem; /* ✅ Tamaño normal */
+  font-weight: 400;
+  color: #f0f0f0;
+  text-decoration: none;
+  padding: 8px 15px; /* ✅ Padding normal */
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .main-title {
+    font-size: 2.5rem;
+    font-family: "Berkshire Swash", cursive;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .footer-section {
+    padding: 60px 0 40px 0; /* ✅ Altura moderada en móvil */
+    min-height: 240px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    text-align: center;
+    padding: 0 15px;
+  }
+  
+  .footer-title {
+    font-size: 1.5rem;
+  }
+  
+  .logo-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .social-link {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .social-link svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .social-link i {
+    font-size: 18px;
+  }
+  
+  .footer-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .footer-link {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-section {
+    padding: 50px 0 35px 0;
+    min-height: 200px;
+  }
+  
+  .footer-content {
+    gap: 25px;
+  }
+  
+  .footer-title {
+    font-size: 1.3rem;
+  }
+  
+  .contact-text {
+    font-size: 0.85rem;
+  }
+  
+.social-link {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .social-link svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .social-link i {
+    font-size: 18px;
+  }
+  .footer-link {
+    font-size: 0.85rem;
+  }
+}

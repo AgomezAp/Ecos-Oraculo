@@ -1,0 +1,199 @@
+<div class="bienvenida-container">
+  <!-- Video de fondo -->
+  <div class="video-background">
+    <video
+      #backgroundVideo
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      [defaultMuted]="true"
+      webkit-playsinline
+    >
+      <source src="/Oráculo Galaxia Fondo.mp4" type="video/mp4" />
+      Tu navegador no soporta videos HTML5.
+    </video>
+  </div>
+
+  <!-- Overlay oscuro para mejorar legibilidad -->
+  <div class="overlay"></div>
+
+  <!-- Contenido principal -->
+  <div class="content">
+    <!-- Sección superior - Ecos del Oráculo -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <p class="subtitle">Guía tu futuro</p>
+        <h1 class="main-title">Ecos del Oráculo</h1>
+        <p class="description">Revela lo que el destino tiene para ti</p>
+        <p class="services-text">
+          Prueba nuestros servicios de lectura astrológica, interpretación de
+          sueños, lectura de tarot y numerología para descubrir los misterios
+          del universo y adquirir autoconocimiento.
+        </p>
+        <p class="call-to-action">Todo inicia con una simple pregunta...</p>
+      </div>
+      <div class="hero-symbol">
+        <!-- Aquí puedes agregar el símbolo místico si tienes la imagen -->
+        <div class="mystic-symbol">
+          <img
+            src="/Oráculo Símbolo.webp"
+            alt="Símbolo del Oráculo"
+            class="rotating-logo"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección inferior - Servicios -->
+    <div class="services-section">
+      <h2 class="services-title">¿Qué quieres saber hoy?</h2>
+      <div class="services-grid">
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 1 Sueños C-1.webp')"
+          (click)="navigateTo('/significado-sueños')"
+        >
+          <div class="service-icon">
+            <img src="/Oráculo Servicio (1).svg" alt="Sueños" />
+          </div>
+          <span>Significado de Sueños</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 2 Zodiaco C.webp')"
+          (click)="navigateTo('/Informacion-zodiaco')"
+        >
+          <div class="service-icon">
+            <img src="/Oráculo Servicio (2)-1.svg" alt="Zodiaco" />
+          </div>
+          <span>Información de Zodiaco</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Fondotarot.webp')"
+          (click)="navigateTo('/lectura-tarot')"
+        >
+          <div class="service-icon">
+            <img src="/Oráculo Servicio (3).svg" alt="Tarot" />
+          </div>
+          <span>Lectura de Tarot</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 4 Numerología C.webp')"
+          (click)="navigateTo('/lectura-numerologia')"
+        >
+          <div class="service-icon">
+            <img
+              src="/Oráculo Servicio (4).svg"
+              alt="Numerología"
+            />
+          </div>
+          <span>Lectura de Numerología</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 5 Vocacional C.webp')"
+          (click)="navigateTo('/mapa-vocacional')"
+        >
+          <div class="service-icon">
+            <img src="/Oráculo Servicio (5).svg" alt="Vocacional" />
+          </div>
+          <span>Mapa Vocacional</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 6 Animal C.webp')"
+          (click)="navigateTo('/animal-interior')"
+        >
+          <div class="service-icon">
+            <img src="/Oráculo Servicio (6).svg" alt="Animal" />
+          </div>
+          <span>Descubre tu Animal Interior</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 7 Tabla Nacimiento C-1.webp')"
+          (click)="navigateTo('/tabla-nacimiento')"
+        >
+          <div class="service-icon">
+            <img
+              src="/Oráculo Servicio (7).svg"
+              alt="Tabla Nacimiento"
+            />
+          </div>
+          <span>Tabla de Nacimiento</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 2 Horóscopo C-1.webp')"
+          (click)="navigateTo('/horoscopo')"
+        >
+          <div class="service-icon">
+            <img
+              src="/Oráculo Servicio (9)-2.svg"
+              alt="Horóscopo"
+            />
+          </div>
+          <span>Horóscopo</span>
+        </div>
+        <div
+          class="service-card"
+          style="background-image: url('/Oráculo 8 Calculadora Amor C.webp')"
+          (click)="navigateTo('/calculadora-amor')"
+        >
+          <div class="service-icon">
+            <img
+              src="/Oráculo Servicio (8)-1.svg"
+              alt="Calculadora Amor"
+            />
+          </div>
+          <span>Calculadora del Amor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer-section">
+    <div class="footer-content">
+      <!-- Logo y nombre -->
+      <div class="footer-logo">
+        <img
+          src="/Ecos del Oráculo Logo-1.svg"
+          alt="Ecos del Oráculo"
+          class="logo-image"
+        />
+        <h3 class="footer-title">Ecos del Oráculo</h3>
+      </div>
+
+      <!-- Información de contacto -->
+      <div class="footer-contact">
+        <div class="contact-item">
+           <i class="fas fa-envelope contact-icon"></i>
+          <span class="contact-text">contacto&#64;ecosdeloraculo.com</span>
+        </div>
+
+        <!-- Redes sociales -->
+        <div class="social-links">
+          <a href="#" class="social-link instagram" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="social-link facebook" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-link twitter" aria-label="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link youtube" aria-label="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+          <a href="#" class="social-link pinterest" aria-label="Pinterest">
+            <i class="fab fa-pinterest-p"></i>
+          </a>
+        </div>
+      </div>
+    
+    </div>
+  </footer>
+</div>

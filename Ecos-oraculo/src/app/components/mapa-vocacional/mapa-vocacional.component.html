@@ -1,0 +1,460 @@
+<div class="background-container">
+  <div class="stars"></div>
+  <div class="twinkling"></div>
+  <div class="clouds"></div>
+</div>
+
+<div class="main-content">
+  <div class="vocational-container">
+    <!-- Header del consejero -->
+    <div class="counselor-header">
+      <div class="counselor-info">
+        <div class="counselor-avatar">🎯</div>
+        <div class="counselor-details">
+          <h1>{{ counselorInfo.name }}</h1>
+          <p>{{ counselorInfo.title }}</p>
+          <span class="specialty">{{ counselorInfo.specialty }}</span>
+        </div>
+      </div>
+      <button
+        class="close-chat-btn"
+        onclick="window.location.href='/'"
+        aria-label="Cerrar"
+      >
+        <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+          <path
+            d="M1 1L11 11M1 11L11 1"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Pestañas de navegación -->
+    <div class="navigation-tabs">
+      <button
+        class="tab-button"
+        [class.active]="currentTab === 'chat'"
+        (click)="switchTab('chat')"
+      >
+        <mat-icon>chat</mat-icon>
+        Consulta Personalizada
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="currentTab === 'assessment'"
+        (click)="switchTab('assessment')"
+      >
+        <mat-icon>quiz</mat-icon>
+        Assessment Vocacional
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="currentTab === 'results'"
+        [disabled]="!hasAssessmentResults"
+        (click)="switchTab('results')"
+      >
+        <mat-icon>analytics</mat-icon>
+        Resultados
+      </button>
+    </div>
+
+    <!-- Contenido de pestañas -->
+    <div class="tab-content">
+      <!-- TAB: CHAT -->
+      <div *ngIf="currentTab === 'chat'" class="chat-section">
+        <!-- Sección de datos personales (opcional) -->
+        <div *ngIf="showPersonalForm" class="personal-data-section">
+          <h3>📋 Información Personal para Análisis</h3>
+          <div class="personal-form">
+            <div class="form-row">
+              <mat-form-field class="half-width">
+                <mat-label>Edad</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="personalInfo.age"
+                  placeholder="Ej: 22"
+                />
+              </mat-form-field>
+
+              <mat-form-field class="half-width">
+                <mat-label>Nivel educativo actual</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="personalInfo.currentEducation"
+                  placeholder="Ej: Bachillerato, Universidad"
+                />
+              </mat-form-field>
+            </div>
+
+            <mat-form-field class="full-width">
+              <mat-label>Experiencia laboral</mat-label>
+              <textarea
+                matInput
+                [(ngModel)]="personalInfo.workExperience"
+                placeholder="Describe tu experiencia laboral (si la tienes)"
+                rows="3"
+              ></textarea>
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="savePersonalInfo()"
+              >
+                <mat-icon>save</mat-icon>
+                Guardar información
+              </button>
+              <button mat-button (click)="togglePersonalForm()">
+                <mat-icon>close</mat-icon>
+                Continuar sin datos
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de mensajes -->
+        <div class="chat-messages" #chatContainer (scroll)="onScroll($event)">
+          <div
+            *ngFor="let message of chatMessages"
+            class="message"
+            [class.user-message]="message.isUser"
+            [class.counselor-message]="!message.isUser"
+            [class.blocked-message]="isMessageBlocked(message)"
+          >
+            <div class="message-avatar">
+              <span *ngIf="message.isUser">👤</span>
+              <span *ngIf="!message.isUser">🎯</span>
+            </div>
+
+            <div class="message-content">
+              <!-- CONTENIDO ORIGINAL (se difumina si está bloqueado) -->
+              <div [class.blurred-content]="isMessageBlocked(message)">
+                <div class="message-header">
+                  <span class="sender-name">{{ message.sender }}</span>
+                  <span class="message-time">{{
+                    getTimeString(message.timestamp)
+                  }}</span>
+                </div>
+                <div
+                  class="message-text"
+                  [innerHTML]="formatMessage(message.content)"
+                ></div>
+              </div>
+
+              <!-- OVERLAY DE PAGO (solo aparece si está bloqueado) -->
+              <div
+                *ngIf="isMessageBlocked(message)"
+                class="message-payment-overlay"
+              >
+                <div class="payment-prompt">
+                  <span class="lock-icon">🔒</span>
+                  <p><strong>Contenido Premium</strong></p>
+                  <p>
+                    Paga €5 para ver esta orientación vocacional y acceder a
+                    consultas ilimitadas
+                  </p>
+                  <button (click)="promptForPayment()" class="unlock-button">
+                    💳 Desbloquear por €5
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicador de carga -->
+          <div *ngIf="isLoading" class="loading-message">
+            <div class="loading-avatar">🎯</div>
+            <div class="loading-content">
+              <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p class="loading-text">
+                Dr. Mentor está analizando tu consulta...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de entrada de mensajes -->
+        <div class="chat-input-area">
+          <div class="input-container">
+            <div class="text-input-wrapper">
+              <textarea
+                class="message-input"
+                [(ngModel)]="currentMessage"
+                (keydown)="onKeyPress($event)"
+                (input)="autoResize($event)"
+                placeholder="Escribe tu consulta vocacional..."
+                rows="1"
+                maxlength="1500"
+                [disabled]="isLoading"
+              ></textarea>
+            </div>
+
+            <div class="action-buttons">
+              <button
+                class="clear-button"
+                (click)="currentMessage = ''"
+                [disabled]="!currentMessage.trim()"
+              >
+                <i class="fas fa-redo"></i>
+              </button>
+              <button
+                class="send-button"
+                (click)="sendMessage()"
+                [disabled]="isLoading || !currentMessage.trim()"
+              >
+                <i class="fas fa-paper-plane"></i>
+                <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: ASSESSMENT -->
+      <div *ngIf="currentTab === 'assessment'" class="assessment-section">
+        <!-- Barra de progreso -->
+        <div class="progress-section">
+          <h3>🧭 Assessment Vocacional RIASEC</h3>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="assessmentProgress"
+            ></div>
+          </div>
+          <span class="progress-text">
+            Pregunta {{ currentQuestionIndex + 1 }} de
+            {{ assessmentQuestions.length }} ({{
+              assessmentProgress | number : "1.0-0"
+            }}% completado)
+          </span>
+        </div>
+
+        <!-- Pregunta actual -->
+        <div *ngIf="currentQuestion" class="question-card">
+          <h4>{{ currentQuestion.question }}</h4>
+
+          <div class="options-grid">
+            <div
+              *ngFor="let option of currentQuestion.options"
+              class="option-button"
+              [class.selected]="selectedOption === option.value"
+              (click)="selectOption(option)"
+            >
+              <div class="option-content">
+                <span class="option-icon">{{
+                  getCategoryEmoji(option.category)
+                }}</span>
+                <span class="option-text">{{ option.label }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navegación del assessment -->
+        <div class="assessment-navigation">
+          <button
+            mat-raised-button
+            (click)="previousQuestion()"
+            [disabled]="currentQuestionIndex === 0"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Anterior
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="currentQuestionIndex < assessmentQuestions.length - 1"
+            (click)="nextQuestion()"
+            [disabled]="!selectedOption"
+          >
+            <mat-icon>arrow_forward</mat-icon>
+            Siguiente
+          </button>
+
+          <button
+            mat-raised-button
+            color="accent"
+            *ngIf="currentQuestionIndex === assessmentQuestions.length - 1"
+            (click)="finishAssessment()"
+            [disabled]="!selectedOption"
+          >
+            <mat-icon>check</mat-icon>
+            Finalizar Assessment
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB: RESULTADOS -->
+      <div *ngIf="currentTab === 'results'" class="results-section">
+        <h3>📊 Tu Perfil Vocacional</h3>
+
+        <!-- Perfil dominante -->
+        <div
+          *ngIf="assessmentResults?.dominantProfile"
+          class="dominant-profile"
+        >
+          <div class="profile-header">
+            <span class="profile-emoji">{{
+              getCategoryEmoji(assessmentResults.dominantProfile.name)
+            }}</span>
+            <div class="profile-info">
+              <h4>{{ assessmentResults.dominantProfile.name }}</h4>
+              <p>{{ assessmentResults.dominantProfile.description }}</p>
+            </div>
+          </div>
+
+          <div class="profile-details">
+            <div class="characteristics">
+              <h5>🎯 Características principales</h5>
+              <div class="tags">
+                <span
+                  *ngFor="
+                    let characteristic of assessmentResults.dominantProfile
+                      .characteristics
+                  "
+                  class="tag"
+                  >{{ characteristic }}</span
+                >
+              </div>
+            </div>
+
+            <div class="work-environments">
+              <h5>🏢 Ambientes de trabajo ideales</h5>
+              <div class="tags">
+                <span
+                  *ngFor="
+                    let environment of assessmentResults.dominantProfile
+                      .workEnvironments
+                  "
+                  class="tag secondary"
+                  >{{ environment }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Distribución de perfiles -->
+        <div
+          *ngIf="assessmentResults?.profileDistribution"
+          class="profile-distribution"
+        >
+          <h4>📈 Distribución de tu perfil</h4>
+          <div class="distribution-chart">
+            <div
+              *ngFor="let profile of assessmentResults.profileDistribution"
+              class="profile-bar"
+            >
+              <div class="bar-info">
+                <span class="bar-emoji">{{
+                  getCategoryEmoji(profile.category)
+                }}</span>
+                <span class="bar-label">{{ profile.category }}</span>
+                <span class="bar-percentage">{{ profile.percentage }}%</span>
+              </div>
+              <div class="bar-container">
+                <div
+                  class="bar-fill"
+                  [style.width.%]="profile.percentage"
+                  [style.background-color]="getCategoryColor(profile.category)"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recomendaciones profesionales -->
+        <div
+          *ngIf="assessmentResults?.recommendations"
+          class="career-recommendations"
+        >
+          <h4>💼 Recomendaciones profesionales</h4>
+          <div class="recommendations-grid">
+            <div
+              *ngFor="let recommendation of assessmentResults.recommendations"
+              class="recommendation-card"
+            >
+              <mat-icon>work</mat-icon>
+              <span>{{ recommendation }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones de resultados -->
+        <div class="results-actions">
+          <button mat-raised-button color="primary" (click)="switchTab('chat')">
+            <mat-icon>chat</mat-icon>
+            Discutir resultados con el consejero
+          </button>
+
+          <button mat-raised-button (click)="startNewAssessment()">
+            <mat-icon>refresh</mat-icon>
+            Realizar nuevo assessment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE PAGO -->
+<div *ngIf="showPaymentModal" class="payment-modal-overlay">
+  <div class="payment-modal">
+    <div class="payment-header">
+      <h3>🎯 Desbloquea Orientación Vocacional Ilimitada</h3>
+      <button (click)="cancelPayment()" class="close-payment-button">✕</button>
+    </div>
+
+    <div class="payment-content">
+      <div class="payment-info">
+        <p>Primera consulta vocacional gratis completada.</p>
+        <p>Para continuar explorando tu camino profesional ilimitadamente:</p>
+      </div>
+
+      <div class="payment-price">
+        <span class="price-amount">€5.00</span>
+        <span class="price-description"
+          >Acceso completo a orientación vocacional</span
+        >
+      </div>
+
+      <div *ngIf="isProcessingPayment" class="payment-loading">
+        <div class="loading-spinner"></div>
+        <p>Preparando sistema de pago...</p>
+      </div>
+
+      <div
+        id="payment-element-container"
+        class="payment-element-container"
+        [hidden]="isProcessingPayment"
+      >
+        <!-- Stripe Payment Element se monta aquí -->
+      </div>
+
+      <div *ngIf="paymentError" class="payment-error">
+        <span>{{ paymentError }}</span>
+      </div>
+
+      <div class="payment-actions">
+        <button
+          (click)="handlePaymentSubmit()"
+          [disabled]="isProcessingPayment || !paymentElement"
+          class="pay-button"
+        >
+          <span *ngIf="!isProcessingPayment">💳 Pagar y Continuar</span>
+          <span *ngIf="isProcessingPayment">Procesando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

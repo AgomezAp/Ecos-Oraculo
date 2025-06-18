@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PTQK3SPD');</script>
+  <!-- End Google Tag Manager -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JJ8LSVRR1H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JJ8LSVRR1H');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PTQK3SPD"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div class="background">
+    <app-particles class="particles-js"></app-particles>
+    <div class="popup" [@fadeIn]>
+      <div class="additional-info-container">
+        <p>
+          Ahora podrás contactarte con uno de nuestros maestros registrando tu
+          número de teléfono.
+        </p>
+        <div id="phoneContainer" class="show">
+          <div class="input-group">
+            <label for="nombreCliente">Nombre completo:</label>
+            <input
+              id="nombreCliente"
+              type="text"
+              [(ngModel)]="nombreCliente"
+              required
+            />
+          </div>
+          <div class="input-group phone-group">
+            <div class="phone-select">
+              <label for="countryCode">País:</label>
+              <select id="countryCode" [(ngModel)]="countryCode" required>
+                <option value="+36">+36 España</option>
+              </select>
+            </div>
+            <div class="phone-input">
+              <label for="phoneInput">Número de teléfono:</label>
+              <input id="phoneInput" type="text" [(ngModel)]="phone" required />
+            </div>
+          </div>
+          <div class="input-group terms-group">
+            <input
+              type="checkbox"
+              id="termsCheckbox"
+              [(ngModel)]="termsAccepted"
+            />
+            <label for="termsCheckbox">
+              Acepto los
+              <a
+                href="/terminos-y-condiciones"
+                target="_blank"
+                style="text-decoration: underline"
+                >términos y condiciones</a
+              >
+            </label>
+          </div>
+          <div id="errorMessage" class="none">
+            Por favor, selecciona un código de país.
+          </div>
+          <div id="numErrorMessage" class="none">
+            Por favor, ingresa un número válido.
+          </div>
+          <button id="desplegable" class="desplegable" (click)="submitPhone()">
+            Hablar con una maestra
+          </button>
+        </div>
+        <div id="thankYouMessage" class="none">
+          ¡Gracias por registrar tu número!
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+</body>
+</html>
+

@@ -1,0 +1,270 @@
+<!-- Fondo con estrellas animadas -->
+<div class="background-container">
+  <div class="stars"></div>
+  <div class="twinkling"></div>
+  <div class="clouds"></div>
+</div>
+
+<!-- Contenido principal -->
+<div class="main-content">
+  <div class="birth-chart-modal">
+    <!-- Header -->
+    <div class="birth-chart-header">
+      <div class="astrologer-info">
+        <div class="astrologer-avatar">
+          <span class="astrologer-icon">🌟</span>
+        </div>
+        <div class="astrologer-details">
+          <h3>{{ astrologerInfo.name }}</h3>
+          <p>{{ astrologerInfo.title }}</p>
+        </div>
+      </div>
+      <button
+        class="close-chat-btn"
+        onclick="window.location.href='/'"
+        aria-label="Cerrar"
+      >
+        <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+          <path
+            d="M1 1L11 11M1 11L11 1"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Personal Data Form -->
+    <div class="personal-data-section" *ngIf="showDataForm">
+      <h4>📋 Datos para Tabla de Nacimiento</h4>
+      <div class="data-form">
+        <mat-form-field class="full-width">
+          <mat-label>Nombre completo</mat-label>
+          <input
+            matInput
+            [(ngModel)]="fullName"
+            placeholder="Ej: María Elena García"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Fecha de nacimiento</mat-label>
+          <input matInput [(ngModel)]="birthDate" type="date" />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Hora de nacimiento</mat-label>
+          <input
+            matInput
+            [(ngModel)]="birthTime"
+            type="time"
+            placeholder="HH:MM"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Lugar de nacimiento</mat-label>
+          <input
+            matInput
+            [(ngModel)]="birthPlace"
+            placeholder="Ej: Madrid, España"
+          />
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="savePersonalData()"
+          >
+            Guardar datos
+          </button>
+          <button mat-button (click)="toggleDataForm()">
+            Continuar sin datos completos
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Birth Chart Preview -->
+    <div class="chart-preview" *ngIf="chartData.sunSign || chartData.moonSign">
+      <h4>🌌 Tu Configuración Celestial</h4>
+      <div class="chart-grid">
+        <div class="chart-card" *ngIf="chartData.sunSign">
+          <span class="sign">{{ chartData.sunSign }}</span>
+          <span class="label">Sol</span>
+        </div>
+        <div class="chart-card" *ngIf="chartData.moonSign">
+          <span class="sign">{{ chartData.moonSign }}</span>
+          <span class="label">Luna</span>
+        </div>
+        <div class="chart-card" *ngIf="chartData.ascendant">
+          <span class="sign">{{ chartData.ascendant }}</span>
+          <span class="label">Ascendente</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div
+      class="chat-messages"
+      #chatContainer
+      (scroll)="onScroll($event)"
+      (mousedown)="onUserStartScroll()"
+      (wheel)="onUserStartScroll()"
+    >
+      <div
+        *ngFor="let message of messages"
+        class="message"
+        [ngClass]="{
+          'user-message': message.isUser,
+          'astrologer-message': !message.isUser,
+          'blocked-message': isMessageBlocked(message)
+        }"
+      >
+        <div class="message-avatar" *ngIf="!message.isUser">
+          <span class="avatar-icon">🌟</span>
+        </div>
+
+        <div
+          class="message-content"
+          [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
+        >
+          <div class="message-header" *ngIf="!message.isUser">
+            <span class="sender-name">{{ message.sender }}</span>
+            <span class="message-time">{{
+              message.timestamp | date : "HH:mm"
+            }}</span>
+          </div>
+
+          <div
+            class="message-text"
+            [innerHTML]="formatMessage(message.content)"
+          ></div>
+        </div>
+
+        <div class="message-avatar" *ngIf="message.isUser">
+          <span class="avatar-icon">👤</span>
+        </div>
+
+        <!-- Overlay de pago para mensajes bloqueados -->
+        <div *ngIf="isMessageBlocked(message)" class="message-payment-overlay">
+          <div class="payment-prompt">
+            <span class="lock-icon">🔒</span>
+            <p>¡Sabiduría celestial premium!</p>
+            <p>Desbloquea lecturas ilimitadas de tu carta natal</p>
+            <button class="unlock-button" (click)="promptForPayment()">
+              Desbloquear por $5.00
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="loading-message">
+        <div class="loading-avatar">
+          <span class="avatar-icon">🌟</span>
+        </div>
+        <div class="loading-content">
+          <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <span class="loading-text"
+            >Maestra Astra está consultando las configuraciones
+            celestiales...</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <div class="input-container">
+        <div class="text-input-wrapper">
+          <textarea
+            class="message-input"
+            [(ngModel)]="currentMessage"
+            placeholder="Pregunta sobre tu tabla de nacimiento..."
+            (input)="autoResize($event)"
+            (keydown)="onKeyPress($event)"
+            [disabled]="isLoading"
+            rows="1"
+          >
+          </textarea>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            class="clear-button"
+            (click)="clearChat()"
+            title="Limpiar chat"
+          >
+            <i class="fas fa-redo"></i>
+          </button>
+          <button
+            class="send-button"
+            (click)="sendMessage()"
+            [disabled]="!currentMessage.trim() || isLoading"
+            title="Enviar mensaje"
+          >
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE PAGO ===== -->
+<div *ngIf="showPaymentModal" class="payment-modal-overlay">
+  <div class="payment-modal">
+    <div class="payment-header">
+      <h3>🌟 Desbloquear Sabiduría Celestial</h3>
+      <button class="close-payment-button" (click)="cancelPayment()">✕</button>
+    </div>
+
+    <div class="payment-content">
+      <div class="payment-info">
+        <p>Accede a lecturas ilimitadas con Maestra Astra</p>
+        <p>Descubre todos los secretos de tu carta natal</p>
+      </div>
+
+      <div class="payment-price">
+        <span class="price-amount">$5.00</span>
+        <p class="price-description">Acceso completo e ilimitado</p>
+      </div>
+
+      <div
+        *ngIf="isProcessingPayment && !paymentElement"
+        class="payment-loading"
+      >
+        <div class="loading-spinner"></div>
+        <p>Preparando el pago...</p>
+      </div>
+
+      <div *ngIf="paymentError" class="payment-error">
+        {{ paymentError }}
+      </div>
+
+      <div
+        *ngIf="!isProcessingPayment || paymentElement"
+        id="payment-element-container-birth-chart"
+        class="payment-element-container"
+      ></div>
+
+      <div class="payment-actions">
+        <button
+          *ngIf="!isProcessingPayment || paymentElement"
+          class="pay-button"
+          (click)="handlePaymentSubmit()"
+          [disabled]="isProcessingPayment"
+        >
+          {{ isProcessingPayment ? "Procesando..." : "Pagar $5.00" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,488 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%; /* Cambiado de 100vw para evitar problemas con la barra de desplazamiento */
+  height: 100%;
+  overflow: hidden; /* Forzar sin scroll */
+  position: fixed; /* Evita rebotes en dispositivos móviles */
+  top: 0;
+  left: 0;
+}
+.background {
+  background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed;
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;/* Cambiado de center a flex-start */
+  align-items: center;
+  min-height: 100vh; /* Cambiado de height a min-height */
+  box-sizing: border-box;
+  overflow-y: auto; /* Permite scroll si es necesario */
+  z-index: 1;
+}
+h2 {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  margin-top: 40px;
+  font-size: 60px;
+  color: #ffffff;
+  text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+}
+.particulas {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+}
+.cartas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin-top: -10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-bottom: -10px;
+  overflow: hidden;
+  z-index: 1;
+}
+.card-container {
+  position: relative;
+  width: 100vw;
+  height: 60vh;
+  margin-top: 15vh;
+}
+
+.card {
+  position: absolute;
+  transition: all 0.5s ease-in-out;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card.selected {
+  transform: scale(1.2) translateY(-50px) rotateY(180deg);
+  transition: transform 1s ease-in-out;
+}
+
+#cardContainer.show {
+  position: absolute;
+  top: 50%;
+  height: 1000px;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card.selected {
+  transform: scale(1.2) translateY(-50px) rotateY(180deg);
+  transition: transform 1s ease-in-out;
+}
+@media (max-width: 768px) {
+  .card {
+    width: 70px !important; /* Reducir tamaño */
+    height: 120px !important;
+    margin: -20px; /* Evitar superposición */
+  }
+
+  #cardContainer {
+    position: relative; /* Contenedor padre para posicionamiento absoluto */
+    width: 110vw;
+    height: 80vh;
+    overflow: hidden;
+    margin-right: 20px;
+  }
+
+  /* Ajustes de posicionamiento del abanico */
+  .card {
+    transform-origin: bottom center !important;
+    margin: 0 -25px;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .card {
+    width: 85px !important;
+    height: 140px !important;
+  }
+}
+.fade-out {
+  animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* Modal de pago mejorado */
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+
+.payment-modal-content {
+  background-color: #1a1a2e;
+  color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  animation: modalFadeIn 0.5s ease forwards;
+  overflow-y: visible;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  color: #ffd700;
+  font-size: 26px;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.modal-text {
+  color: #e0e0e0;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  font-size: 16px;
+  text-align: center;
+}
+
+#payment-element-container {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+   overflow: visible;
+}
+
+/* Eliminamos la sombra del borde para elementos de Stripe */
+#payment-element-container iframe {
+  box-shadow: none !important;
+}
+
+/* Estilo para los mensajes y botones */
+.loading-container {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 215, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #ffd700;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.payment-error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.pay-button,
+.cancel-button {
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 10px;
+}
+
+.pay-button {
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.pay-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+}
+
+.pay-button:disabled {
+  background: #777;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #aaa;
+  box-shadow: none;
+}
+
+.cancel-button:hover {
+  color: #fff;
+  border-color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Cambios para dispositivos móviles */
+@media (max-width: 600px) {
+  .payment-modal-content {
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 22px;
+  }
+
+  .modal-text {
+    font-size: 14px;
+  }
+
+  .pay-button,
+  .cancel-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+/* Añade esto al final de tu archivo CSS */
+.reading-preparation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 100px);
+  text-align: center;
+  color: #ffd700;
+  font-size: 20px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1600;
+  animation: fadeInPreparation 1s ease forwards;
+}
+
+@keyframes fadeInPreparation {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 120px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 100px);
+  }
+}
+
+.reading-preparation p {
+  margin-bottom: 15px;
+}
+
+.tarot-loader {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffd700;
+  animation: tarot-spin 1s ease-in-out infinite;
+}
+
+@keyframes tarot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 767px) {
+  /* Ajustes generales del modal */
+  .payment-modal-overlay {
+    padding: 10px;
+    align-items: flex-start; /* Mejor para scroll en móviles */
+    overflow-y: auto;
+    margin-right: 20px;
+  }
+
+  .payment-modal-content {
+    padding: 40px 15px;
+    width: 95%;
+    max-width: none;
+    margin: 40px auto;
+    max-height: 85vh;
+    overflow-y: auto;
+    margin-right: 20px;
+  }
+
+  /* Ajustes de texto */
+  .modal-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .modal-text {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  /* Ajuste del contenedor del elemento de pago */
+  #payment-element-container {
+    padding: 15px 10px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+  }
+
+  /* Reorganizar botones en vertical para móviles pequeños */
+  .modal-actions {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .pay-button {
+    order: 1; /* Primer elemento en el flex container */
+    margin: 0 0 15px 0; /* Margen abajo en vez de laterales */
+    width: 80%;
+    max-width: 200px;
+  }
+
+  .cancel-button {
+    order: 2; /* Segundo elemento en el flex container */
+    margin: 0;
+    width: 80%;
+    margin-left: 103px;
+    max-width: 180px;
+  }
+}
+
+/* Ajustes específicos para móviles extra pequeños */
+@media (max-width: 480px) {
+  .payment-modal-content {
+    padding: 15px 12px;
+    border-radius: 12px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    padding-bottom: 10px;
+  }
+
+  #payment-element-container {
+    padding: 10px 8px;
+  }
+
+  /* Asegurarse de que el iframe de Stripe se ajuste */
+  #payment-element-container iframe {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Ajuste de los campos de entrada */
+  input.InputElement {
+    font-size: 16px !important; /* Evita zoom en iOS */
+  }
+
+  /* Eliminar efectos que puedan causar desbordamiento */
+  .pay-button:hover,
+  .cancel-button:hover {
+    transform: none;
+  }
+}
+
+/* Orientación apaisada en dispositivos móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  .payment-modal-content {
+    max-height: 90vh;
+    padding: 15px;
+    margin: 25px auto;
+    margin-right: 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .modal-text {
+    font-size: 13px;
+    margin-bottom: 15px;
+  }
+
+  /* Reducir tamaño del spinner para ahorrar espacio vertical */
+  .spinner {
+    width: 30px;
+    height: 30px;
+    margin: 10px auto;
+  }
+
+  /* Botones más compactos en horizontal */
+  .modal-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .pay-button,
+  .cancel-button {
+    padding: 8px 15px;
+  }
+}
