@@ -22,9 +22,8 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3010;
 // Middleware
 app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL || "http://localhost:4200",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express_1.default.json({ limit: "10mb" }));

@@ -8,9 +8,9 @@ import vocationalRoutes from "../routes/mapa-vocacional";
 import zodiacoRoutes from "../routes/zodiaco";
 import interpretadorsueno from "../routes/interpretador-sueno";
 import animalInteriorRoutes from "../routes/animal-interior";
-import tablaNacimientoRoutes from '../routes/tabla-nacimiento';
-import zodiacoChino from '../routes/zodiaco-chino';
-import calculadoraAmor from '../routes/calculadora-amor';
+import tablaNacimientoRoutes from "../routes/tabla-nacimiento";
+import zodiacoChino from "../routes/zodiaco-chino";
+import calculadoraAmor from "../routes/calculadora-amor";
 import RPagos from "../routes/Pagos";
 // Cargar variables de entorno
 dotenv.config();
@@ -21,13 +21,11 @@ const PORT = process.env.PORT || 3010;
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:4200",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,10 +40,10 @@ app.use(numerologyRoutes);
 app.use(vocationalRoutes);
 app.use(zodiacoRoutes);
 app.use(animalInteriorRoutes);
-app.use(tablaNacimientoRoutes); 
+app.use(tablaNacimientoRoutes);
 app.use(zodiacoChino);
 app.use(calculadoraAmor);
-app.use(RPagos)
+app.use(RPagos);
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
