@@ -96,14 +96,14 @@ export class CalculadoraAmorComponent
 
   // Info del experto en amor
   loveExpertInfo_display = {
-    name: 'Maestra Valentina',
+    name: 'Maestra Paula',
     title: 'Guardiana del Amor Eterno',
     specialty: 'Numerología amorosa y compatibilidad de almas',
   };
 
   // Frases de bienvenida aleatorias
   welcomeMessages = [
-    '¡Saludos, alma enamorada! 💕 Soy la Maestra Valentina, y estoy aquí para revelarte los secretos del amor verdadero. Las cartas del amor susurran historias de corazones unidos y pasiones eternas. ¿Estás preparada para descubrir la compatibilidad de tu relación?',
+    '¡Saludos, alma enamorada! 💕 Soy la Maestra Paula, y estoy aquí para revelarte los secretos del amor verdadero. Las cartas del amor susurran historias de corazones unidos y pasiones eternas. ¿Estás preparada para descubrir la compatibilidad de tu relación?',
     'Las energías amorosas me susurran que has venido buscando respuestas del corazón... Los números del amor revelan la química entre las almas. ¿Qué secreto romántico deseas conocer?',
     'Bienvenido al templo del amor eterno. Los patrones numerológicos del romance han anunciado tu llegada. Permíteme calcular la compatibilidad de tu relación a través de la numerología sagrada.',
     'Los números del amor danzan ante mí revelando tu presencia... Cada cálculo revela un destino romántico. ¿Qué pareja deseas que analice numerológicamente para ti?'
@@ -608,7 +608,7 @@ export class CalculadoraAmorComponent
     const welcomeMessage = {
       id: Date.now().toString(),
       role: 'love_expert' as const,
-      message: '¡Hola! Soy la Maestra Valentina, tu guía en el mundo del amor y la compatibilidad numerológica. ¿En qué puedo ayudarte hoy? 💕',
+      message: '¡Hola! Soy la Maestra Paula, tu guía en el mundo del amor y la compatibilidad numerológica. ¿En qué puedo ayudarte hoy? 💕',
       timestamp: new Date(),
       isBlocked: false
     };

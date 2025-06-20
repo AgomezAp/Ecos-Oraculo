@@ -1,3 +1,12 @@
+<!-- Video de fondo -->
+<video autoplay muted loop playsinline class="background-video">
+  <source src="/ANIMAL.webm" type="video/webm">
+  Tu navegador no soporta videos HTML5.
+</video>
+
+<!-- Overlay opcional para mejorar legibilidad -->
+<div class="video-overlay"></div>
+
 <div class="oracle-container">
   <div class="content-with-navbar">
     <div class="oracle-main">
@@ -13,6 +22,20 @@
             Especialista en conexión espiritual con el reino animal
           </p>
         </div>
+        <button
+          class="close-chat-btn"
+          onclick="window.location.href='/'"
+          aria-label="Cerrar"
+        >
+          <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
+            <path
+              d="M1 1L11 11M1 11L11 1"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
       </div>
 
       <!-- ===== ÁREA DE CHAT ===== -->
@@ -89,42 +112,41 @@
         </div>
 
         <!-- ===== ÁREA DE ENTRADA ===== -->
-       
       </div>
-       <div class="input-area">
-          <div class="input-container">
-            <div class="text-input-wrapper">
-              <textarea
-                class="message-input"
-                [(ngModel)]="currentMessage"
-                placeholder="Escribe tu consulta sobre tu animal interior..."
-                (input)="autoResize($event)"
-                (keydown)="onKeyPress($event)"
-                [disabled]="isLoading"
-                rows="1"
-              >
-              </textarea>
-            </div>
+      <div class="input-area">
+        <div class="input-container">
+          <div class="text-input-wrapper">
+            <textarea
+              class="message-input"
+              [(ngModel)]="currentMessage"
+              placeholder="Escribe tu consulta sobre tu animal interior..."
+              (input)="autoResize($event)"
+              (keydown)="onKeyPress($event)"
+              [disabled]="isLoading"
+              rows="1"
+            >
+            </textarea>
+          </div>
 
-            <div class="action-buttons">
-              <button
-                class="clear-button"
-                (click)="clearChat()"
-                title="Limpiar chat"
-              >
-                <i class="fas fa-redo"></i>
-              </button>
-              <button
-                class="send-button"
-                (click)="sendMessage()"
-                [disabled]="!currentMessage.trim() || isLoading"
-                title="Enviar mensaje"
-              >
-                <i class="fas fa-paper-plane"></i>
-              </button>
-            </div>
+          <div class="action-buttons">
+            <button
+              class="clear-button"
+              (click)="clearChat()"
+              title="Limpiar chat"
+            >
+              <i class="fas fa-redo"></i>
+            </button>
+            <button
+              class="send-button"
+              (click)="sendMessage()"
+              [disabled]="!currentMessage.trim() || isLoading"
+              title="Enviar mensaje"
+            >
+              <i class="fas fa-paper-plane"></i>
+            </button>
           </div>
         </div>
+      </div>
     </div>
   </div>
 </div>

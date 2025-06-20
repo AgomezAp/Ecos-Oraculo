@@ -50,7 +50,7 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
 
   // Datos del guía
   private guideData: AnimalGuideData = {
-    name: 'Xamán Kiara',
+    name: 'Xamán Olivia',
     specialty: 'Guía de Animales Interiores',
     experience: 'Especialista en conexión espiritual con el reino animal'
   };
@@ -97,8 +97,8 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
     
     if (this.chatMessages.length === 0) {
       this.addMessage({
-        sender: 'Xamán Kiara',
-        content: `🦉 ¡Saludos, buscador! Soy Kiara, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
+        sender: 'Xamán Olivia',
+        content: `🦉 ¡Saludos, buscador! Soy Olivia, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
 
 ¿Qué te gustaría explorar sobre tu espíritu animal?`,
         timestamp: new Date(),
@@ -187,7 +187,7 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
         if (response.success && response.response) {
           const messageId = Date.now().toString();
           this.addMessage({
-            sender: 'Xamán Kiara',
+            sender: 'Xamán Olivia',
             content: response.response,
             timestamp: new Date(),
             isUser: false,
@@ -207,7 +207,7 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
           }
         } else {
           this.addMessage({
-            sender: 'Xamán Kiara',
+            sender: 'Xamán Olivia',
             content: '🦉 Disculpa, no pude conectar con la sabiduría animal en este momento. Intenta de nuevo.',
             timestamp: new Date(),
             isUser: false
@@ -219,7 +219,7 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
       error: (error) => {
         this.shouldScrollToBottom = true;
         this.addMessage({
-          sender: 'Xamán Kiara',
+          sender: 'Xamán Olivia',
           content: '🦉 Ocurrió un error en la conexión espiritual. Intenta de nuevo.',
           timestamp: new Date(),
           isUser: false
@@ -319,7 +319,7 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
       sessionStorage.removeItem('animalInteriorBlockedMessageId');
       this.shouldScrollToBottom = true;
       this.addMessage({
-        sender: 'Xamán Kiara',
+        sender: 'Xamán Olivia',
         content: '🦉 ✨ ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría del reino animal sin límites.',
         timestamp: new Date(),
         isUser: false
@@ -430,8 +430,8 @@ export class AnimalInteriorComponent implements OnInit, OnDestroy, AfterViewChec
     
     // Agregar mensaje de bienvenida inicial
     this.addMessage({
-      sender: 'Xamán Kiara',
-      content: `🦉 ¡Saludos, buscador! Soy Kiara, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
+      sender: 'Xamán Olivia',
+      content: `🦉 ¡Saludos, buscador! Soy Olivia, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
 
 ¿Qué te gustaría explorar sobre tu espíritu animal?`,
       timestamp: new Date(),

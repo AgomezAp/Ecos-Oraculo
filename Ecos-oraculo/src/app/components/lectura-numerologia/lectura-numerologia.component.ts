@@ -89,7 +89,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
 
   // Info del numerólogo
   numerologistInfo = {
-    name: 'Maestra Pythia',
+    name: 'Maestra Sofía',
     title: 'Guardiana de los Números Sagrados',
     specialty: 'Numerología y vibración numérica universal',
   };
@@ -97,7 +97,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   // Frases de bienvenida aleatorias
   welcomeMessages = [
     'Salve, buscador de la sabiduría numérica... Los números son el lenguaje del universo y revelan los secretos de tu destino. ¿Qué deseas conocer sobre tu vibración numerológica?',
-    'Las energías numéricas me susurran que has venido buscando respuestas... Soy Maestra Pythia, guardiana de los números sagrados. ¿Qué misterio numérico te inquieta?',
+    'Las energías numéricas me susurran que has venido buscando respuestas... Soy Maestra Sofía, guardiana de los números sagrados. ¿Qué misterio numérico te inquieta?',
     'Bienvenido al templo de los números sagrados. Los patrones matemáticos del cosmos han anunciado tu llegada. Permíteme revelarte los secretos de tu código numerológico.',
     'Los números danzan ante mí revelando tu presencia... Cada número tiene un significado, cada cálculo revela un destino. ¿Qué números deseas que interprete para ti?'
   ];

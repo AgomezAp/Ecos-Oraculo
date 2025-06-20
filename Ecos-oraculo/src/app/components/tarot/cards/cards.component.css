@@ -5,26 +5,55 @@
 }
 
 html, body {
-  width: 100%; /* Cambiado de 100vw para evitar problemas con la barra de desplazamiento */
+  width: 100%;
   height: 100%;
-  overflow: hidden; /* Forzar sin scroll */
-  position: fixed; /* Evita rebotes en dispositivos móviles */
+  overflow: hidden;
+  position: fixed;
   top: 0;
   left: 0;
 }
+
 .background {
-  background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed;
-  background-size: cover;
-  background-position: center center;
+  /* Remover la imagen de fondo estática */
+  /* background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed; */
+  /* background-size: cover; */
+  /* background-position: center center; */
+  
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;/* Cambiado de center a flex-start */
+  justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Cambiado de height a min-height */
+  min-height: 100vh;
   box-sizing: border-box;
-  overflow-y: auto; /* Permite scroll si es necesario */
+  overflow-y: auto;
   z-index: 1;
 }
+
+/* Video de fondo */
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Overlay opcional para mejorar legibilidad */
+.background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 0;
+  pointer-events: none;
+}
+
 h2 {
   position: absolute;
   top: 0;
@@ -35,12 +64,20 @@ h2 {
   font-size: 60px;
   color: #ffffff;
   text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
+
 .particulas {
   position: absolute;
   z-index: 1;
   overflow: hidden;
 }
+
+.content-container {
+  position: relative;
+  z-index: 2; /* Asegurar que esté sobre el video */
+}
+
 .cartas-container {
   display: flex;
   justify-content: center;
@@ -53,11 +90,28 @@ h2 {
   overflow: hidden;
   z-index: 1;
 }
+
 .card-container {
   position: relative;
   width: 100vw;
   height: 60vh;
   margin-top: 15vh;
+}
+
+.selected-cards-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 90vw;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.selected-card {
+  width: 28%;
+  max-width: 180px;
+  margin: 0 2%;
+  transition: all 0.3s ease;
 }
 
 .card {
@@ -85,43 +139,39 @@ h2 {
   justify-content: center;
   align-items: center;
 }
+
 .card:hover {
   transform: scale(1.05);
 }
 
-.card.selected {
-  transform: scale(1.2) translateY(-50px) rotateY(180deg);
-  transition: transform 1s ease-in-out;
-}
 @media (max-width: 768px) {
   .card {
-    width: 70px !important; /* Reducir tamaño */
+    width: 70px !important;
     height: 120px !important;
-    margin: -20px; /* Evitar superposición */
+    margin: -20px;
   }
 
   #cardContainer {
-    position: relative; /* Contenedor padre para posicionamiento absoluto */
+    position: relative;
     width: 110vw;
     height: 80vh;
     overflow: hidden;
     margin-right: 20px;
   }
 
-  /* Ajustes de posicionamiento del abanico */
   .card {
     transform-origin: bottom center !important;
     margin: 0 -25px;
   }
 }
 
-/* Ajustes para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .card {
     width: 85px !important;
     height: 140px !important;
   }
 }
+
 .fade-out {
   animation: fadeOut 1s forwards;
 }
@@ -134,6 +184,7 @@ h2 {
     opacity: 0;
   }
 }
+
 /* Modal de pago mejorado */
 .payment-modal-overlay {
   position: fixed;
@@ -199,15 +250,13 @@ h2 {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-   overflow: visible;
+  overflow: visible;
 }
 
-/* Eliminamos la sombra del borde para elementos de Stripe */
 #payment-element-container iframe {
   box-shadow: none !important;
 }
 
-/* Estilo para los mensajes y botones */
 .loading-container {
   text-align: center;
   padding: 20px 0;
@@ -291,7 +340,6 @@ h2 {
   transform: translateY(-2px);
 }
 
-/* Cambios para dispositivos móviles */
 @media (max-width: 600px) {
   .payment-modal-content {
     padding: 20px;
@@ -311,7 +359,7 @@ h2 {
     font-size: 14px;
   }
 }
-/* Añade esto al final de tu archivo CSS */
+
 .reading-preparation {
   position: absolute;
   top: 50%;
@@ -355,11 +403,11 @@ h2 {
     transform: rotate(360deg);
   }
 }
+
 @media (max-width: 767px) {
-  /* Ajustes generales del modal */
   .payment-modal-overlay {
     padding: 10px;
-    align-items: flex-start; /* Mejor para scroll en móviles */
+    align-items: flex-start;
     overflow-y: auto;
     margin-right: 20px;
   }
@@ -374,7 +422,6 @@ h2 {
     margin-right: 20px;
   }
 
-  /* Ajustes de texto */
   .modal-title {
     font-size: 22px;
     margin-bottom: 15px;
@@ -385,14 +432,12 @@ h2 {
     margin-bottom: 20px;
   }
 
-  /* Ajuste del contenedor del elemento de pago */
   #payment-element-container {
     padding: 15px 10px;
     margin-top: 15px;
     margin-bottom: 20px;
   }
 
-  /* Reorganizar botones en vertical para móviles pequeños */
   .modal-actions {
     flex-direction: column;
     gap: 15px;
@@ -400,14 +445,14 @@ h2 {
   }
 
   .pay-button {
-    order: 1; /* Primer elemento en el flex container */
-    margin: 0 0 15px 0; /* Margen abajo en vez de laterales */
+    order: 1;
+    margin: 0 0 15px 0;
     width: 80%;
     max-width: 200px;
   }
 
   .cancel-button {
-    order: 2; /* Segundo elemento en el flex container */
+    order: 2;
     margin: 0;
     width: 80%;
     margin-left: 103px;
@@ -415,7 +460,6 @@ h2 {
   }
 }
 
-/* Ajustes específicos para móviles extra pequeños */
 @media (max-width: 480px) {
   .payment-modal-content {
     padding: 15px 12px;
@@ -431,25 +475,21 @@ h2 {
     padding: 10px 8px;
   }
 
-  /* Asegurarse de que el iframe de Stripe se ajuste */
   #payment-element-container iframe {
     width: 100% !important;
     min-width: 0 !important;
   }
 
-  /* Ajuste de los campos de entrada */
   input.InputElement {
-    font-size: 16px !important; /* Evita zoom en iOS */
+    font-size: 16px !important;
   }
 
-  /* Eliminar efectos que puedan causar desbordamiento */
   .pay-button:hover,
   .cancel-button:hover {
     transform: none;
   }
 }
 
-/* Orientación apaisada en dispositivos móviles */
 @media (max-height: 500px) and (orientation: landscape) {
   .payment-modal-content {
     max-height: 90vh;
@@ -468,14 +508,12 @@ h2 {
     margin-bottom: 15px;
   }
 
-  /* Reducir tamaño del spinner para ahorrar espacio vertical */
   .spinner {
     width: 30px;
     height: 30px;
     margin: 10px auto;
   }
 
-  /* Botones más compactos en horizontal */
   .modal-actions {
     flex-direction: row;
     gap: 10px;

@@ -1,29 +1,47 @@
-/* Contenedor de fondo con imagen */
+/* Contenedor de fondo con video */
 .oracle-container {
   min-height: 100vh;
   width: 100%;
-  background-image: url("/FondoSueños.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 20px; /* Reducir padding exterior */
+  padding: 20px;
   overflow: hidden;
 }
 
-/* Contenedor principal con menos padding */
+/* Video de fondo */
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Contenedor principal con menos padding - asegurar z-index */
 .oracle-main {
   font-family: "Cinzel", serif;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
   max-width: 1200px;
   width: 95%;
-  height: calc(100vh - 40px); /* Ajustar por padding reducido */
+  height: calc(100vh - 40px);
   margin: 0 auto;
   position: relative;
   color: white;
@@ -33,15 +51,16 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 15px; /* Reducir padding interno */
+  padding: 15px;
+  z-index: 1; /* Asegurar que esté sobre el video */
 }
 
-/* Header más compacto */
+/* Header más compacto - asegurar z-index */
 .interpreter-info {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap */
-  padding: 8px 20px; /* Reducir padding */
+  gap: 12px;
+  padding: 8px 20px;
   background: linear-gradient(
     135deg,
     rgba(162, 142, 255, 0.8) 0%,
@@ -52,7 +71,8 @@
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
-  margin-bottom: 12px; /* Reducir margen inferior */
+  margin-bottom: 12px;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
 .interpreter-avatar {
@@ -61,42 +81,45 @@
 }
 
 .mystical-orb {
-  width: 45px; /* Reducir tamaño */
+  width: 45px;
   height: 45px;
   border-radius: 50%;
   background: linear-gradient(45deg, #a28eff, #6c5ce7);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px; /* Reducir tamaño del emoji */
+  font-size: 22px;
   box-shadow: 0 8px 16px rgba(162, 142, 255, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .interpreter-details h3 {
   margin: 0;
-  font-size: 1.1rem; /* Reducir tamaño */
+  font-size: 1.1rem;
   color: white;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste */
 }
 
 .interpreter-title {
-  margin: 2px 0 0 0; /* Reducir margin */
-  font-size: 0.85rem; /* Reducir tamaño */
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste */
 }
 
 .interpreter-specialty {
-  margin: 2px 0 0 0; /* Reducir margin */
-  font-size: 0.75rem; /* Reducir tamaño */
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.8);
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste */
 }
 
-/* Área de chat con menos padding */
+/* Área de chat con menos padding - asegurar z-index */
 .chat-area {
   display: flex;
   flex-direction: column;
@@ -105,27 +128,29 @@
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin: 0 0 12px 0; /* Reducir margen inferior */
+  margin: 0 0 12px 0;
   min-height: 0;
   overflow: hidden;
-  padding: 12px; /* Reducir padding interno */
+  padding: 12px;
+  position: relative;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 15px; /* Reducir padding interno */
+  padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Reducir gap entre mensajes */
+  gap: 12px;
 }
 
 .message {
   display: flex;
   align-items: flex-start;
-  gap: 10px; /* Reducir gap entre avatar y mensaje */
+  gap: 10px;
   animation: message-appear 0.3s ease-out;
-  margin: 0 8px; /* Reducir margen lateral */
+  margin: 0 8px;
 }
 
 @keyframes message-appear {
@@ -149,13 +174,13 @@
 }
 
 .message-avatar {
-  width: 35px; /* Reducir tamaño */
+  width: 35px;
   height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px; /* Reducir tamaño */
+  font-size: 16px;
   flex-shrink: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -169,11 +194,11 @@
 }
 
 .message-content {
-  max-width: 80%; /* Aumentar ancho para más texto */
+  max-width: 80%;
 }
 
 .message-bubble {
-  padding: 12px 16px; /* Reducir padding en burbujas */
+  padding: 12px 16px;
   border-radius: 18px;
   backdrop-filter: blur(10px);
   position: relative;
@@ -189,9 +214,9 @@
 .user-message .message-bubble p {
   color: #333;
   font-family: "Arsenal", sans-serif;
-  font-size: 15px; /* Reducir tamaño de texto */
+  font-size: 15px;
   font-weight: 300;
-  line-height: 1.4; /* Reducir line-height */
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -204,17 +229,17 @@
 .interpreter-message .message-bubble p {
   color: white;
   font-family: "Cinzel", serif !important;
-  font-size: 16px; /* Reducir tamaño de texto */
+  font-size: 16px;
   font-weight: 300;
-  line-height: 1.4; /* Reducir line-height */
+  line-height: 1.4;
   margin: 0;
 }
 
 .message-time {
-  font-size: 0.65rem; /* Reducir tamaño */
+  font-size: 0.65rem;
   display: block;
   text-align: right;
-  margin-top: 4px; /* Reducir margen */
+  margin-top: 4px;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -226,12 +251,12 @@
 
 .typing-dots {
   display: flex;
-  gap: 3px; /* Reducir gap */
-  margin-bottom: 4px; /* Reducir margen */
+  gap: 3px;
+  margin-bottom: 4px;
 }
 
 .typing-dots span {
-  width: 5px; /* Reducir tamaño */
+  width: 5px;
   height: 5px;
   border-radius: 50%;
   background: white;
@@ -246,7 +271,7 @@
 }
 
 .typing-text {
-  font-size: 0.75rem; /* Reducir tamaño */
+  font-size: 0.75rem;
   color: white;
   font-style: italic;
   margin: 0;
@@ -264,27 +289,29 @@
   }
 }
 
-/* Área de entrada con menos padding */
+/* Área de entrada con menos padding - asegurar z-index */
 .input-area {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 15px 20px; /* Reducir padding */
+  padding: 15px 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
 .input-container {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap */
+  gap: 12px;
 }
 
 .text-input-wrapper {
   flex: 1;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 22px;
-  padding: 10px 18px; /* Reducir padding */
+  padding: 10px 18px;
   backdrop-filter: blur(10px);
   border: 2px solid rgba(162, 142, 255, 0.2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -302,7 +329,7 @@
   border: none !important;
   outline: none !important;
   color: #333 !important;
-  font-size: 16px !important; /* Reducir tamaño de texto */
+  font-size: 16px !important;
   resize: none;
   min-height: 18px;
   font-family: "Arial", sans-serif !important;
@@ -319,14 +346,14 @@
 
 .action-buttons {
   display: flex;
-  gap: 8px; /* Reducir gap entre botones */
+  gap: 8px;
   align-items: center;
 }
 
 .send-button {
   width: 40px;
   height: 40px;
-  background-color: rgba(90, 90, 100, 0); /* Mucho más transparente */
+  background-color: rgba(90, 90, 100, 0);
   color: rgba(255, 255, 255, 0.9);
   border: none;
   border-radius: 50%;
@@ -357,8 +384,8 @@
 .clear-button {
   width: 40px;
   height: 40px;
-  background: white; /* Mucho más transparente */
-  color: rgba(255, 255, 255, 0.9);
+  background: white;
+  color: rgba(0, 0, 0, 0.8);
   border: none;
   border-radius: 50%;
   display: flex;
@@ -374,9 +401,9 @@
 }
 
 .input-hint {
-  font-size: 0.75rem; /* Reducir tamaño */
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
-  margin-top: 8px; /* Reducir margen */
+  margin-top: 8px;
   text-align: center;
   font-family: "Arsenal", sans-serif;
   font-weight: 300;
@@ -384,7 +411,7 @@
 
 /* Scrollbar personalizado */
 .messages-container::-webkit-scrollbar {
-  width: 6px; /* Reducir ancho */
+  width: 6px;
 }
 
 .messages-container::-webkit-scrollbar-track {
@@ -431,12 +458,12 @@
 
 .payment-prompt {
   text-align: center;
-  padding: 15px; /* Reducir padding */
+  padding: 15px;
   max-width: 200px;
 }
 
 .lock-icon {
-  font-size: 20px; /* Reducir tamaño */
+  font-size: 20px;
   display: block;
   margin-bottom: 8px;
   color: #a28eff;
@@ -445,19 +472,19 @@
 .payment-prompt p {
   margin: 4px 0;
   color: #333;
-  font-size: 12px; /* Reducir tamaño */
+  font-size: 12px;
 }
 
 .unlock-button {
   background: linear-gradient(135deg, #a28eff, #6c5ce7);
   color: white;
   border: none;
-  padding: 10px 16px; /* Reducir padding */
+  padding: 10px 16px;
   border-radius: 20px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-  margin-top: 8px; /* Reducir margen */
+  margin-top: 8px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(162, 142, 255, 0.3);
 }
@@ -467,7 +494,7 @@
   box-shadow: 0 6px 20px rgba(162, 142, 255, 0.4);
 }
 
-/* Modal de pago con temática de sueños */
+/* Modal de pago con temática de sueños - aumentar z-index para estar sobre el video */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -479,11 +506,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: modal-appear 0.3s ease-out;
-  padding: 20px; /* Añadir padding para el scroll */
+  padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto; /* Habilitar scroll vertical */
+  overflow-y: auto;
 }
 
 @keyframes modal-appear {
@@ -508,7 +535,7 @@
   padding: 0;
   max-width: 480px;
   width: 92%;
-  max-height: calc(100vh - 40px); /* Altura máxima para permitir scroll */
+  max-height: calc(100vh - 40px);
   color: white;
   position: relative;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(162, 142, 255, 0.3),
@@ -517,10 +544,14 @@
   border: 2px solid rgba(162, 142, 255, 0.3);
   overflow: hidden;
   animation: modal-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  margin: auto; /* Centrar en el overlay */
+  margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
+
+/* ... resto del CSS permanece igual hasta el final ... */
+
 @keyframes modal-scale {
   from {
     transform: scale(0.8) translateY(20px);
@@ -546,7 +577,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
-  flex-shrink: 0; /* No se encoge */
+  flex-shrink: 0;
 }
 
 .payment-header::before {
@@ -610,9 +641,9 @@
   padding: 30px;
   text-align: center;
   position: relative;
-  overflow-y: auto; /* Habilitar scroll en el contenido */
-  flex: 1; /* Ocupa el espacio disponible */
-  max-height: calc(100vh - 200px); /* Altura máxima del contenido */
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(100vh - 200px);
 }
 .payment-content::-webkit-scrollbar {
   width: 8px;
@@ -1023,35 +1054,35 @@
 /* Responsive */
 @media (max-width: 768px) {
   .oracle-container {
-    padding: 15px; /* Reducir padding */
+    padding: 15px;
   }
 
   .oracle-main {
     height: calc(100vh - 30px);
     border-radius: 20px;
     max-width: 98%;
-    padding: 12px; /* Reducir padding */
+    padding: 12px;
   }
 
   .interpreter-info {
-    padding: 6px 15px; /* Reducir padding */
+    padding: 6px 15px;
     margin-bottom: 10px;
   }
 
   .chat-area {
-    padding: 10px; /* Reducir padding */
+    padding: 10px;
   }
 
   .messages-container {
-    padding: 12px; /* Reducir padding */
+    padding: 12px;
   }
 
   .message {
-    margin: 0 6px; /* Reducir margen */
+    margin: 0 6px;
   }
 
   .input-area {
-    padding: 12px 15px; /* Reducir padding */
+    padding: 12px 15px;
   }
 }
 
@@ -1076,20 +1107,20 @@
 
   .messages-container {
     padding: 10px;
-    gap: 8px; /* Reducir gap en mobile */
+    gap: 8px;
   }
 
   .message {
     margin: 0 4px;
-    gap: 8px; /* Reducir gap */
+    gap: 8px;
   }
 
   .message-bubble {
-    padding: 10px 14px; /* Reducir padding */
+    padding: 10px 14px;
   }
 
   .message-avatar {
-    width: 40px; /* Tamaño uniforme */
+    width: 40px;
     height: 40px;
     border-radius: 50%;
   }
@@ -1114,6 +1145,6 @@
 
   .user-message .message-bubble p,
   .interpreter-message .message-bubble p {
-    font-size: 13px; /* Reducir en mobile */
+    font-size: 13px;
   }
 }

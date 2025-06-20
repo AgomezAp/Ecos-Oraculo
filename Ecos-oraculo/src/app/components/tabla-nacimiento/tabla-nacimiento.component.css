@@ -1,8 +1,8 @@
 /* ===== CONFIGURACIÓN DE FUENTES BASE ===== */
 :root {
-  --font-astrologer: 'Berkshire Swash', cursive;
-  --font-user: 'El Messiri', sans-serif;
-  --font-system: 'Arsenal', sans-serif;
+  --font-astrologer: "Berkshire Swash", cursive;
+  --font-user: "El Messiri", sans-serif;
+  --font-system: "Arsenal", sans-serif;
 }
 
 /* ===== VARIABLES GLOBALES ===== */
@@ -18,6 +18,7 @@
   --shadow-medium: 0 6px 25px rgba(139, 92, 246, 0.2);
   --transition: all 0.3s ease;
 }
+
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -43,22 +44,43 @@
   width: 12px;
   height: 12px;
 }
-/* Contenedor de fondo con imagen - estructura exacta de sueños */
-.background-container {
+
+/* ===== VIDEO DE FONDO ===== */
+.background-video {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/CartaAstral.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  z-index: -1;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
 }
 
-/* Contenedor principal con menos padding - estructura exacta de sueños */
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Contenedor de fondo con imagen - actualizado para funcionar con video */
+.background-container {
+  /* Eliminar propiedades de fondo estático */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -3; /* Mover atrás del video */
+}
+
+/* Contenedor principal con z-index actualizado */
 .main-content {
   min-height: 100vh;
   width: 100%;
@@ -67,17 +89,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 20px; /* Reducir padding exterior como sueños */
+  padding: 20px;
   overflow: hidden;
+  z-index: 1; /* Asegurar que esté sobre el video */
 }
 
 .birth-chart-modal {
-  font-family: 'Cinzel', serif;
+  font-family: "Cinzel", serif;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
   max-width: 1200px;
   width: 95%;
-  height: calc(100vh - 40px); /* Ajustar por padding reducido como sueños */
+  height: calc(100vh - 40px);
   margin: 0 auto;
   position: relative;
   color: white;
@@ -87,35 +110,41 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 15px; /* Reducir padding interno como sueños */
+  padding: 15px;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
-/* Header más compacto - estructura exacta de sueños pero colores púrpuras */
+/* Header con z-index alto y mejor contraste */
 .birth-chart-header {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap como sueños */
-  padding: 8px 20px; /* Reducir padding como sueños */
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  gap: 12px;
+  padding: 8px 20px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-purple);
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
-  margin-bottom: 12px; /* Reducir margen inferior como sueños */
+  margin-bottom: 12px;
   justify-content: space-between;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .astrologer-info {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap como sueños */
+  gap: 12px;
   position: relative;
   z-index: 1;
 }
 
 .astrologer-avatar {
-  width: 45px; /* Reducir tamaño como sueños */
+  width: 45px;
   height: 45px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
@@ -128,31 +157,37 @@
 }
 
 .astrologer-icon {
-  font-size: 22px; /* Reducir tamaño del emoji como sueños */
+  font-size: 22px;
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
   animation: pulse-glow 2s infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)); }
-  50% { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1)); }
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1));
+  }
 }
 
 .astrologer-details h3 {
   margin: 0;
   color: white;
-  font-size: 1.1rem; /* Reducir tamaño como sueños */
+  font-size: 1.1rem;
   font-weight: 600;
   font-family: var(--font-user);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .astrologer-details p {
-  margin: 2px 0 0 0; /* Reducir margin como sueños */
+  margin: 2px 0 0 0;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.85rem; /* Reducir tamaño como sueños */
+  font-size: 0.85rem;
   font-style: italic;
   font-family: var(--font-user);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .close-button {
@@ -161,14 +196,14 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   transition: var(--transition);
-  width: 30px; /* Reducir tamaño como sueños */
+  width: 30px;
   height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px; /* Reducir tamaño como sueños */
+  font-size: 16px;
 }
 
 .close-button:hover {
@@ -177,32 +212,35 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Sección de datos personales compacta - estructura exacta de sueños */
+/* Sección de datos personales con z-index alto */
 .personal-data-section {
   background: rgba(139, 92, 246, 0.1);
   border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-  padding: 12px 20px; /* Reducir padding como sueños */
+  padding: 12px 20px;
   flex-shrink: 0;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .personal-data-section h4 {
-  margin: 0 0 10px 0; /* Reducir margin como sueños */
+  margin: 0 0 10px 0;
   color: var(--primary-purple);
-  font-size: 1em; /* Reducir tamaño como sueños */
+  font-size: 1em;
   font-weight: 600;
   text-align: center;
   font-family: var(--font-astrologer);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .data-form {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Reducir gap como sueños */
+  gap: 10px;
 }
 
 .form-row {
   display: flex;
-  gap: 10px; /* Reducir gap como sueños */
+  gap: 10px;
 }
 
 .half-width {
@@ -215,54 +253,60 @@
 
 .form-actions {
   display: flex;
-  gap: 8px; /* Reducir gap como sueños */
-  margin-top: 8px; /* Reducir margin como sueños */
+  gap: 8px;
+  margin-top: 8px;
   justify-content: center;
 }
 
 .form-actions button {
   border-radius: 12px;
-  padding: 8px 16px; /* Reducir padding como sueños */
+  padding: 8px 16px;
   font-family: var(--font-user);
   font-weight: 600;
   transition: var(--transition);
-  font-size: 0.85rem; /* Reducir tamaño como sueños */
+  font-size: 0.85rem;
 }
 
 .form-actions button:hover {
-  transform: translateY(-1px); /* Reducir movimiento como sueños */
+  transform: translateY(-1px);
   box-shadow: var(--shadow-medium);
 }
 
-/* Preview de carta compacto - estructura exacta de sueños */
+/* Preview de carta con z-index alto */
 .chart-preview {
   background: rgba(139, 92, 246, 0.05);
   border-bottom: 1px solid rgba(139, 92, 246, 0.1);
-  padding: 12px 20px; /* Reducir padding como sueños */
+  padding: 12px 20px;
   flex-shrink: 0;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .chart-preview h4 {
-  margin: 0 0 10px 0; /* Reducir margin como sueños */
+  margin: 0 0 10px 0;
   color: var(--primary-purple);
-  font-size: 1em; /* Reducir tamaño como sueños */
+  font-size: 1em;
   font-weight: 600;
   text-align: center;
   font-family: var(--font-astrologer);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Reducir minmax como sueños */
-  gap: 10px; /* Reducir gap como sueños */
-  max-width: 350px; /* Reducir ancho como sueños */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(100px, 1fr)
+  );
+  gap: 10px;
+  max-width: 350px;
   margin: 0 auto;
 }
 
 .chart-card {
   background: white;
-  border-radius: 10px; /* Reducir border-radius como sueños */
-  padding: 10px; /* Reducir padding como sueños */
+  border-radius: 10px;
+  padding: 10px;
   text-align: center;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-purple);
@@ -270,46 +314,47 @@
 }
 
 .chart-card:hover {
-  transform: translateY(-1px); /* Reducir movimiento como sueños */
+  transform: translateY(-1px);
   box-shadow: var(--shadow-medium);
 }
 
 .chart-card .sign {
   display: block;
-  font-size: 1.2rem; /* Reducir tamaño como sueños */
+  font-size: 1.2rem;
   font-weight: bold;
   color: var(--primary-purple);
-  margin-bottom: 4px; /* Reducir margin como sueños */
+  margin-bottom: 4px;
 }
 
 .chart-card .label {
   display: block;
-  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  font-size: 0.75rem;
   color: #64748b;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Área de chat con menos padding - estructura exacta de sueños */
+/* Área de chat con z-index alto */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 15px; /* Reducir padding interno como sueños */
-  background: rgba(12, 12, 38, 0.6); /* Mismo color que sueños */
+  padding: 15px;
+  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin: 0 0 12px 0; /* Reducir margen inferior como sueños */
+  margin: 0 0 12px 0;
   min-height: 0;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Reducir gap entre mensajes como sueños */
+  gap: 12px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .chat-messages::-webkit-scrollbar {
-  width: 6px; /* Reducir ancho como sueños */
+  width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-track {
@@ -329,10 +374,10 @@
 /* Mensajes con estructura exacta de sueños */
 .message {
   display: flex;
-  gap: 10px; /* Reducir gap entre avatar y mensaje como sueños */
+  gap: 10px;
   animation: fadeInUp 0.4s ease-out;
   position: relative;
-  margin: 0 8px; /* Reducir margen lateral como sueños */
+  margin: 0 8px;
 }
 
 @keyframes fadeInUp {
@@ -351,20 +396,24 @@
 }
 
 .message-avatar {
-  width: 35px; /* Reducir tamaño como sueños */
+  width: 35px;
   height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px; /* Reducir tamaño como sueños */
+  font-size: 16px;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
   position: relative;
 }
 
 .message.astrologer-message .message-avatar {
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
 }
 
 .message.user-message .message-avatar {
@@ -376,7 +425,7 @@
 }
 
 .message-content {
-  max-width: 80%; /* Aumentar ancho para más texto como sueños */
+  max-width: 80%;
   position: relative;
 }
 
@@ -384,25 +433,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px; /* Reducir margin como sueños */
+  margin-bottom: 5px;
 }
 
 .sender-name {
   font-weight: 600;
   color: var(--primary-purple);
-  font-size: 0.8rem; /* Reducir tamaño como sueños */
+  font-size: 0.8rem;
   font-family: var(--font-system);
 }
 
 .message-time {
-  font-size: 0.65rem; /* Reducir tamaño como sueños */
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
   font-family: var(--font-system);
 }
 
 .message-text {
-  padding: 12px 16px; /* Reducir padding como sueños */
+  padding: 12px 16px;
   border-radius: 18px;
   box-shadow: var(--shadow-soft);
   position: relative;
@@ -420,16 +469,20 @@
 .message.astrologer-message .message-text p {
   color: #334155 !important;
   font-family: var(--font-astrologer) !important;
-  font-size: 15px !important; /* Reducir tamaño como sueños */
+  font-size: 15px !important;
   font-weight: 400 !important;
-  line-height: 1.4 !important; /* Reducir line-height como sueños */
+  line-height: 1.4 !important;
   margin: 0;
   text-shadow: none;
 }
 
 .message.user-message .message-text {
   border-bottom-right-radius: 6px;
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
   color: white;
   border: 1px solid var(--border-purple);
 }
@@ -437,9 +490,9 @@
 .message.user-message .message-text p {
   color: white !important;
   font-family: var(--font-user) !important;
-  font-size: 15px !important; /* Reducir tamaño como sueños */
+  font-size: 15px !important;
   font-weight: 500 !important;
-  line-height: 1.4 !important; /* Reducir line-height como sueños */
+  line-height: 1.4 !important;
   margin: 0;
 }
 
@@ -476,26 +529,26 @@
 
 .payment-prompt {
   background: white;
-  padding: 15px; /* Reducir padding como sueños */
+  padding: 15px;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   border: 2px solid var(--primary-purple);
-  max-width: 200px; /* Reducir ancho como sueños */
+  max-width: 200px;
   animation: bounce 0.5s ease-out;
 }
 
 .lock-icon {
-  font-size: 20px; /* Reducir tamaño como sueños */
+  font-size: 20px;
   display: block;
-  margin-bottom: 8px; /* Reducir margin como sueños */
+  margin-bottom: 8px;
   color: var(--primary-purple);
 }
 
 .payment-prompt p {
-  margin: 4px 0; /* Reducir margin como sueños */
+  margin: 4px 0;
   color: #334155;
-  font-size: 12px; /* Reducir tamaño como sueños */
+  font-size: 12px;
   font-family: var(--font-user);
   line-height: 1.3;
 }
@@ -507,48 +560,56 @@
 }
 
 .unlock-button {
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
   color: white;
   border: none;
-  padding: 8px 16px; /* Reducir padding como sueños */
+  padding: 8px 16px;
   border-radius: 20px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   font-family: var(--font-user);
-  margin-top: 8px; /* Reducir margin como sueños */
-  font-size: 12px; /* Reducir tamaño como sueños */
+  margin-top: 8px;
+  font-size: 12px;
   width: 100%;
 }
 
 .unlock-button:hover {
-  transform: translateY(-1px); /* Reducir movimiento como sueños */
+  transform: translateY(-1px);
   box-shadow: var(--shadow-medium);
 }
 
 /* Indicador de carga - estructura exacta de sueños */
 .loading-message {
   display: flex;
-  gap: 10px; /* Reducir gap como sueños */
+  gap: 10px;
   animation: fadeInUp 0.4s ease-out;
 }
 
 .loading-avatar {
-  width: 35px; /* Reducir tamaño como sueños */
+  width: 35px;
   height: 35px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px; /* Reducir tamaño como sueños */
+  font-size: 16px;
   box-shadow: var(--shadow-soft);
 }
 
 .loading-content {
   flex: 1;
   background: white;
-  padding: 12px 16px; /* Reducir padding como sueños */
+  padding: 12px 16px;
   border-radius: 18px;
   border-bottom-left-radius: 6px;
   box-shadow: var(--shadow-soft);
@@ -557,31 +618,37 @@
 
 .loading-dots {
   display: flex;
-  gap: 3px; /* Reducir gap como sueños */
-  margin-bottom: 4px; /* Reducir margin como sueños */
+  gap: 3px;
+  margin-bottom: 4px;
 }
 
 .loading-dots span {
-  width: 5px; /* Reducir tamaño como sueños */
+  width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--primary-purple);
   animation: pulse 1.4s infinite ease-in-out;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 .loading-text {
   color: #64748b;
-  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  font-size: 0.75rem;
   font-style: italic;
   font-family: var(--font-astrologer);
   margin: 0;
 }
 
 @keyframes pulse {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
     opacity: 0.5;
   }
@@ -591,19 +658,21 @@
   }
 }
 
-/* Área de entrada con menos padding - estructura exacta de sueños */
+/* Área de entrada con z-index alto */
 .chat-input-area {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 15px 20px; /* Reducir padding como sueños */
+  padding: 15px 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .input-container {
   display: flex;
-  gap: 12px; /* Reducir gap como sueños */
+  gap: 12px;
   align-items: center;
 }
 
@@ -614,16 +683,16 @@
 
 .message-input {
   width: 100%;
-  min-height: 18px; /* Reducir altura mínima como sueños */
-  max-height: 80px; /* Reducir altura máxima como sueños */
-  padding: 10px 18px; /* Reducir padding como sueños */
+  min-height: 18px;
+  max-height: 80px;
+  padding: 10px 18px;
   border: 2px solid var(--border-purple);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.95); /* Mismo color que sueños */
-  color: #334155; /* Color del texto como sueños */
+  background: rgba(255, 255, 255, 0.95);
+  color: #334155;
   font-family: var(--font-user);
-  font-size: 14px; /* Reducir tamaño como sueños */
-  line-height: 1.3; /* Reducir line-height como sueños */
+  font-size: 14px;
+  line-height: 1.3;
   resize: none;
   outline: none;
   transition: var(--transition);
@@ -652,73 +721,71 @@
 
 .action-buttons {
   display: flex;
-  gap: 10px; /* Reducir gap como sueños */
+  gap: 10px;
   align-items: center;
 }
 
-.send-button,
-.data-button,
-.clear-button {
-  width: 40px; /* Reducir tamaño como sueños */
+.send-button {
+  width: 40px;
   height: 40px;
+  background-color: rgba(120, 120, 130, 0.4);
+  color: white;
   border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition);
-  box-shadow: var(--shadow-soft);
-  font-size: 1.1rem; /* Reducir tamaño como sueños */
+  transition: background-color 0.2s ease;
+  backdrop-filter: blur(5px);
 }
-
-.send-button {
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
-  color: white;
-}
-
-.send-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-}
-
-.send-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.data-button {
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
-  color: white;
-}
-
-.data-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
-}
-
 .clear-button {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #666;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .clear-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.send-button:hover {
+  background-color: rgba(120, 120, 130, 0.5);
+}
+
+.clear-button:active {
+  transform: scale(0.95);
+}
+
+.send-button:active {
+  transform: scale(0.95);
+}
+
+.send-button:disabled {
+  background-color: rgba(120, 120, 130, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
 }
 
 .input-hint {
-  margin: 8px 0 0 0; /* Reducir margin como sueños */
+  margin: 8px 0 0 0;
   text-align: center;
   color: rgba(139, 92, 246, 0.7);
-  font-size: 0.75rem; /* Reducir tamaño como sueños */
+  font-size: 0.75rem;
   font-family: var(--font-system);
   font-style: italic;
   font-weight: 300;
 }
 
-/* Modal de pago con estructura exacta de sueños pero colores púrpuras */
+/* Modal de pago con z-index máximo */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -730,7 +797,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: fadeIn 0.3s ease-out;
   padding: 20px;
   box-sizing: border-box;
@@ -748,27 +815,28 @@
 }
 
 .payment-modal {
-  background: linear-gradient(135deg, 
-    rgba(28, 28, 60, 0.98) 0%, 
-    rgba(44, 44, 80, 0.98) 50%, 
-    rgba(76, 50, 130, 0.98) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(28, 28, 60, 0.98) 0%,
+    rgba(44, 44, 80, 0.98) 50%,
+    rgba(76, 50, 130, 0.98) 100%
+  );
   border-radius: 25px;
   padding: 0;
   max-width: 480px;
   width: 92%;
   color: white;
   position: relative;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(139, 92, 246, 0.3), /* Color púrpura */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(139, 92, 246, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px);
-  border: 2px solid var(--border-purple); /* Color púrpura */
+  border: 2px solid var(--border-purple);
   overflow: hidden;
   animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 @keyframes modalSlideIn {
@@ -783,7 +851,11 @@
 }
 
 .payment-header {
-  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple),
+    var(--secondary-purple)
+  );
   padding: 20px 25px;
   display: flex;
   justify-content: space-between;
@@ -795,22 +867,28 @@
 }
 
 .payment-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   animation: shimmer 3s infinite;
 }
 
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .payment-header h3 {
@@ -851,7 +929,7 @@
 }
 
 .payment-content::before {
-  content: '✨';
+  content: "✨";
   position: absolute;
   top: 10px;
   left: 20px;
@@ -861,7 +939,7 @@
 }
 
 .payment-content::after {
-  content: '🔮';
+  content: "🔮";
   position: absolute;
   top: 20px;
   right: 30px;
@@ -871,8 +949,13 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .payment-info {
@@ -897,35 +980,36 @@
   text-align: center;
   margin: 20px 0;
   padding: 18px;
-  background: linear-gradient(135deg, 
-    var(--light-purple) 0%, 
-    rgba(139, 92, 246, 0.05) 100%); /* Colores púrpuras */
+  background: linear-gradient(
+    135deg,
+    var(--light-purple) 0%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
   border-radius: 20px;
-  border: 2px solid var(--border-purple); /* Color púrpura */
+  border: 2px solid var(--border-purple);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(10px);
 }
 
 .payment-price::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, 
-    var(--light-purple) 0%, 
-    transparent 70%);
+  background: radial-gradient(circle, var(--light-purple) 0%, transparent 70%);
   animation: pulse-glow-price 4s ease-in-out infinite;
 }
 
 @keyframes pulse-glow-price {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
     transform: scale(1.1);
   }
@@ -935,14 +1019,12 @@
   display: block;
   font-size: 2.2em;
   font-weight: bold;
-  color: var(--primary-purple); /* Color púrpura */
+  color: var(--primary-purple);
   font-family: var(--font-user);
   margin-bottom: 6px;
   position: relative;
   z-index: 1;
-  text-shadow: 
-    2px 2px 4px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(139, 92, 246, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.5);
 }
 
 .price-description {
@@ -974,8 +1056,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .payment-loading p {
@@ -1017,10 +1103,12 @@
 }
 
 .pay-button {
-  background: linear-gradient(135deg, 
-    var(--primary-purple) 0%, 
-    var(--secondary-purple) 50%, 
-    var(--primary-purple) 100%); /* Colores púrpuras */
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple) 0%,
+    var(--secondary-purple) 50%,
+    var(--primary-purple) 100%
+  );
   color: white;
   border: none;
   padding: 12px 30px;
@@ -1033,22 +1121,23 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  box-shadow: 
-    0 8px 25px rgba(139, 92, 246, 0.4),
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .pay-button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -1058,8 +1147,7 @@
 
 .pay-button:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 
-    0 12px 35px rgba(139, 92, 246, 0.6),
+  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -1079,30 +1167,41 @@
 }
 
 .payment-modal::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at center, 
-    var(--light-purple) 0%, 
-    transparent 50%);
+  background: radial-gradient(
+    circle at center,
+    var(--light-purple) 0%,
+    transparent 50%
+  );
   animation: rotate-bg 20s linear infinite;
   z-index: -1;
 }
 
 @keyframes rotate-bg {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Animaciones adicionales */
 @keyframes bounce {
-  0%, 20%, 53%, 80%, 100% {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
     transform: translate3d(0, 0, 0);
   }
-  40%, 43% {
+  40%,
+  43% {
     transform: translate3d(0, -10px, 0);
   }
   70% {
@@ -1116,103 +1215,103 @@
 /* Responsive con estructura exacta de sueños */
 @media (max-width: 768px) {
   .main-content {
-    padding: 15px; /* Reducir padding como sueños */
+    padding: 15px;
   }
 
   .birth-chart-modal {
     height: calc(100vh - 30px);
     border-radius: 20px;
     max-width: 98%;
-    padding: 12px; /* Reducir padding como sueños */
+    padding: 12px;
   }
 
   .birth-chart-header {
-    padding: 6px 15px; /* Reducir padding como sueños */
+    padding: 6px 15px;
     margin-bottom: 10px;
   }
 
   .astrologer-info {
-    gap: 10px; /* Reducir gap como sueños */
+    gap: 10px;
   }
 
   .astrologer-avatar {
-    width: 40px; /* Reducir tamaño como sueños */
+    width: 40px;
     height: 40px;
   }
 
   .astrologer-icon {
-    font-size: 18px; /* Reducir tamaño como sueños */
+    font-size: 18px;
   }
 
   .astrologer-details h3 {
-    font-size: 1rem; /* Reducir tamaño como sueños */
+    font-size: 1rem;
   }
 
   .astrologer-details p {
-    font-size: 0.8rem; /* Reducir tamaño como sueños */
+    font-size: 0.8rem;
   }
 
   .personal-data-section {
-    padding: 10px 15px; /* Reducir padding como sueños */
+    padding: 10px 15px;
   }
 
   .chart-preview {
-    padding: 10px 15px; /* Reducir padding como sueños */
+    padding: 10px 15px;
   }
 
   .chart-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px; /* Reducir gap como sueños */
+    gap: 8px;
   }
 
   .chart-card {
-    padding: 8px; /* Reducir padding como sueños */
+    padding: 8px;
   }
 
   .chart-card .sign {
-    font-size: 1rem; /* Reducir tamaño como sueños */
+    font-size: 1rem;
   }
 
   .chat-messages {
-    padding: 12px; /* Reducir padding como sueños */
+    padding: 12px;
   }
 
   .message {
-    margin: 0 6px; /* Reducir margen como sueños */
+    margin: 0 6px;
   }
 
   .message-avatar {
-    width: 32px; /* Reducir tamaño como sueños */
+    width: 32px;
     height: 32px;
-    font-size: 14px; /* Reducir tamaño como sueños */
+    font-size: 14px;
   }
 
   .message-text {
-    padding: 10px 14px; /* Reducir padding como sueños */
-    font-size: 0.9rem; /* Reducir tamaño como sueños */
+    padding: 10px 14px;
+    font-size: 0.9rem;
   }
 
   .message-payment-overlay {
-    left: 35px; /* Ajustar posición como sueños */
+    left: 35px;
   }
 
   .payment-prompt {
-    padding: 12px; /* Reducir padding como sueños */
-    max-width: 180px; /* Reducir ancho como sueños */
+    padding: 12px;
+    max-width: 180px;
   }
 
   .chat-input-area {
-    padding: 12px 15px; /* Reducir padding como sueños */
+    padding: 12px 15px;
   }
 
   .action-buttons {
-    gap: 8px; /* Reducir gap como sueños */
+    gap: 8px;
   }
 
   .send-button,
   .data-button,
   .clear-button {
-    width: 35px; /* Reducir tamaño como sueños */
+    width: 35px;
     height: 35px;
   }
 
@@ -1223,11 +1322,11 @@
 
   .payment-header,
   .payment-content {
-    padding: 15px; /* Reducir padding como sueños */
+    padding: 15px;
   }
 
   .price-amount {
-    font-size: 2em; /* Reducir tamaño como sueños */
+    font-size: 2em;
   }
 }
 
@@ -1247,15 +1346,15 @@
   }
 
   .astrologer-details h3 {
-    font-size: 0.95rem; /* Reducir tamaño como sueños */
+    font-size: 0.95rem;
   }
 
   .personal-data-section {
-    padding: 8px 12px; /* Reducir padding como sueños */
+    padding: 8px 12px;
   }
 
   .chart-preview {
-    padding: 8px 12px; /* Reducir padding como sueños */
+    padding: 8px 12px;
   }
 
   .chart-grid {
@@ -1264,23 +1363,23 @@
 
   .message {
     margin: 0 4px;
-    gap: 8px; /* Reducir gap como sueños */
+    gap: 8px;
   }
 
   .message-avatar {
-    width: 30px; /* Reducir tamaño en mobile como sueños */
+    width: 30px;
     height: 30px;
     font-size: 12px;
   }
 
   .message-text {
-    padding: 8px 12px; /* Reducir padding como sueños */
-    font-size: 0.85rem; /* Reducir tamaño como sueños */
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 
   .payment-prompt {
-    padding: 10px; /* Reducir padding como sueños */
-    max-width: 160px; /* Reducir ancho como sueños */
+    padding: 10px;
+    max-width: 160px;
   }
 
   .payment-modal {
@@ -1290,11 +1389,11 @@
 
   .payment-header,
   .payment-content {
-    padding: 12px; /* Reducir padding como sueños */
+    padding: 12px;
   }
 
   .price-amount {
-    font-size: 1.8em; /* Reducir tamaño como sueños */
+    font-size: 1.8em;
   }
 }
 

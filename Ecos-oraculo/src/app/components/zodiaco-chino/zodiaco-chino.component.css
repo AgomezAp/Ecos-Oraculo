@@ -25,24 +25,47 @@
   width: 12px;
   height: 12px;
 }
-.background-container {
+
+/* ===== VIDEO DE FONDO ===== */
+.background-video {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #4B0082 0%, #8A2BE2 100%);
-  z-index: -1;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
 }
 
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Contenedor de fondo actualizado para funcionar con video */
+.background-container {
+  /* Eliminar propiedades de fondo estático */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -3; /* Mover atrás del video */
+}
+
+/* Contenedor principal con z-index actualizado */
 .main-content {
   min-height: 100vh;
   width: 100%;
-  background-image: url("/FondoZodiaco.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Eliminar propiedades de imagen de fondo */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -50,6 +73,7 @@
   justify-content: flex-start;
   padding: 20px;
   overflow: hidden;
+  z-index: 1; /* Asegurar que esté sobre el video */
 }
 
 /* Contenedor principal con menos padding */
@@ -70,9 +94,10 @@
   flex-direction: column;
   overflow: hidden;
   padding: 15px;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
-/* Header más compacto - adaptado para zodiac-header */
+/* Header más compacto - adaptado para zodiac-header con z-index alto */
 .zodiac-header {
   display: flex;
   align-items: center;
@@ -86,6 +111,7 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .master-info-header {
@@ -117,6 +143,7 @@
   color: white;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .master-details-header p {
@@ -125,6 +152,7 @@
   color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .close-button {
@@ -149,12 +177,12 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Área de chat con menos padding - adaptado para chat-messages */
+/* Área de chat con menos padding - adaptado para chat-messages con z-index alto */
 .chat-messages {
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.6);
+  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -164,6 +192,7 @@
   padding: 12px;
   overflow-y: auto;
   gap: 12px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .message-wrapper {
@@ -299,6 +328,84 @@
   margin: 0;
 }
 
+/* Mensajes bloqueados - estructura exacta de sueños */
+.blocked-message {
+  position: relative;
+}
+
+.blurred-content .message-text {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.message-payment-overlay {
+  position: absolute;
+  top: 0;
+  left: 45px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.payment-prompt {
+  background: white;
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border: 2px solid #8A2BE2;
+  max-width: 200px;
+  animation: bounce 0.5s ease-out;
+}
+
+.lock-icon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 8px;
+  color: #8A2BE2;
+}
+
+.payment-prompt p {
+  margin: 4px 0;
+  color: #333;
+  font-size: 12px;
+  font-family: "Berkshire Swash", cursive;
+  line-height: 1.3;
+}
+
+.payment-prompt p:first-of-type {
+  font-weight: 600;
+  color: #8A2BE2;
+  font-size: 13px;
+}
+
+.unlock-button {
+  background: linear-gradient(135deg, #8A2BE2, #4B0082);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Berkshire Swash", cursive;
+  margin-top: 8px;
+  font-size: 12px;
+  width: 100%;
+}
+
+.unlock-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+}
+
 /* Loading indicator */
 .loading-message {
   display: flex;
@@ -380,7 +487,7 @@
   }
 }
 
-/* Área de entrada estilo WhatsApp mejorada */
+/* Área de entrada estilo WhatsApp mejorada con z-index alto */
 .chat-input-area {
   display: flex;
   align-items: center;
@@ -390,6 +497,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   border-radius:20px;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .message-input {
@@ -603,73 +712,7 @@
   background: rgba(138, 43, 226, 0.5);
 }
 
-/* Estilos para contenido bloqueado */
-.blocked-message {
-  position: relative;
-  overflow: hidden;
-}
-
-.blurred-content {
-  filter: blur(5px);
-  pointer-events: none;
-  user-select: none;
-  transition: filter 0.3s ease;
-}
-
-.message-payment-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px;
-  z-index: 10;
-}
-
-.payment-prompt {
-  text-align: center;
-  padding: 15px;
-  max-width: 200px;
-}
-
-.lock-icon {
-  font-size: 20px;
-  display: block;
-  margin-bottom: 8px;
-  color: #8A2BE2;
-}
-
-.payment-prompt p {
-  margin: 4px 0;
-  color: #333;
-  font-size: 12px;
-}
-
-.unlock-button {
-  background: linear-gradient(135deg, #8A2BE2, #4B0082);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
-}
-
-.unlock-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
-}
-
-/* Modal de pago con temática del horóscopo */
+/* Modal de pago con temática del horóscopo con z-index máximo */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -681,7 +724,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: modal-appear 0.3s ease-out;
   padding: 20px;
   box-sizing: border-box;
@@ -722,6 +765,7 @@
   margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 @keyframes modal-scale {

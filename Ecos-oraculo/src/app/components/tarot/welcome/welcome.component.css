@@ -5,53 +5,79 @@
 }
 
 html, body {
-  width: 100%; /* Cambiado de 100vw para evitar problemas con la barra de desplazamiento */
+  width: 100%;
   height: 100%;
-  overflow: hidden; /* Forzar sin scroll */
-  position: fixed; /* Evita rebotes en dispositivos móviles */
+  overflow: hidden;
+  position: fixed;
   top: 0;
   left: 0;
 }
+
 .background {
-  background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed;
-  background-size: cover;
-  background-position: center center;
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;/* Cambiado de center a flex-start */
+  justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Cambiado de height a min-height */
+  min-height: 100vh;
   box-sizing: border-box;
-  overflow-y: auto; /* Permite scroll si es necesario */
+  overflow-y: auto;
   z-index: 1;
 }
 
+/* Video de fondo */
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
 
-  .particulas{
-    position: absolute;
-    z-index: 1;
-    overflow: hidden;
-  }
-  .content-container {
-    display: flex;
-    font-family: Arial, sans-serif;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    width: 90%;
-    max-width: 500px;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 2; /* Asegura que esté sobre las partículas */
-  }
-  
+/* Overlay opcional para mejorar legibilidad */
+.background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particulas {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.content-container {
+  display: flex;
+  font-family: Arial, sans-serif;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 2;
+  position: relative;
+}
+
 h1 {
   text-align: center;
-  margin-top: 15px; /* Reducido */
-  font-size: clamp(32px, 8vw, 60px); /* Tamaño responsive */
+  margin-top: 15px;
+  font-size: clamp(32px, 8vw, 60px);
   color: #ffffff;
   text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+  position: relative;
+  z-index: 2;
 }
 
 .start-button-amor, 
@@ -73,28 +99,83 @@ h1 {
   letter-spacing: 1px;
   position: relative;
   overflow: hidden;
+  z-index: 2;
 }
-.start-button:hover {
-    background: linear-gradient(360deg, #FAE365, #FFBA63);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
-    transform: translateY(-3px);
+
+.start-button-amor:hover,
+.start-button-futuro:hover,
+.start-button-dinero:hover {
+  background: linear-gradient(360deg, #FAE365, #FFBA63);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
+  transform: translateY(-3px);
 }
+
 @media (max-height: 600px) {
   h1 {
-      margin-top: 10px;
-      font-size: 28px;
+    margin-top: 10px;
+    font-size: 28px;
   }
   
   .content-container {
-      margin-top: 10px;
-      padding: 15px;
-      
+    margin-top: 10px;
+    padding: 15px;
   }
   
   .start-button-amor, 
   .start-button-futuro, 
   .start-button-dinero {
-      padding: 10px 20px;
-      margin: 5px 0;
+    padding: 10px 20px;
+    margin: 5px 0;
   }
+}
+
+/* Responsive design para dispositivos móviles */
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(24px, 6vw, 48px);
+    margin-top: 20px;
+  }
+  
+  .content-container {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .start-button-amor, 
+  .start-button-futuro, 
+  .start-button-dinero {
+    width: 180px;
+    font-size: 18px;
+    padding: 12px 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(20px, 5vw, 36px);
+  }
+  
+  .start-button-amor, 
+  .start-button-futuro, 
+  .start-button-dinero {
+    width: 160px;
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+}
+
+/* Animación de entrada para los botones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-container {
+  animation: fadeIn 1s ease-out;
 }

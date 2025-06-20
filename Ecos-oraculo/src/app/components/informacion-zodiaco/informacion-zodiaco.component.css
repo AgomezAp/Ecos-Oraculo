@@ -10,6 +10,7 @@
   --astro-glow: rgba(147, 112, 219, 0.3);
   --astro-border: rgba(147, 112, 219, 0.3);
 }
+
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -35,22 +36,49 @@
   width: 12px;
   height: 12px;
 }
-/* ===== FONDO ANIMADO ===== */
+
+/* ===== CONTENEDOR CON VIDEO DE FONDO ===== */
 .oracle-container {
   position: relative;
   height: 100vh;
   width: 100%;
-  background-image: url("/ZignozoodiaFondo.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Remover la imagen de fondo estática */
+  /* background-image: url("/ZignozoodiaFondo.png"); */
+  /* background-size: cover; */
+  /* background-position: center; */
+  /* background-repeat: no-repeat; */
+  /* background-attachment: fixed; */
   overflow: hidden;
   font-family: var(--font-system);
   padding: 20px;
   box-sizing: border-box;
 }
 
+/* Video de fondo */
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== FONDO ANIMADO (mantenemos las estrellas sobre el video) ===== */
 .oracle-container::before {
   content: "";
   position: absolute;
@@ -143,6 +171,7 @@
   flex-direction: column;
   padding: 15px;
   box-sizing: border-box;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 @keyframes modal-appear {
@@ -173,6 +202,7 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
 }
 
 .interpreter-info::before {
@@ -247,6 +277,7 @@
   background-clip: text;
   font-weight: 400;
   font-family: var(--font-interpreter);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-title {
@@ -256,6 +287,7 @@
   font-style: italic;
   font-family: var(--font-interpreter);
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-specialty {
@@ -264,6 +296,7 @@
   color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-system);
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 /* ===== ZONA DEL SIGNO ZODIACAL ===== */
@@ -279,6 +312,8 @@
   border-radius: 20px;
   flex-shrink: 0;
   margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .sign-card {
@@ -333,6 +368,8 @@
   margin: 0 0 12px 0;
   overflow: hidden;
   padding: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .messages-container {
@@ -548,6 +585,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   flex-shrink: 0;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .input-container {
@@ -560,7 +599,7 @@
 
 .text-input-wrapper {
   flex: 1;
-  background: rgba(255, 255, 255, 0.95); /* Cambiado a blanco */
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 22px;
   padding: 10px 18px;
   backdrop-filter: blur(10px);
@@ -581,7 +620,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #333; /* Texto negro para contraste en fondo blanco */
+  color: #333;
   font-size: 14px;
   line-height: 1.3;
   resize: none;
@@ -594,7 +633,7 @@
 }
 
 .message-input::placeholder {
-  color: rgba(51, 51, 51, 0.6); /* Placeholder oscuro para fondo blanco */
+  color: rgba(51, 51, 51, 0.6);
   font-family: var(--font-user) !important;
   font-weight: 400 !important;
   font-style: italic;
@@ -612,16 +651,16 @@
 
 .action-buttons {
   display: flex;
-  flex-direction: row; /* Cambiado de column a row */
-  align-items: center; /* Centra verticalmente */
-  gap: 8px; /* Espacio entre botones */
-  height: 100%; /* Ocupa toda la altura disponible */
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
 }
 
 .send-button,
 .clear-button {
-  width: 45px; /* Ancho fijo para ambos botones */
-  height: 45px; /* Altura fija para ambos botones */
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   border: none;
   display: flex;
@@ -630,7 +669,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 16px;
-  flex-shrink: 0; /* Evita que se encojan */
+  flex-shrink: 0;
   position: relative;
 }
 
@@ -850,7 +889,7 @@
   transform: translateY(0);
 }
 
-/* ===== MODAL DE PAGO ===== */
+/* ===== MODAL DE PAGO - Aumentar z-index para estar sobre el video ===== */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -862,7 +901,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -881,6 +920,7 @@
   margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 .payment-header {
@@ -1073,7 +1113,7 @@
 }
 
 .message-input::-webkit-scrollbar-thumb {
-  background: rgba(51, 51, 51, 0.3); /* Cambiado para fondo blanco */
+  background: rgba(51, 51, 51, 0.3);
   border-radius: 2px;
 }
 

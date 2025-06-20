@@ -24,145 +24,53 @@
   height: 12px;
 }
 
-/* Contenedor de fondo con estrellas animadas */
-.background-container {
+/* ===== VIDEO DE FONDO ===== */
+.background-video {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%);
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
   z-index: -1;
+  pointer-events: none;
 }
 
-.stars {
-  position: absolute;
+/* Contenedor de fondo actualizado para funcionar con video */
+.background-container {
+  /* Eliminar propiedades de fondo estático */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: transparent;
+  z-index: -3; /* Mover atrás del video */
 }
 
-.stars::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-    radial-gradient(2px 2px at 40px 70px, #fff, transparent),
-    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
-    radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
-  background-repeat: repeat;
-  background-size: 200px 100px;
-  animation: sparkle 20s linear infinite;
-}
-
-@keyframes sparkle {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-200px);
-  }
-}
-
-.twinkling {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-}
-
-.twinkling::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(1px 1px at 25px 5px, white, transparent),
-    radial-gradient(1px 1px at 50px 25px, white, transparent),
-    radial-gradient(1px 1px at 125px 20px, white, transparent),
-    radial-gradient(1px 1px at 150px 75px, white, transparent);
-  background-repeat: repeat;
-  background-size: 250px 150px;
-  animation: twinkle 15s linear infinite;
-  opacity: 0.3;
-}
-
-@keyframes twinkle {
-  from {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.8;
-  }
-  to {
-    opacity: 0.3;
-  }
-}
-
+/* Eliminar elementos de estrellas animadas ya que usamos video */
+.stars,
+.twinkling,
 .clouds {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
+  display: none;
 }
 
-.clouds::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-      circle at 20% 80%,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 40% 40%,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%
-    );
-  animation: float-clouds 30s ease-in-out infinite;
-}
-
-@keyframes float-clouds {
-  0%,
-  100% {
-    transform: translateX(0) translateY(0);
-  }
-  33% {
-    transform: translateX(10px) translateY(-10px);
-  }
-  66% {
-    transform: translateX(-10px) translateY(5px);
-  }
-}
-
+/* Contenedor principal con z-index actualizado */
 .main-content {
   min-height: 100vh;
   width: 100%;
-  background-image: url("/FondoCalculadoraAmor.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Eliminar propiedades de imagen de fondo */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -170,9 +78,10 @@
   justify-content: flex-start;
   padding: 20px;
   overflow: hidden;
+  z-index: 1; /* Asegurar que esté sobre el video */
 }
 
-/* Contenedor principal de la calculadora de amor */
+/* Contenedor principal de la calculadora de amor con z-index alto */
 .love-calculator-modal {
   font-family: "Cinzel", serif;
   background-color: rgba(255, 255, 255, 0.15);
@@ -190,9 +99,10 @@
   flex-direction: column;
   overflow: hidden;
   padding: 15px;
+  z-index: 2; /* Asegurar que esté sobre el video */
 }
 
-/* Header del componente de amor */
+/* Header del componente de amor con z-index alto */
 .love-header {
   display: flex;
   align-items: center;
@@ -210,6 +120,7 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .love-expert-info {
@@ -245,6 +156,7 @@
   color: white;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .expert-details p {
@@ -253,6 +165,7 @@
   color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .close-button {
@@ -277,12 +190,12 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Área de mensajes de chat */
+/* Área de mensajes de chat con z-index alto */
 .chat-messages {
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.6);
+  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -292,6 +205,7 @@
   padding: 12px;
   overflow-y: auto;
   gap: 12px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 .message {
@@ -405,12 +319,30 @@
   padding-right: 25px;
 }
 
+.user-message .message-text p {
+  color: #333;
+  font-family: "Arsenal", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0;
+}
+
 .expert-message .message-text {
   background: linear-gradient(135deg, #ff1493 0%, #c7158b 100%);
   border: 1px solid rgba(255, 20, 147, 0.5);
   color: white;
   padding-top: 20px;
   padding-left: 25px;
+}
+
+.expert-message .message-text p {
+  color: white;
+  font-family: "Berkshire Swash", cursive;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* Overlay para contenido bloqueado */
@@ -596,9 +528,9 @@
   animation: bounce 1.4s infinite ease-in-out both;
 }
 
-/* Formulario de datos de compatibilidad */
+/* Formulario de datos de compatibilidad con z-index alto */
 .data-form-container {
-  background: rgba(12, 12, 38, 0.6);
+  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -606,6 +538,8 @@
   padding: 20px;
   max-height: 400px;
   overflow-y: auto;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .data-form h4 {
@@ -671,7 +605,7 @@
   font-family: "Arsenal", sans-serif;
 }
 
-/* Área de entrada de chat */
+/* Área de entrada de chat con z-index alto */
 .chat-input-area {
   display: flex;
   align-items: flex-end;
@@ -681,6 +615,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   border-radius: 20px;
+  z-index: 3; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .message-input {
@@ -792,7 +728,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Modal de pago específico para amor */
+/* Modal de pago específico para amor con z-index máximo */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -804,7 +740,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: modal-appear 0.3s ease-out;
   padding: 20px;
   box-sizing: border-box;
@@ -845,6 +781,7 @@
   margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 @keyframes modal-scale {
@@ -931,7 +868,7 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Contenido del modal de pago */
+/* Resto del CSS del modal de pago permanece igual... */
 .payment-content {
   padding: 30px;
   text-align: center;

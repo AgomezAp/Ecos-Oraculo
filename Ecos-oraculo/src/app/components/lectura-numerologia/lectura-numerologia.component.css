@@ -4,6 +4,7 @@
   --font-user: "El Messiri", sans-serif;
   --font-system: "Arsenal", sans-serif;
 }
+
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -29,26 +30,53 @@
   width: 12px;
   height: 12px;
 }
-/* ===== FONDO ANIMADO ===== */
+
+/* ===== CONTENEDOR CON VIDEO DE FONDO ===== */
 .oracle-container {
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background-image: url("/NumerologiaFondo.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Remover la imagen de fondo estática */
+  /* background-image: url("/NumerologiaFondo.png"); */
+  /* background-size: cover; */
+  /* background-position: center; */
+  /* background-repeat: no-repeat; */
+  /* background-attachment: fixed; */
   overflow: hidden;
   font-family: var(--font-system);
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Cambiar de flex-start a center */
+  justify-content: center;
   height: 100vh;
 }
 
+/* Video de fondo */
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== FONDO ANIMADO (mantenemos las estrellas sobre el video) ===== */
 .oracle-container::before {
   content: "";
   position: absolute;
@@ -124,6 +152,7 @@
   justify-content: center;
   padding: 0;
 }
+
 .oracle-main {
   font-family: "Cinzel", serif;
   width: 100%;
@@ -141,8 +170,8 @@
   flex-direction: column;
   padding: 15px;
   margin: 0 auto;
-  /* Asegurar que no tenga scroll */
   max-height: calc(100vh - 40px);
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 @keyframes modal-appear {
@@ -160,8 +189,8 @@
 .interpreter-info {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap */
-  padding: 8px 20px; /* Reducir padding */
+  gap: 12px;
+  padding: 8px 20px;
   background: linear-gradient(
     135deg,
     rgba(147, 112, 219, 0.3) 0%,
@@ -172,7 +201,8 @@
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
-  margin-bottom: 12px; /* Reducir margen inferior */
+  margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
 }
 
 .interpreter-info::before {
@@ -207,14 +237,14 @@
 }
 
 .mystical-orb {
-  width: 45px; /* Reducir tamaño */
+  width: 45px;
   height: 45px;
   border-radius: 50%;
   background: linear-gradient(45deg, #9370db, #8a2be2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px; /* Reducir tamaño del emoji */
+  font-size: 22px;
   box-shadow: 0 8px 16px rgba(147, 112, 219, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   animation: orb-glow 2s ease-in-out infinite alternate;
@@ -240,35 +270,38 @@
 
 .interpreter-details h3 {
   margin: 0;
-  font-size: 1.1rem; /* Reducir tamaño */
+  font-size: 1.1rem;
   background: linear-gradient(45deg, #9370db, #8a2be2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-title {
-  margin: 2px 0 0 0; /* Reducir margin */
-  font-size: 0.85rem; /* Reducir tamaño */
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-family: "Berkshire Swash", cursive;
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-specialty {
-  margin: 2px 0 0 0; /* Reducir margin */
-  font-size: 0.75rem; /* Reducir tamaño */
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-system);
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 /* ===== DATOS PERSONALES FORM ===== */
 .personal-data-section {
-  padding: 12px 20px; /* Reducir padding */
+  padding: 12px 20px;
   background: linear-gradient(
     135deg,
     rgba(167, 139, 250, 0.2) 0%,
@@ -278,13 +311,15 @@
   border-bottom: 1px solid rgba(167, 139, 250, 0.3);
   border-radius: 20px;
   flex-shrink: 0;
-  margin-bottom: 12px; /* Agregar margen inferior */
+  margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .personal-data-section h4 {
-  margin: 0 0 10px 0; /* Reducir margin */
+  margin: 0 0 10px 0;
   color: #a78bfa;
-  font-size: 1em; /* Reducir tamaño */
+  font-size: 1em;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
 }
@@ -292,7 +327,7 @@
 .data-form {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Reducir gap */
+  gap: 10px;
 }
 
 .full-width {
@@ -301,13 +336,13 @@
 
 .form-actions {
   display: flex;
-  gap: 8px; /* Reducir gap */
-  margin-top: 8px; /* Reducir margin */
+  gap: 8px;
+  margin-top: 8px;
 }
 
 /* ===== NÚMEROS CALCULADOS ===== */
 .numbers-preview {
-  padding: 12px 20px; /* Reducir padding */
+  padding: 12px 20px;
   background: linear-gradient(
     135deg,
     rgba(167, 139, 250, 0.2) 0%,
@@ -317,20 +352,22 @@
   border-bottom: 1px solid rgba(167, 139, 250, 0.3);
   border-radius: 20px;
   flex-shrink: 0;
-  margin-bottom: 12px; /* Agregar margen inferior */
+  margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .numbers-preview h4 {
-  margin: 0 0 10px 0; /* Reducir margin */
+  margin: 0 0 10px 0;
   color: #a78bfa;
-  font-size: 1em; /* Reducir tamaño */
+  font-size: 1em;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
 }
 
 .numbers-grid {
   display: flex;
-  gap: 12px; /* Reducir gap */
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -338,15 +375,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px; /* Reducir padding */
+  padding: 10px;
   background: rgba(167, 139, 250, 0.2);
   border-radius: 10px;
   border: 1px solid rgba(167, 139, 250, 0.3);
-  min-width: 100px; /* Reducir width */
+  min-width: 100px;
 }
 
 .number-card .number {
-  font-size: 1.6em; /* Reducir tamaño */
+  font-size: 1.6em;
   color: #a78bfa;
   font-weight: 600;
   text-shadow: 0 0 20px rgba(167, 139, 250, 0.6);
@@ -355,9 +392,9 @@
 }
 
 .number-card .label {
-  font-size: 0.8em; /* Reducir tamaño */
+  font-size: 0.8em;
   color: #e2e8f0;
-  margin-top: 4px; /* Reducir margin */
+  margin-top: 4px;
   font-family: "El Messiri", sans-serif;
 }
 
@@ -380,28 +417,30 @@
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin: 0 0 12px 0; /* Reducir margen inferior */
+  margin: 0 0 12px 0;
   min-height: 0;
   overflow: hidden;
-  padding: 12px; /* Reducir padding interno */
+  padding: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 15px; /* Reducir padding interno */
+  padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Reducir gap entre mensajes */
+  gap: 12px;
 }
 
 /* ===== MENSAJES ===== */
 .message {
   display: flex;
   align-items: flex-start;
-  gap: 10px; /* Reducir gap entre avatar y mensaje */
+  gap: 10px;
   animation: message-appear 0.3s ease-out;
-  margin: 0 8px; /* Reducir margen lateral */
+  margin: 0 8px;
 }
 
 @keyframes message-appear {
@@ -425,21 +464,23 @@
 }
 
 .message-avatar {
-  width: 35px; /* Reducir tamaño */
+  width: 35px;
   height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px; /* Reducir tamaño */
+  font-size: 16px;
   flex-shrink: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 .user-message .message-avatar {
   background: linear-gradient(45deg, #4a90e2, #357abd);
   top: -5px;
   right: -5px;
 }
+
 .interpreter-message .message-avatar {
   background: linear-gradient(45deg, #9370db, #8a2be2);
   top: -5px;
@@ -455,11 +496,11 @@
 }
 
 .message-content {
-  max-width: 80%; /* Aumentar ancho para más texto */
+  max-width: 80%;
 }
 
 .message-bubble {
-  padding: 12px 16px; /* Reducir padding en burbujas */
+  padding: 12px 16px;
   border-radius: 18px;
   backdrop-filter: blur(10px);
   position: relative;
@@ -476,9 +517,9 @@
 .user-message p {
   color: #333;
   font-family: "El Messiri", sans-serif !important;
-  font-size: 15px !important; /* Reducir tamaño de texto */
+  font-size: 15px !important;
   font-weight: 500 !important;
-  line-height: 1.4 !important; /* Reducir line-height */
+  line-height: 1.4 !important;
   margin: 0 0 10px 0;
   word-wrap: break-word;
   letter-spacing: 0.2px;
@@ -500,10 +541,10 @@
 
 .interpreter-message p {
   color: white;
-    font-family: "Cinzel", serif !important;
-  font-size: 16px !important; /* Reducir tamaño de texto */
+  font-family: "Cinzel", serif !important;
+  font-size: 16px !important;
   font-weight: 400 !important;
-  line-height: 1.4 !important; /* Reducir line-height */
+  line-height: 1.4 !important;
   letter-spacing: 0.3px;
   margin: 0 0 10px 0;
   word-wrap: break-word;
@@ -517,12 +558,12 @@
 }
 
 .message-time {
-  font-size: 0.65rem; /* Reducir tamaño */
+  font-size: 0.65rem;
   display: block;
   text-align: right;
   font-family: var(--font-system);
   opacity: 0.7;
-  margin-top: 4px; /* Reducir margen */
+  margin-top: 4px;
 }
 
 /* ===== MENSAJES BLOQUEADOS ===== */
@@ -555,14 +596,14 @@
 
 .payment-prompt {
   text-align: center;
-  padding: 15px; /* Reducir padding */
-  max-width: 200px; /* Reducir width */
+  padding: 15px;
+  max-width: 200px;
 }
 
 .lock-icon {
-  font-size: 20px; /* Reducir tamaño */
+  font-size: 20px;
   display: block;
-  margin-bottom: 8px; /* Reducir margin */
+  margin-bottom: 8px;
   animation: pulse 2s infinite;
 }
 
@@ -579,9 +620,9 @@
 }
 
 .payment-prompt p {
-  margin: 4px 0; /* Reducir margin */
+  margin: 4px 0;
   color: #333;
-  font-size: 12px; /* Reducir tamaño */
+  font-size: 12px;
   line-height: 1.3;
   font-family: "El Messiri", sans-serif;
   font-weight: 500;
@@ -590,19 +631,19 @@
 .payment-prompt p:first-of-type {
   font-weight: 600;
   color: #6366f1;
-  font-size: 13px; /* Reducir tamaño */
+  font-size: 13px;
 }
 
 .unlock-button {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
   border: none;
-  padding: 8px 16px; /* Reducir padding */
+  padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 12px; /* Reducir tamaño */
+  font-size: 12px;
   font-weight: 600;
-  margin-top: 8px; /* Reducir margin */
+  margin-top: 8px;
   transition: all 0.3s ease;
   box-shadow: 0 3px 12px rgba(99, 102, 241, 0.3);
   width: 100%;
@@ -623,12 +664,12 @@
 
 .typing-dots {
   display: flex;
-  gap: 3px; /* Reducir gap */
-  margin-bottom: 4px; /* Reducir margin */
+  gap: 3px;
+  margin-bottom: 4px;
 }
 
 .typing-dots span {
-  width: 5px; /* Reducir tamaño */
+  width: 5px;
   height: 5px;
   border-radius: 50%;
   background: white;
@@ -643,7 +684,7 @@
 }
 
 .typing-text {
-  font-size: 0.75rem; /* Reducir tamaño */
+  font-size: 0.75rem;
   color: white;
   font-style: italic;
   margin: 0;
@@ -666,16 +707,18 @@
 .input-area {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 15px 20px; /* Reducir padding */
+  padding: 15px 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .input-container {
   display: flex;
   align-items: center;
-  gap: 12px; /* Reducir gap */
+  gap: 12px;
 }
 
 .data-button {
@@ -683,7 +726,7 @@
   color: #a78bfa;
   border: 1px solid rgba(167, 139, 250, 0.3);
   border-radius: 50%;
-  width: 40px; /* Reducir tamaño */
+  width: 40px;
   height: 40px;
   transition: all 0.3s ease;
   display: flex;
@@ -701,7 +744,7 @@
   flex: 1;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 22px;
-  padding: 10px 18px; /* Reducir padding */
+  padding: 10px 18px;
   backdrop-filter: blur(10px);
   border: 2px solid rgba(167, 139, 250, 0.2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -719,7 +762,7 @@
   border: none !important;
   outline: none !important;
   color: #333 !important;
-  font-size: 16px !important; /* Reducir tamaño de texto */
+  font-size: 16px !important;
   resize: none;
   min-height: 18px;
   font-family: "Arial", sans-serif !important;
@@ -737,12 +780,13 @@
 /* ===== BOTONES ===== */
 .action-buttons {
   display: flex;
-  gap: 10px; /* Reducir gap entre botones */
+  gap: 10px;
   align-items: center;
 }
+
 .send-button {
-  width: 45px; /* Mismo tamaño que el input */
-  height: 45px; /* Mismo tamaño que el input */
+  width: 45px;
+  height: 45px;
   background: linear-gradient(135deg, #8b7cf6 0%, #7c3aed 100%);
   color: white;
   border: none;
@@ -755,11 +799,12 @@
   box-shadow: 0 2px 6px rgba(139, 124, 246, 0.25);
   position: relative;
   overflow: hidden;
-  font-size: 16px; /* Icono más grande */
+  font-size: 16px;
 }
+
 .clear-button {
-  width: 45px; /* Mismo tamaño que el send-button y el input */
-  height: 45px; /* Mismo tamaño que el send-button y el input */
+  width: 45px;
+  height: 45px;
   background: white;
   color: white;
   border: none;
@@ -770,7 +815,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 5px rgba(239, 68, 68, 0.25);
-  font-size: 14px; /* Icono proporcionado */
+  font-size: 14px;
   color: #555555;
 }
 
@@ -795,7 +840,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MODAL DE PAGO ===== */
+/* ===== MODAL DE PAGO - Aumentar z-index para estar sobre el video ===== */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -807,11 +852,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: modal-appear 0.3s ease-out;
-  padding: 20px; /* Añadir padding para el scroll */
+  padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto; /* Habilitar scroll vertical */
+  overflow-y: auto;
 }
 
 @keyframes modal-appear {
@@ -829,30 +874,31 @@
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 25px;
   padding: 0;
-  max-width: 480px; /* Reducir max-width */
+  max-width: 480px;
   width: 92%;
-  max-height: calc(100vh - 40px); /* Altura máxima para permitir scroll */
+  max-height: calc(100vh - 40px);
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin: auto; /* Centrar en el overlay */
+  margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 .payment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 25px; /* Reducir padding */
+  padding: 20px 25px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0; /* No se encoge */
+  flex-shrink: 0;
 }
 
 .payment-header h3 {
   color: #a78bfa;
   margin: 0;
-  font-size: 1.2em; /* Reducir tamaño */
+  font-size: 1.2em;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
 }
@@ -861,7 +907,7 @@
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 1.3em; /* Reducir tamaño */
+  font-size: 1.3em;
   cursor: pointer;
   padding: 5px;
   transition: color 0.3s ease;
@@ -872,14 +918,14 @@
 }
 
 .payment-content {
-  padding: 20px 25px; /* Reducir padding */
-  overflow-y: auto; /* Habilitar scroll en el contenido */
-  flex: 1; /* Ocupa el espacio disponible */
-  max-height: calc(100vh - 160px); /* Altura máxima del contenido */
+  padding: 20px 25px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(100vh - 160px);
 }
 
 .payment-content::-webkit-scrollbar {
-  width: 6px; /* Reducir ancho */
+  width: 6px;
 }
 
 .payment-content::-webkit-scrollbar-track {
@@ -898,22 +944,22 @@
 
 .payment-info {
   text-align: center;
-  margin-bottom: 20px; /* Reducir margin */
+  margin-bottom: 20px;
 }
 
 .payment-info p {
   color: rgba(255, 255, 255, 0.8);
-  margin: 6px 0; /* Reducir margin */
-  line-height: 1.4; /* Reducir line-height */
+  margin: 6px 0;
+  line-height: 1.4;
   font-family: "El Messiri", sans-serif;
   font-weight: 500;
-  font-size: 14px; /* Reducir tamaño */
+  font-size: 14px;
 }
 
 .payment-price {
   text-align: center;
-  margin-bottom: 25px; /* Reducir margin */
-  padding: 18px; /* Reducir padding */
+  margin-bottom: 25px;
+  padding: 18px;
   background: rgba(167, 139, 250, 0.1);
   border-radius: 15px;
   border: 1px solid rgba(167, 139, 250, 0.2);
@@ -921,34 +967,34 @@
 
 .price-amount {
   display: block;
-  font-size: 2.2em; /* Reducir tamaño */
+  font-size: 2.2em;
   font-weight: 400;
   color: #a78bfa;
-  margin-bottom: 6px; /* Reducir margin */
+  margin-bottom: 6px;
   font-family: "Berkshire Swash", cursive;
 }
 
 .price-description {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9em; /* Reducir tamaño */
+  font-size: 0.9em;
   font-family: "El Messiri", sans-serif;
   font-weight: 600;
 }
 
 .payment-loading {
   text-align: center;
-  padding: 25px; /* Reducir padding */
+  padding: 25px;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .loading-spinner {
-  width: 35px; /* Reducir tamaño */
+  width: 35px;
   height: 35px;
   border: 3px solid rgba(167, 139, 250, 0.3);
   border-top: 3px solid #a78bfa;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 12px; /* Reducir margin */
+  margin: 0 auto 12px;
 }
 
 @keyframes spin {
@@ -961,8 +1007,8 @@
 }
 
 .payment-element-container {
-  margin-bottom: 20px; /* Reducir margin */
-  padding: 15px; /* Reducir padding */
+  margin-bottom: 20px;
+  padding: 15px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -972,32 +1018,32 @@
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 10px;
-  padding: 12px; /* Reducir padding */
-  margin-bottom: 15px; /* Reducir margin */
+  padding: 12px;
+  margin-bottom: 15px;
   color: #fca5a5;
   text-align: center;
   font-family: "El Messiri", sans-serif;
-  font-size: 13px; /* Reducir tamaño */
+  font-size: 13px;
 }
 
 .payment-actions {
   text-align: center;
-  margin-top: 20px; /* Reducir margin */
+  margin-top: 20px;
 }
 
 .pay-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 12px 30px; /* Reducir padding */
+  padding: 12px 30px;
   border-radius: 25px;
-  font-size: 1em; /* Reducir tamaño */
+  font-size: 1em;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
   font-family: "El Messiri", sans-serif;
-  min-width: 180px; /* Reducir ancho mínimo */
+  min-width: 180px;
 }
 
 .pay-button:hover:not(:disabled) {
@@ -1013,7 +1059,7 @@
 
 /* ===== SCROLLBAR PERSONALIZADA ===== */
 .messages-container::-webkit-scrollbar {
-  width: 6px; /* Reducir ancho */
+  width: 6px;
 }
 
 .messages-container::-webkit-scrollbar-track {
@@ -1033,41 +1079,41 @@
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .oracle-container {
-    padding: 15px; /* Reducir padding */
+    padding: 15px;
   }
 
   .oracle-main {
     border-radius: 20px;
     height: calc(100vh - 30px);
     max-width: 98%;
-    padding: 12px; /* Reducir padding */
+    padding: 12px;
   }
 
   .interpreter-info {
-    padding: 6px 15px; /* Reducir padding */
+    padding: 6px 15px;
     flex-direction: row;
     text-align: left;
-    gap: 10px; /* Reducir gap */
+    gap: 10px;
     margin-bottom: 10px;
   }
 
   .personal-data-section,
   .numbers-preview {
-    padding: 10px 15px; /* Reducir padding */
+    padding: 10px 15px;
     margin-bottom: 10px;
   }
 
   .numbers-grid {
     justify-content: center;
-    gap: 10px; /* Reducir gap */
+    gap: 10px;
   }
 
   .chat-area {
-    padding: 10px; /* Reducir padding */
+    padding: 10px;
   }
 
   .messages-container {
-    padding: 12px; /* Reducir padding */
+    padding: 12px;
   }
 
   .message-content {
@@ -1075,7 +1121,7 @@
   }
 
   .input-area {
-    padding: 12px 15px; /* Reducir padding */
+    padding: 12px 15px;
   }
 
   .input-container {
@@ -1083,26 +1129,26 @@
   }
 
   .send-button {
-    width: 35px; /* Reducir tamaño */
+    width: 35px;
     height: 35px;
   }
 
   .clear-button {
-    width: 30px; /* Reducir tamaño */
+    width: 30px;
     height: 30px;
   }
 
   .data-button {
-    width: 35px; /* Reducir tamaño */
+    width: 35px;
     height: 35px;
   }
 
   .user-message p {
-    font-size: 13px !important; /* Reducir tamaño */
+    font-size: 13px !important;
   }
 
   .interpreter-message p {
-    font-size: 14px !important; /* Reducir tamaño */
+    font-size: 14px !important;
     line-height: 1.4 !important;
   }
 
@@ -1113,11 +1159,11 @@
 
   .payment-header,
   .payment-content {
-    padding: 15px 20px; /* Reducir padding */
+    padding: 15px 20px;
   }
 
   .price-amount {
-    font-size: 2em; /* Reducir tamaño */
+    font-size: 2em;
   }
 }
 
@@ -1137,9 +1183,9 @@
   }
 
   .mystical-orb {
-    width: 40px; /* Reducir tamaño */
+    width: 40px;
     height: 40px;
-    font-size: 20px; /* Reducir tamaño */
+    font-size: 20px;
   }
 
   .personal-data-section,
@@ -1153,23 +1199,23 @@
   }
 
   .message-avatar {
-    width: 30px; /* Reducir tamaño */
+    width: 30px;
     height: 30px;
     font-size: 14px;
   }
 
   .messages-container {
     padding: 10px;
-    gap: 8px; /* Reducir gap */
+    gap: 8px;
   }
 
   .message {
     margin: 0 4px;
-    gap: 8px; /* Reducir gap */
+    gap: 8px;
   }
 
   .message-bubble {
-    padding: 10px 14px; /* Reducir padding */
+    padding: 10px 14px;
   }
 
   .input-area {
@@ -1181,17 +1227,17 @@
   }
 
   .send-button {
-    width: 32px; /* Reducir tamaño */
+    width: 32px;
     height: 32px;
   }
 
   .clear-button {
-    width: 28px; /* Reducir tamaño */
+    width: 28px;
     height: 28px;
   }
 
   .data-button {
-    width: 32px; /* Reducir tamaño */
+    width: 32px;
     height: 32px;
   }
 

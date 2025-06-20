@@ -429,7 +429,7 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
         this.masterInfo = {
           success: true,
           master: {
-            name: 'Astróloga Luna',
+            name: 'Astróloga María',
             title: 'Guía Celestial de los Signos',
             specialty: 'Astrología occidental y horóscopo personalizado',
             description:
@@ -452,7 +452,7 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
   addWelcomeMessage(): void {
     const welcomeMessage = `¡Saludos y bienvenido al reino de las estrellas! 🔮✨
 
-Soy la Astróloga Luna, guía celestial de los signos zodiacales. Durante décadas he estudiado las influencias de los planetas y las constelaciones que guían nuestro destino.
+Soy la Astróloga María, guía celestial de los signos zodiacales. Durante décadas he estudiado las influencias de los planetas y las constelaciones que guían nuestro destino.
 
 Cada persona nace bajo la protección de un signo zodiacal que influye en su personalidad, destino y camino en la vida. Para revelar los secretos de tu horóscopo y las influencias celestiales, necesito conocer tu fecha de nacimiento.
 
@@ -489,7 +489,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       // Preparar datos para enviar al backend
       const consultationData = {
         zodiacData: {
-          name: 'Astróloga Luna',
+          name: 'Astróloga María',
           specialty: 'Astrología occidental y horóscopo personalizado',
           experience:
             'Décadas de experiencia en interpretación astrológica',
@@ -546,7 +546,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       const formData = this.userForm.value;
       const consultationData = {
         zodiacData: {
-          name: 'Astróloga Luna',
+          name: 'Astróloga María',
           specialty: 'Astrología occidental y horóscopo personalizado',
           experience:
             'Décadas de experiencia en interpretación astrológica',

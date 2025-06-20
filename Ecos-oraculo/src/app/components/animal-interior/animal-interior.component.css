@@ -18,30 +18,66 @@
   --animal-glow: rgba(34, 139, 34, 0.3);
 }
 
-/* Contenedor de fondo con imagen - adaptado para background-container */
-.background-container {
+.close-chat-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  background: rgba(112, 98, 69, 0.8);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+}
+
+.close-chat-btn:hover {
+  background: rgba(112, 98, 69, 0.8);
+}
+
+.close-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ===== VIDEO DE FONDO ===== */
+.background-video {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    var(--animal-forest) 0%,
-    var(--animal-primary) 50%,
-    var(--animal-secondary) 100%
-  );
-  z-index: -1;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
 }
 
+/* Overlay opcional para mejorar legibilidad */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
 .oracle-container {
   min-height: 100vh;
   width: 100%;
-  background-image: url("/Oráculo 6 Animal C.webp");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  /* Remover la imagen de fondo estática */
+  /* background-image: url("/Oráculo 6 Animal C.webp"); */
+  /* background-size: cover; */
+  /* background-position: center; */
+  /* background-repeat: no-repeat; */
+  /* background-attachment: fixed; */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -49,15 +85,27 @@
   justify-content: flex-start;
   padding: 15px;
   overflow: hidden;
+  z-index: 1; /* Asegurar que esté sobre el video */
 }
 
-/* Contenedor principal con menos padding */
+.content-with-navbar {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 100%;
+}
+
+/* Contenedor principal con z-index alto */
 .oracle-main {
   font-family: "Cinzel", serif;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
-  max-width: 1193px; /* Aumentado de 1400px a 1600px */
-  width: calc(100vw - 20px); /* Usa viewport width menos padding mínimo */
+  max-width: 1193px;
+  width: calc(100vw - 20px);
   height: calc(100vh - 40px);
   margin: 0 auto;
   position: relative;
@@ -69,13 +117,14 @@
   flex-direction: column;
   overflow: hidden;
   padding: 15px;
+  z-index: 3; /* Asegurar que esté sobre el video */
 }
 
 /* Header más compacto - adaptado para interpreter-info */
 .interpreter-info {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Cambio: alinear al inicio */
+  justify-content: flex-start;
   gap: 12px;
   padding: 8px 20px;
   background: linear-gradient(
@@ -89,6 +138,7 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
 }
 
 .interpreter-info::before {
@@ -120,7 +170,7 @@
 .interpreter-avatar {
   position: relative;
   z-index: 1;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0;
 }
 
 .mystical-orb {
@@ -142,6 +192,7 @@
   z-index: 1;
   animation: orb-glow 2s ease-in-out infinite alternate;
 }
+
 @keyframes orb-glow {
   from {
     box-shadow: 0 8px 16px var(--animal-glow),
@@ -154,14 +205,16 @@
     transform: scale(1.05);
   }
 }
+
 .interpreter-details {
   position: relative;
   z-index: 1;
-  flex: 1; /* Toma el espacio disponible */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+
 .interpreter-details h3 {
   margin: 0;
   font-size: 1.1rem;
@@ -175,6 +228,7 @@
   background-clip: text;
   font-weight: 400;
   font-family: var(--font-interpreter);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-details p {
@@ -183,6 +237,7 @@
   color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-family: var(--font-interpreter);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-title {
@@ -192,6 +247,7 @@
   font-style: italic;
   font-family: var(--font-interpreter);
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-specialty {
@@ -200,33 +256,10 @@
   color: rgba(255, 255, 255, 0.8);
   font-family: var(--font-system);
   font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
-.close-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  margin-left: auto; /* Empuja el botón al extremo derecho */
-  flex-shrink: 0;
-}
-
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-}
-
-/* Área de chat con menos padding - adaptado para chat-area */
+/* Área de chat con z-index alto */
 .chat-area {
   display: flex;
   flex-direction: column;
@@ -239,6 +272,8 @@
   min-height: 0;
   overflow: hidden;
   padding: 12px;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .messages-container {
@@ -328,26 +363,28 @@
   max-width: 80%;
   position: relative;
 }
+
 .interpreter-message .message-content::before {
   content: "Xamán Kiara";
   position: absolute;
   top: -10px;
-  left: 36px; /* Alineado con el padding de la burbuja */
+  left: 36px;
   font-size: 0.8rem;
   font-weight: 600;
   font-family: "Berkshire Swash", cursive;
   z-index: 10;
   border-radius: 8px;
 }
+
 /* Ajustar padding del contenido para dar espacio al avatar */
 .user-message .message-content {
   padding-right: 40px;
-  padding-top: 15px; /* Espacio para el nombre */
+  padding-top: 15px;
 }
 
 .interpreter-message .message-content {
   padding-left: 40px;
-  padding-top: 15px; /* Espacio para el nombre */
+  padding-top: 15px;
 }
 
 .message-header {
@@ -573,7 +610,7 @@
   }
 }
 
-/* Área de entrada con menos padding - adaptado para input-area */
+/* Área de entrada con z-index alto */
 .input-area {
   background: rgba(139, 69, 19, 0.2);
   border-radius: 20px;
@@ -581,6 +618,8 @@
   backdrop-filter: blur(15px);
   border: 1px solid var(--animal-border);
   flex-shrink: 0;
+  z-index: 4; /* Asegurar que esté sobre el video */
+  position: relative;
 }
 
 .input-container {
@@ -639,7 +678,7 @@
 .send-button {
   width: 40px;
   height: 40px;
-  background-color: rgba(80, 80, 95, 0.35); /* Gris semitransparente */
+  background-color: rgba(80, 80, 95, 0.35);
   color: rgba(255, 255, 255, 0.9);
   border: none;
   border-radius: 50%;
@@ -666,10 +705,10 @@
 }
 
 .clear-button {
- width: 40px;
+  width: 40px;
   height: 40px;
-  background-color: rgba(255, 255, 255, 0.9); /* Botón izquierdo blanco */
-  color: rgba(80, 80, 95, 0.8); /* Color de icono más oscuro */
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgba(80, 80, 95, 0.8);
   border: none;
   border-radius: 50%;
   display: flex;
@@ -684,6 +723,7 @@
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
 }
+
 .clear-button:hover:not(:disabled),
 .send-button:hover:not(:disabled) {
   background-color: rgba(100, 100, 120, 0.5);
@@ -701,16 +741,7 @@
   cursor: not-allowed;
 }
 
-.input-hint {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 8px;
-  text-align: center;
-  font-family: var(--font-system);
-  font-weight: 300;
-}
-
-/* Modal de pago con temática del animal interior */
+/* Modal de pago con z-index máximo */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -722,7 +753,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
   animation: modal-appear 0.3s ease-out;
   padding: 20px;
   box-sizing: border-box;
@@ -763,6 +794,7 @@
   margin: auto;
   display: flex;
   flex-direction: column;
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
 
 @keyframes modal-scale {
@@ -849,7 +881,7 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Resto del CSS del modal de pago permanece igual... */
+/* Resto del CSS del modal permanece igual... */
 .payment-content {
   padding: 30px;
   text-align: center;
@@ -1131,32 +1163,6 @@
   display: none;
 }
 
-/* Efectos especiales de fondo */
-.payment-modal::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle at center,
-    var(--animal-light) 0%,
-    transparent 50%
-  );
-  animation: rotate-bg 20s linear infinite;
-  z-index: -1;
-}
-
-@keyframes rotate-bg {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* Scrollbar personalizado con colores tierra/naturaleza */
 .messages-container::-webkit-scrollbar {
   width: 6px;
@@ -1176,7 +1182,7 @@
   background: rgba(139, 69, 19, 0.5);
 }
 
-/* Responsive - mantiene todas las media queries existentes */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .payment-modal {
     max-width: 95%;
@@ -1263,6 +1269,7 @@
     padding-top: 18px;
     padding-left: 20px;
   }
+
   .interpreter-info {
     padding: 6px 15px;
     gap: 10px;
@@ -1285,20 +1292,6 @@
 
   .interpreter-specialty {
     font-size: 0.7rem;
-  }
-
-  .close-button {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  /* Nombres más pequeños en mobile */
-  .interpreter-message .message-content::before,
-  .user-message .message-content::before {
-    font-size: 0.7rem;
-    padding: 1px 6px;
-    top: -20px;
   }
 }
 
@@ -1425,6 +1418,7 @@
     padding-top: 15px;
     padding-left: 18px;
   }
+
   .interpreter-info {
     padding: 6px 12px;
     gap: 8px;
@@ -1448,25 +1442,6 @@
   .interpreter-specialty {
     font-size: 0.65rem;
   }
-
-  .close-button {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-  }
-
-  /* Nombres aún más pequeños en móviles pequeños */
-  .interpreter-message .message-content::before,
-  .user-message .message-content::before {
-    font-size: 0.65rem;
-    padding: 1px 5px;
-    top: -18px;
-  }
-
-  .user-message .message-content,
-  .interpreter-message .message-content {
-    padding-top: 12px;
-  }
 }
 
 /* Estilos adicionales para iconos de los botones */
@@ -1479,25 +1454,5 @@
   .send-button i,
   .clear-button i {
     font-size: 14px;
-  }
-}
-
-/* Animaciones de entrada/salida para mejor UX */
-.payment-modal-overlay.ng-enter {
-  animation: modal-appear 0.3s ease-out;
-}
-
-.payment-modal-overlay.ng-leave {
-  animation: modal-disappear 0.2s ease-in;
-}
-
-@keyframes modal-disappear {
-  from {
-    opacity: 1;
-    backdrop-filter: blur(10px);
-  }
-  to {
-    opacity: 0;
-    backdrop-filter: blur(0px);
   }
 }

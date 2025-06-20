@@ -88,7 +88,7 @@ export class InformacionZodiacoComponent
   private backendUrl = 'http://localhost:3010';
 
   astrologerInfo = {
-    name: 'Maestra Celestine',
+    name: 'Maestra Carla',
     title: 'Guardiana de las Estrellas',
     specialty: 'Especialista en Astrología y Signos Zodiacales',
   };
@@ -96,7 +96,7 @@ export class InformacionZodiacoComponent
   // Frases de bienvenida aleatorias
   welcomeMessages = [
     'Bienvenido, alma cósmica. Las estrellas me han susurrado tu llegada... ¿Qué misterios del zodíaco deseas desentrañar hoy?',
-    'Los planetas se alinean para recibirte. Soy Maestra Celestine, intérprete de los designios astrales. ¿Sobre qué signo o aspecto celestial deseas consultar?',
+    'Los planetas se alinean para recibirte. Soy Maestra Carla, intérprete de los designios astrales. ¿Sobre qué signo o aspecto celestial deseas consultar?',
     'El cosmos vibra con tu presencia... Las constelaciones danzan esperando tus preguntas. Permíteme guiarte por los senderos del zodíaco.',
     'Ah, veo que los astros te han dirigido hacia mí. Los secretos de los signos zodiacales aguardan ser revelados. ¿Qué te inquieta del firmamento?',
   ];

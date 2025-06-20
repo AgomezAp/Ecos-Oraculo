@@ -100,7 +100,7 @@ export class TablaNacimientoComponent
 
   // Información del astrólogo
   astrologerInfo: AstrologerInfo = {
-    name: 'Maestra Astra',
+    name: 'Maestra Emma',
     title: 'Guardiana de las Configuraciones Celestiales',
     specialty: 'Especialista en cartas natales y astrología transpersonal',
   };
@@ -142,8 +142,8 @@ export class TablaNacimientoComponent
     // Mensaje de bienvenida
     if (this.messages.length === 0) {
       this.addMessage({
-        sender: 'Maestra Astra',
-        content: `🌟 ¡Saludos, buscador de los misterios celestiales! Soy Astra, tu guía en el cosmos de las configuraciones astrales. 
+        sender: 'Maestra Emma',
+        content: `🌟 ¡Saludos, buscador de los misterios celestiales! Soy Emma, tu guía en el cosmos de las configuraciones astrales. 
 
 Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimiento. Las estrellas han estado esperando este momento para revelarte su sabiduría.
 
@@ -267,7 +267,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       const response = this.generateAstrologicalResponse(userMessage);
 
       this.addMessage({
-        sender: 'Maestra Astra',
+        sender: 'Maestra Emma',
         content: response,
         timestamp: new Date(),
         isUser: false,
@@ -442,7 +442,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       this.shouldScrollToBottom = true;
 
       this.addMessage({
-        sender: 'Maestra Astra',
+        sender: 'Maestra Emma',
         content:
           '🌟 ✨ ¡Pago confirmado! Las puertas del conocimiento celestial se han abierto para ti. Ahora puedes acceder a toda la sabiduría de tu carta natal sin límites.',
         timestamp: new Date(),
@@ -484,7 +484,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
     this.shouldScrollToBottom = true;
     this.addMessage({
-      sender: 'Maestra Astra',
+      sender: 'Maestra Emma',
       content: `🌟 Perfecto, ${this.fullName}. He registrado tus datos celestiales. Las configuraciones de tu nacimiento en ${this.birthPlace} el ${this.birthDate} revelan patrones únicos en el cosmos. ¿Sobre qué aspecto específico de tu carta natal te gustaría que profundice?`,
       timestamp: new Date(),
       isUser: false,
@@ -613,8 +613,8 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
     // Agregar mensaje de bienvenida inicial
     this.addMessage({
-      sender: 'Maestra Astra',
-      content: `🌟 ¡Saludos, buscador de los misterios celestiales! Soy Astra, tu guía en el cosmos de las configuraciones astrales. 
+      sender: 'Maestra Emma',
+      content: `🌟 ¡Saludos, buscador de los misterios celestiales! Soy Emma, tu guía en el cosmos de las configuraciones astrales. 
 
 Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimiento. Las estrellas han estado esperando este momento para revelarte su sabiduría.
 

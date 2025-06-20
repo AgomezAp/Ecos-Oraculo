@@ -116,7 +116,7 @@ export class CardsComponent implements OnInit, OnDestroy {
     const isMobile = window.innerWidth <= 768;
     const radius = isMobile ? 140 : 240;
     const centerX = window.innerWidth / 2.0;
-    const centerY = window.innerHeight / (isMobile ? 2.2 : 1.45) + 20;
+    const centerY = window.innerHeight / (isMobile ? 1.9 : 1.45) - 40;
 
     for (let i = 0; i < Math.min(numberOfCards, this.cards.length); i++) {
       const cardData = this.cards[i];
@@ -128,8 +128,8 @@ export class CardsComponent implements OnInit, OnDestroy {
         const card = document.createElement('div');
         card.classList.add('card');
         card.style.position = 'absolute';
-        card.style.width = isMobile ? '120px' : '150px'; // Tamaño adaptable
-        card.style.height = isMobile ? '200px' : '245px'; // Ajusta la altura aquí
+        card.style.width = isMobile ? '150px' : '180px'; // Tamaño adaptable
+        card.style.height = isMobile ? '230px' : '275px'; // Ajusta la altura aquí
         card.style.border = '1px solid #ccc';
         card.style.borderRadius = '10px';
         card.style.left = `${
@@ -169,52 +169,50 @@ export class CardsComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectCard(event: Event): void {
-    const target = event.currentTarget as HTMLElement; // Use currentTarget for dynamically added listeners
-    if (
-      this.selectedCards.length >= 3 ||
-      target.classList.contains('selected')
-    ) {
-      return;
-    }
-
-    const currentZIndex = 1500 + this.selectedCards.length;
-    target.style.zIndex = currentZIndex.toString();
-
-    target.classList.add('selected');
-    target.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-
-    const isMobile = window.innerWidth <= 768;
-    const centerX = window.innerWidth / 1.6;
-    const centerY = window.innerHeight / 4.25 + (isMobile ? 125 : 150);
-    const cardSpacing = isMobile ? 40 : 100; // Menor espacio entre cartas en móvil
-
-    // Calcular nueva posición basada en cantidad de seleccionadas
-    const offsetX = (this.selectedCards.length - 1) * cardSpacing - cardSpacing;
-
-    target.style.left = `${centerX - (isMobile ? 40 : 125) + offsetX}px`;
-    target.style.top = `${centerY - (isMobile ? 40 : 125)}px`;
-    target.style.transform = `scale(${isMobile ? 1.1 : 1.2}) rotateY(180deg)`; // Enhanced shadow for selected
-
-    this.selectedCards.push({
-      src: target.dataset['src'] || '',
-      name: target.dataset['name'] || '',
-      descriptions: target.dataset['descriptions']?.split('.,') || [],
-    });
-
-    setTimeout(() => {
-      target.style.backgroundImage = `url('${target.dataset['src']}')`;
-      target.style.pointerEvents = 'none'; // Disable further clicks on this card
-    }, 850); // Corresponds to half of the 1.5s rotation
-
-    if (this.selectedCards.length === 3) {
-      this.cardService.setSelectedCards(this.selectedCards);
-      // Añade un elemento visual que indique que se está preparando la lectura
-      setTimeout(() => {
-        this.promptForPayment();
-      }, 3000); // 3 segundos de espera
-    }
+selectCard(event: Event): void {
+  const target = event.currentTarget as HTMLElement;
+  if (this.selectedCards.length >= 3 || target.classList.contains('selected')) {
+    return;
   }
+
+  const currentZIndex = 1500 + this.selectedCards.length;
+  target.style.zIndex = currentZIndex.toString();
+
+  target.classList.add('selected');
+  target.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+
+  const isMobile = window.innerWidth <= 768;
+  const centerX = window.innerWidth / 1.6;
+  const centerY = window.innerHeight / 4.25 + (isMobile ? 155 : 140);
+  
+  // Espaciado más moderado - entre el original y el muy ancho
+  const cardSpacing = isMobile ? 60 : 140; // Reducido de 200 a 140 para desktop
+  
+  // Calcular nueva posición basada en cantidad de seleccionadas
+  const offsetX = (this.selectedCards.length - 1) * cardSpacing - cardSpacing;
+
+  target.style.left = `${centerX - (isMobile ? 40 : 165) + offsetX}px`;
+  target.style.top = `${centerY - (isMobile ? 40 : 125)}px`;
+  target.style.transform = `scale(${isMobile ? 1.3 : 1.4}) rotateY(180deg)`;
+
+  this.selectedCards.push({
+    src: target.dataset['src'] || '',
+    name: target.dataset['name'] || '',
+    descriptions: target.dataset['descriptions']?.split('.,') || [],
+  });
+
+  setTimeout(() => {
+    target.style.backgroundImage = `url('${target.dataset['src']}')`;
+    target.style.pointerEvents = 'none';
+  }, 850);
+
+  if (this.selectedCards.length === 3) {
+    this.cardService.setSelectedCards(this.selectedCards);
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 3000);
+  }
+}
 
   async promptForPayment(): Promise<void> {
     this.showPaymentModal = true;
@@ -361,28 +359,6 @@ async handlePaymentSubmit(): Promise<void> {
     this.isProcessingPayment = false;
     this.paymentError = null;
   }
-
-  private ajustarPosicionFinal(isMobile: boolean): void {
-    // This method might still be useful if you want a final "tidy up" animation
-    // after selection but before the payment modal, or if selectCard's positioning
-    // isn't final. For now, selectCard handles the final selected positions.
-    const selectedElements = document.getElementsByClassName('selected');
-    const cardWidth = isMobile ? 80 : 120;
-    const spacing = isMobile ? 10 : 20;
-    const totalWidth = cardWidth * 3 + spacing * 2;
-    const startX = (window.innerWidth - totalWidth) / 2;
-    const centerY = window.innerHeight * (isMobile ? 0.65 : 0.6); // Consistent with selectCard
-
-    Array.from(selectedElements).forEach((card: Element, index: number) => {
-      const htmlCard = card as HTMLElement;
-      htmlCard.style.transition = 'all 0.8s ease-out'; // Faster final adjustment
-      htmlCard.style.left = `${startX + index * (cardWidth + spacing)}px`;
-      htmlCard.style.top = `${centerY}px`;
-      // Transform might already be set by selectCard, confirm if it needs to be reapplied
-      // htmlCard.style.transform = `scale(${isMobile ? 1.1 : 1.2}) rotateY(180deg)`;
-    });
-  }
-
   private fadeOutAndNavigate(): void {
     const cardContainer = document.getElementById('cardContainer');
     const paymentModalOverlay = document.querySelector(

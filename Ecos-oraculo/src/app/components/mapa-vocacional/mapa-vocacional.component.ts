@@ -91,7 +91,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
 
   // Info del consejero
   counselorInfo = {
-    name: 'Dr. Mentor Vocationis',
+    name: 'Dra. Valeria',
     title: 'Consejero Vocacional Especialista',
     specialty: 'Orientación profesional y mapas vocacionales personalizados'
   };

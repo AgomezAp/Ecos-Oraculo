@@ -75,7 +75,7 @@ export class SignificadoSuenosComponent
   private backendUrl = 'http://localhost:3010';
 
   interpreterData: DreamInterpreterData = {
-    name: 'Maestro Oneiros',
+    name: 'Maestra Alma',
     specialty: 'Interpretación de sueños y simbolismo onírico',
     experience: 'Siglos interpretando los mensajes del subconsciente',
   };
@@ -83,7 +83,7 @@ export class SignificadoSuenosComponent
   // Frases de bienvenida aleatorias
   welcomeMessages = [
     'Ah, veo que has venido a mí buscando desentrañar los misterios de tu mundo onírico... Los sueños son ventanas al alma. Cuéntame, ¿qué visiones te han visitado?',
-    'Las energías cósmicas me susurran que tienes sueños que necesitan interpretación. Soy Maestro Oneiros, guardián de los secretos oníricos. ¿Qué mensaje del subconsciente te inquieta?',
+    'Las energías cósmicas me susurran que tienes sueños que necesitan interpretación. Soy Maestra Alma, guardiana de los secretos oníricos. ¿Qué mensaje del subconsciente te inquieta?',
     'Bienvenido, viajero de los sueños. Los planos astrales me han mostrado tu llegada. Permíteme guiarte a través de los símbolos y misterios de tus visiones nocturnas.',
     'El cristal de los sueños se ilumina ante tu presencia... Siento que portas visiones que necesitan ser descifradas. Confía en mi sabiduría ancestral y comparte conmigo tus sueños.',
   ];
