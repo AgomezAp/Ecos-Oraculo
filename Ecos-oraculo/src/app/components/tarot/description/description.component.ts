@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-description',
-  imports: [CommonModule, ParticlesComponent],
+  imports: [CommonModule],
   templateUrl: './description.component.html',
   styleUrl: './description.component.css'
 })

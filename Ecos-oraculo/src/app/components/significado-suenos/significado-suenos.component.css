@@ -20,6 +20,7 @@
   object-fit: cover;
   z-index: -2;
   pointer-events: none;
+  filter: hue-rotate(50deg) sepia(22%) invert(9%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
@@ -37,7 +38,7 @@
 /* Contenedor principal con menos padding - asegurar z-index */
 .oracle-main {
   font-family: "Cinzel", serif;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #00000026;
   border-radius: 25px;
   max-width: 1200px;
   width: 95%;
@@ -46,8 +47,8 @@
   position: relative;
   color: white;
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -61,11 +62,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(162, 142, 255, 0.8) 0%,
-    rgba(108, 92, 231, 0.6) 100%
-  );
+  background: linear-gradient(135deg, #9f4272, #cd82a9);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(162, 142, 255, 0.3);
   border-radius: 20px;
@@ -122,9 +119,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.6);
   border-radius: 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   margin: 0 0 12px 0;
   min-height: 0;
@@ -219,8 +214,8 @@
 }
 
 .interpreter-message .message-bubble {
-  background: linear-gradient(135deg, #a28eff 0%, #6c5ce7 100%);
-  border: 1px solid rgba(162, 142, 255, 0.5);
+  background: linear-gradient(120deg, #cd82a9, #9f4272);
+  border: 1px solid #cd82a9;
   color: white;
 }
 
@@ -292,10 +287,8 @@
 
 /* Área de entrada con menos padding - asegurar z-index */
 .input-area {
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 15px 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
   position: relative;
@@ -368,7 +361,7 @@
 }
 .clear-button:hover:not(:disabled),
 .send-button:hover:not(:disabled) {
-  background-color: rgba(110, 110, 130, 0.4);
+  background-color: #ffffff80;
 }
 
 .clear-button:active:not(:disabled),
@@ -395,10 +388,6 @@
   cursor: pointer;
   transition: background-color 0.25s ease;
   backdrop-filter: blur(3px);
-}
-.clear-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
 }
 
 .input-hint {
@@ -832,7 +821,7 @@
   right: 16px;
   width: 30px;
   height: 30px;
-  background: rgba(80, 65, 130, 0.8);
+  background: white;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -844,7 +833,7 @@
 }
 
 .close-chat-btn:hover {
-  background: rgba(100, 85, 150, 0.9);
+  background: #ffffff80;
 }
 
 .close-icon {
@@ -1161,26 +1150,17 @@
   border-radius: 50%;
   object-fit: cover;
 }
-.interpreter-avatar-small {
-  border: 2px solid #8a5cf600;
-}
-
-.user-avatar-image {
-  border: 2px solid #3b83f600;
-}
 
 .message-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 40px;
+  min-width: 32px;
+  height: 32px;
 }
 .mystical-orb-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }

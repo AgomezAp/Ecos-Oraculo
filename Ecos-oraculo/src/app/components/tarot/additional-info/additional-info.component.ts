@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-additional-info',
-  imports: [ParticlesComponent,FormsModule,CommonModule],
+  imports: [FormsModule,CommonModule],
   templateUrl: './additional-info.component.html',
   styleUrl: './additional-info.component.css',
 

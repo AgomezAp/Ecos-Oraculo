@@ -4,7 +4,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -34,11 +35,12 @@ html, body {
   height: 100%;
   object-fit: cover;
   z-index: -1;
+  filter: hue-rotate(319deg) saturate(190%) sepia(10%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
 .background::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -71,26 +73,26 @@ html, body {
 }
 
 h1 {
+  font-family: "Berkshire Swash", cursive;
   text-align: center;
   margin-top: 15px;
   font-size: clamp(32px, 8vw, 60px);
-  color: #ffffff;
-  text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+  color: #29176d;
+  text-shadow: 1px 1px 20px rgb(255 255 255 / 100%);
   position: relative;
   z-index: 2;
 }
 
-.start-button-amor, 
-.start-button-futuro, 
+.start-button-amor,
+.start-button-futuro,
 .start-button-dinero {
   padding: 15px 30px;
   font-size: 20px;
   color: white;
-  background: linear-gradient(135deg, #e2ac3d, #ffc552);
+  background: #7d6ac3;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
   transition: all 0.3s ease;
   margin: 10px 0;
   width: 200px;
@@ -105,8 +107,7 @@ h1 {
 .start-button-amor:hover,
 .start-button-futuro:hover,
 .start-button-dinero:hover {
-  background: linear-gradient(360deg, #FAE365, #FFBA63);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
+  background: #29176d;
   transform: translateY(-3px);
 }
 
@@ -115,14 +116,14 @@ h1 {
     margin-top: 10px;
     font-size: 28px;
   }
-  
+
   .content-container {
     margin-top: 10px;
     padding: 15px;
   }
-  
-  .start-button-amor, 
-  .start-button-futuro, 
+
+  .start-button-amor,
+  .start-button-futuro,
   .start-button-dinero {
     padding: 10px 20px;
     margin: 5px 0;
@@ -135,14 +136,14 @@ h1 {
     font-size: clamp(24px, 6vw, 48px);
     margin-top: 20px;
   }
-  
+
   .content-container {
     width: 95%;
     padding: 15px;
   }
-  
-  .start-button-amor, 
-  .start-button-futuro, 
+
+  .start-button-amor,
+  .start-button-futuro,
   .start-button-dinero {
     width: 180px;
     font-size: 18px;
@@ -154,9 +155,9 @@ h1 {
   h1 {
     font-size: clamp(20px, 5vw, 36px);
   }
-  
-  .start-button-amor, 
-  .start-button-futuro, 
+
+  .start-button-amor,
+  .start-button-futuro,
   .start-button-dinero {
     width: 160px;
     font-size: 16px;

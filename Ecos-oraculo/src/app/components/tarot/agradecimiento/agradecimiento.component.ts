@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-agradecimiento',
-  imports: [ParticlesComponent],
+  imports: [],
   templateUrl: './agradecimiento.component.html',
   styleUrl: './agradecimiento.component.css'
 })

@@ -69,6 +69,10 @@ export class SignificadoSuenosComponent
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
 
+  textareaHeight: number = 45; // Altura inicial
+  private readonly minTextareaHeight = 45;
+  private readonly maxTextareaHeight = 120;
+
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
@@ -331,6 +335,9 @@ export class SignificadoSuenosComponent
           },
         });
     }
+    setTimeout(() => {
+      this.textareaHeight = this.minTextareaHeight;
+    }, 50);
   }
 
   private saveStateBeforePayment(): void {
@@ -545,7 +552,22 @@ export class SignificadoSuenosComponent
     this.isProcessingPayment = false;
     this.paymentError = null;
   }
+  adjustTextareaHeight(event: any): void {
+    const textarea = event.target;
 
+    // Resetear altura para obtener scrollHeight correcto
+    textarea.style.height = 'auto';
+
+    // Calcular nueva altura basada en el contenido
+    const newHeight = Math.min(
+      Math.max(textarea.scrollHeight, this.minTextareaHeight),
+      this.maxTextareaHeight
+    );
+
+    // Aplicar nueva altura
+    this.textareaHeight = newHeight;
+    textarea.style.height = newHeight + 'px';
+  }
   // Método para nueva consulta (resetear solo si no ha pagado)
   newConsultation(): void {
     // ✅ RESETEAR CONTROL DE SCROLL
@@ -563,7 +585,7 @@ export class SignificadoSuenosComponent
       this.firstQuestionAsked = false;
       this.blockedMessageId = null;
     }
-    
+
     this.messages = [];
     this.hasStartedConversation = false;
     setTimeout(() => {
@@ -578,7 +600,7 @@ export class SignificadoSuenosComponent
       timestamp: new Date(),
     };
     this.messages.push(errorMsg);
-    
+
     // ✅ ACTIVAR AUTO-SCROLL para mensajes de error
     this.shouldAutoScroll = true;
   }
@@ -594,17 +616,24 @@ export class SignificadoSuenosComponent
     }
   }
 
-
   clearConversation(): void {
     this.newConsultation();
   }
 
+  // Actualizar el método onKeyPress
   onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      this.sendMessage();
+      if (this.messageText?.trim() && !this.isLoading) {
+        this.sendMessage();
+        // Resetear altura del textarea después del envío
+        setTimeout(() => {
+          this.textareaHeight = this.minTextareaHeight;
+        }, 50);
+      }
     }
   }
+
   getTimeString(timestamp: Date | string): string {
     try {
       // Si es string, convertir a Date

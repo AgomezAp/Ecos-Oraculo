@@ -32,7 +32,7 @@
           <svg class="close-icon" width="12" height="12" viewBox="0 0 12 12">
             <path
               d="M1 1L11 11M1 11L11 1"
-              stroke="white"
+              stroke="grey"
               stroke-width="2"
               stroke-linecap="round"
             />
@@ -133,16 +133,19 @@
         <div class="input-container">
           <div class="text-input-wrapper">
             <textarea
+              #messageTextarea
               class="message-input"
               [(ngModel)]="messageText"
               placeholder="Describe tu sueño en detalle..."
-              rows="1"
               maxlength="1500"
               (keydown)="onKeyPress($event)"
-              (input)="autoResize($event)"
+              (input)="adjustTextareaHeight($event)"
+              [style.height.px]="textareaHeight"
               [disabled]="isLoading"
-            >
-            </textarea>
+            ></textarea>
+            <div class="character-count" *ngIf="(messageText?.length || 0) > 1200">
+              {{ messageText.length || 0 }}/1500
+            </div>
           </div>
 
           <div class="action-buttons">
