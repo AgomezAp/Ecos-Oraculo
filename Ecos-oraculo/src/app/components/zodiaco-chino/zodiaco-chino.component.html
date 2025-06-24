@@ -1,12 +1,11 @@
 <!-- Fondo con estrellas animadas -->
 <video autoplay muted loop playsinline class="background-video">
-  <source src="/HOROSCOPO.webm" type="video/webm">
+  <source src="/HOROSCOPO.webm" type="video/webm" />
   Tu navegador no soporta videos HTML5.
 </video>
 
 <!-- Overlay opcional para mejorar legibilidad -->
 <div class="video-overlay"></div>
-
 
 <!-- Contenido principal -->
 <div class="main-content">
@@ -14,12 +13,19 @@
     <!-- Header -->
     <div class="zodiac-header">
       <div class="master-info-header">
-        <div class="master-avatar-header">
-          <span class="master-icon">🔮</span>
+        <div class="interpreter-avatar">
+          <img
+            class="mystical-orb-image"
+            src="/Maestra-8.webp"
+            alt="Maestra Avatar"
+          />
         </div>
         <div class="master-details-header" *ngIf="masterInfo">
-          <h3>{{ masterInfo.master.name }}</h3>
-          <p>{{ masterInfo.master.title }}</p>
+          <h3>Astróloga María</h3>
+          <p class="interpreter-title">Guía Celestial de los Signos</p>
+          <p class="interpreter-specialty">
+            Astrología occidental y horóscopo personalizado
+          </p>
         </div>
       </div>
       <button
@@ -57,7 +63,12 @@
           }"
         >
           <div class="message-avatar" *ngIf="message.role === 'master'">
-            <span class="avatar-icon">🔮</span>
+            <img
+              *ngIf="message.role === 'master'"
+              class="interpreter-avatar-small"
+              src="/Maestra-8.webp"
+              alt="Maestra Avatar"
+            />
           </div>
 
           <div
@@ -65,9 +76,7 @@
             [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
           >
             <div class="message-header" *ngIf="message.role === 'master'">
-              <span class="sender-name">{{
-                masterInfo?.master?.name || "Astróloga Luna"
-              }}</span>
+              <span class="sender-name">{{ "Astróloga María" }}</span>
               <span class="message-time">{{
                 formatTime(message.timestamp)
               }}</span>
@@ -80,7 +89,12 @@
           </div>
 
           <div class="message-avatar" *ngIf="message.role === 'user'">
-            <span class="avatar-icon">👤</span>
+            <img
+              *ngIf="message.role === 'user'"
+              class="user-avatar-image"
+              src="/Visitante.webp"
+              alt="Usuario Avatar"
+            />
           </div>
         </div>
       </div>
@@ -89,13 +103,21 @@
     <div class="chat-input-area">
       <div class="message-input">
         <mat-form-field appearance="outline">
-          <input
+          <textarea
             matInput
             [(ngModel)]="currentMessage"
-            (keydown.enter)="sendMessage()"
+            (keydown)="onKeyPress($event)"
+            (input)="autoResize($event)"
             placeholder="Pregunta sobre tu signo zodiacal y horóscopo..."
             [disabled]="isLoading"
-          />
+            rows="1"
+            style="
+              min-height: 24px;
+              max-height: 120px;
+              resize: none;
+              overflow-y: auto;
+            "
+          ></textarea>
         </mat-form-field>
       </div>
 

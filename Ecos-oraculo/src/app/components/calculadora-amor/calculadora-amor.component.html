@@ -1,6 +1,6 @@
 <!-- Fondo con estrellas animadas -->
 <video autoplay muted loop playsinline class="background-video">
-  <source src="/CALCULADORA.webm" type="video/webm">
+  <source src="/CALCULADORA.webm" type="video/webm" />
   Tu navegador no soporta videos HTML5.
 </video>
 
@@ -12,16 +12,19 @@
     <!-- Header -->
     <div class="love-header">
       <div class="love-expert-info">
-        <div class="expert-avatar">
-          <span class="expert-icon">💕</span>
+        <div class="interpreter-avatar">
+          <img
+            class="mystical-orb-image"
+            src="/Maestra-9.webp"
+            alt="Maestra Avatar"
+          />
         </div>
         <div class="expert-details" *ngIf="loveExpertInfo">
           <h3>{{ loveExpertInfo.loveExpert.name }}</h3>
-          <p>{{ loveExpertInfo.loveExpert.title }}</p>
-        </div>
-        <div class="expert-details" *ngIf="!loveExpertInfo">
-          <h3>{{ loveExpertInfo_display.name }}</h3>
-          <p>{{ loveExpertInfo_display.title }}</p>
+          <p class="interpreter-title">{{ loveExpertInfo.loveExpert.title }}</p>
+          <p class="interpreter-specialty">
+           Canalizadora del amor universal y numerología amorosa 
+          </p>
         </div>
       </div>
       <button
@@ -51,7 +54,12 @@
         }"
       >
         <div class="message-avatar" *ngIf="message.role === 'love_expert'">
-          <span class="avatar-icon">💕</span>
+          <img
+            *ngIf="message.role === 'love_expert'"
+            class="interpreter-avatar-small"
+            src="/Maestra-9.webp"
+            alt="Maestra Avatar"
+          />
         </div>
 
         <div
@@ -83,14 +91,24 @@
         </div>
 
         <div class="message-avatar" *ngIf="message.role === 'user'">
-          <span class="avatar-icon">👤</span>
+          <img
+            *ngIf="message.role === 'user'"
+            class="user-avatar-image"
+            src="/Visitante.webp"
+            alt="Usuario Avatar"
+          />
         </div>
       </div>
 
       <!-- Loading indicator -->
       <div *ngIf="isLoading" class="loading-message">
         <div class="loading-avatar">
-          <span class="avatar-icon">💕</span>
+          <span class="avatar-icon">
+            <img
+              class="interpreter-avatar-small"
+              src="/Maestra-9.webp"
+              alt="Maestra Avatar"
+          /></span>
         </div>
         <div class="loading-content">
           <div class="loading-dots">
@@ -119,108 +137,21 @@
       </div>
     </div>
 
-    <!-- Formulario de datos de compatibilidad -->
-    <div *ngIf="showDataForm" class="data-form-container">
-      <div class="data-form">
-        <h4>Información para el análisis de compatibilidad</h4>
-        <form
-          [formGroup]="compatibilityForm"
-          (ngSubmit)="calculateCompatibility()"
-        >
-          <div class="person-section">
-            <h5>Primera persona</h5>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Nombre completo</mat-label>
-              <input
-                matInput
-                formControlName="person1Name"
-                placeholder="Ej: Ana María García"
-              />
-              <mat-error *ngIf="hasFormError('person1Name', 'required')">
-                {{ getFieldErrorMessage("person1Name") }}
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Fecha de nacimiento</mat-label>
-              <input
-                matInput
-                [matDatepicker]="picker1"
-                formControlName="person1BirthDate"
-              />
-              <mat-datepicker-toggle
-                matIconSuffix
-                [for]="picker1"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #picker1></mat-datepicker>
-              <mat-error *ngIf="hasFormError('person1BirthDate', 'required')">
-                {{ getFieldErrorMessage("person1BirthDate") }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="person-section">
-            <h5>Segunda persona</h5>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Nombre completo</mat-label>
-              <input
-                matInput
-                formControlName="person2Name"
-                placeholder="Ej: Carlos Luis Mendoza"
-              />
-              <mat-error *ngIf="hasFormError('person2Name', 'required')">
-                {{ getFieldErrorMessage("person2Name") }}
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Fecha de nacimiento</mat-label>
-              <input
-                matInput
-                [matDatepicker]="picker2"
-                formControlName="person2BirthDate"
-              />
-              <mat-datepicker-toggle
-                matIconSuffix
-                [for]="picker2"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #picker2></mat-datepicker>
-              <mat-error *ngIf="hasFormError('person2BirthDate', 'required')">
-                {{ getFieldErrorMessage("person2BirthDate") }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" mat-stroked-button (click)="toggleDataForm()">
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              mat-raised-button
-              color="primary"
-              [disabled]="compatibilityForm.invalid || isLoading"
-            >
-              <mat-icon *ngIf="!isLoading">calculate</mat-icon>
-              <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-              Calcular Compatibilidad
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <!-- Input Area -->
     <div class="chat-input-area">
       <div class="message-input">
         <textarea
+          #messageTextarea
           placeholder="Pregunta sobre amor y compatibilidad..."
           [(ngModel)]="currentMessage"
+          (input)="adjustTextareaHeight($event)"
           (keydown.enter)="onEnterPressed($any($event))"
-          [maxlength]="500"
-          rows="1"
+          [style.height.px]="textareaHeight"
+          maxlength="1000"
         ></textarea>
-        <div class="character-count">{{ currentMessage.length || 0 }}/500</div>
+        <div class="character-count" *ngIf="(currentMessage?.length || 0) > 800">
+          {{ currentMessage || 0 }}/1000
+        </div>
       </div>
 
       <div class="input-buttons">
@@ -375,13 +306,5 @@
         los bancos. No almacenamos información de tarjetas de crédito.
       </p>
     </div>
-  </div>
-</div>
-
-<!-- Loading Overlay General -->
-<div *ngIf="isLoading && !showPaymentModal" class="loading-overlay">
-  <div class="loading-content">
-    <mat-spinner diameter="60"></mat-spinner>
-    <p>Conectando con las energías del amor...</p>
   </div>
 </div>

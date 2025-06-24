@@ -1,7 +1,7 @@
 <div class="oracle-container">
-    <!-- Video de fondo -->
+  <!-- Video de fondo -->
   <video autoplay muted loop playsinline class="background-video">
-    <source src="/SUENOS.webm" type="video/webm">
+    <source src="/SUENOS.webm" type="video/webm" />
     Tu navegador no soporta videos HTML5.
   </video>
 
@@ -13,7 +13,11 @@
       <!-- Información del intérprete -->
       <div class="interpreter-info">
         <div class="interpreter-avatar">
-          <div class="mystical-orb">🔮</div>
+          <img
+            class="mystical-orb-image"
+            src="/Maestra1.webp"
+            alt="Maestra Avatar"
+          />
         </div>
         <div class="interpreter-details">
           <h3>{{ interpreterData.name }}</h3>
@@ -51,14 +55,18 @@
             [class.blocked-message]="isMessageBlocked(message)"
           >
             <div class="message-avatar">
-              <span *ngIf="message.role === 'user'" class="user-avatar"
-                >👤</span
-              >
-              <span
+              <img
+                *ngIf="message.role === 'user'"
+                class="user-avatar-image"
+                src="/Visitante.webp"
+                alt="Usuario Avatar"
+              />
+              <img
                 *ngIf="message.role === 'interpreter'"
                 class="interpreter-avatar-small"
-                >🔮</span
-              >
+                src="/Maestra1.webp"
+                alt="Maestra Avatar"
+              />
             </div>
 
             <div class="message-content">
@@ -97,9 +105,14 @@
           <div
             *ngIf="isTyping"
             class="message interpreter-message typing-indicator"
-          >
+            >
             <div class="message-avatar">
-              <span class="interpreter-avatar-small">🔮</span>
+              <span class="interpreter-avatar-small">
+                <img
+                  class="interpreter-avatar-small"
+                  src="/Maestra1.webp"
+                  alt="Maestra Avatar"
+              /></span>
             </div>
             <div class="message-content">
               <div class="message-bubble typing">

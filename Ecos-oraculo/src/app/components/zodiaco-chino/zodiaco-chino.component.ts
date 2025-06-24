@@ -21,7 +21,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { loadStripe, Stripe, StripeElements, StripePaymentElement } from '@stripe/stripe-js';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  StripePaymentElement,
+} from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 
 interface ChatMessage {
@@ -66,7 +71,9 @@ interface ZodiacAnimal {
   templateUrl: './zodiaco-chino.component.html',
   styleUrl: './zodiaco-chino.component.css',
 })
-export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class ZodiacoChinoComponent
+  implements OnInit, AfterViewChecked, OnDestroy
+{
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
   // Propiedades principales
@@ -78,7 +85,7 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
   conversationHistory: ChatMessage[] = [];
   zodiacAnimal: ZodiacAnimal = {};
   showDataForm = true;
-
+  isTyping: boolean = false;
   private shouldScrollToBottom = false;
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
@@ -96,7 +103,8 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
   blockedMessageId: string | null = null;
 
   // Configuración de Stripe
-  private stripePublishableKey = 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+  private stripePublishableKey =
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = 'http://localhost:3010';
 
   constructor(
@@ -124,16 +132,22 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
       console.error('Error loading Stripe.js:', error);
-      this.paymentError = 'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
+      this.paymentError =
+        'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
 
     // Verificar estado de pago para horóscopo
-    this.hasUserPaidForHoroscope = sessionStorage.getItem('hasUserPaidForHoroscope') === 'true';
+    this.hasUserPaidForHoroscope =
+      sessionStorage.getItem('hasUserPaidForHoroscope') === 'true';
 
     // Cargar datos guardados específicos del horóscopo
     const savedMessages = sessionStorage.getItem('horoscopeMessages');
-    const savedFirstQuestion = sessionStorage.getItem('horoscopeFirstQuestionAsked');
-    const savedBlockedMessageId = sessionStorage.getItem('horoscopeBlockedMessageId');
+    const savedFirstQuestion = sessionStorage.getItem(
+      'horoscopeFirstQuestionAsked'
+    );
+    const savedBlockedMessageId = sessionStorage.getItem(
+      'horoscopeBlockedMessageId'
+    );
 
     if (savedMessages) {
       try {
@@ -144,7 +158,9 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
         }));
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
-        console.log('✅ Mensajes del horóscopo restaurados desde sessionStorage');
+        console.log(
+          '✅ Mensajes del horóscopo restaurados desde sessionStorage'
+        );
       } catch (error) {
         console.error('Error al restaurar mensajes del horóscopo:', error);
         this.clearHoroscopeSessionData();
@@ -155,7 +171,7 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
     this.checkHoroscopePaymentStatus();
 
     this.loadMasterInfo();
-    
+
     // Solo agregar mensaje de bienvenida si no hay mensajes guardados
     if (this.conversationHistory.length === 0) {
       this.addWelcomeMessage();
@@ -167,8 +183,11 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
     }
-    
-    if (this.shouldAutoScroll && this.conversationHistory.length > this.lastMessageCount) {
+
+    if (
+      this.shouldAutoScroll &&
+      this.conversationHistory.length > this.lastMessageCount
+    ) {
       this.scrollToBottom();
       this.lastMessageCount = this.conversationHistory.length;
     }
@@ -189,12 +208,15 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
   private checkHoroscopePaymentStatus(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentIntent = urlParams.get('payment_intent');
-    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+    const paymentIntentClientSecret = urlParams.get(
+      'payment_intent_client_secret'
+    );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
       console.log('🔍 Verificando estado del pago del horóscopo...');
 
-      this.stripe.retrievePaymentIntent(paymentIntentClientSecret)
+      this.stripe
+        .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent) {
             switch (paymentIntent.status) {
@@ -205,11 +227,22 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
                 this.blockedMessageId = null;
                 sessionStorage.removeItem('horoscopeBlockedMessageId');
 
-                window.history.replaceState({}, document.title, window.location.pathname);
+                window.history.replaceState(
+                  {},
+                  document.title,
+                  window.location.pathname
+                );
 
-                const lastMessage = this.conversationHistory[this.conversationHistory.length - 1];
-                if (!lastMessage || !lastMessage.message.includes('¡Pago confirmado!')) {
-                  this.addMessage('master', '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y tu horóscopo personal están a tu disposición. ¿Qué otro aspecto de tu signo zodiacal te gustaría explorar?');
+                const lastMessage =
+                  this.conversationHistory[this.conversationHistory.length - 1];
+                if (
+                  !lastMessage ||
+                  !lastMessage.message.includes('¡Pago confirmado!')
+                ) {
+                  this.addMessage(
+                    'master',
+                    '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y tu horóscopo personal están a tu disposición. ¿Qué otro aspecto de tu signo zodiacal te gustaría explorar?'
+                  );
                 }
                 break;
 
@@ -236,7 +269,10 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
         ...msg,
         timestamp: msg.timestamp,
       }));
-      sessionStorage.setItem('horoscopeMessages', JSON.stringify(messagesToSave));
+      sessionStorage.setItem(
+        'horoscopeMessages',
+        JSON.stringify(messagesToSave)
+      );
     } catch (error) {
       console.error('Error guardando mensajes del horóscopo:', error);
     }
@@ -252,14 +288,22 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
   private saveHoroscopeStateBeforePayment(): void {
     console.log('💾 Guardando estado del horóscopo antes del pago...');
     this.saveHoroscopeMessagesToSession();
-    sessionStorage.setItem('horoscopeFirstQuestionAsked', this.firstQuestionAsked.toString());
+    sessionStorage.setItem(
+      'horoscopeFirstQuestionAsked',
+      this.firstQuestionAsked.toString()
+    );
     if (this.blockedMessageId) {
-      sessionStorage.setItem('horoscopeBlockedMessageId', this.blockedMessageId);
+      sessionStorage.setItem(
+        'horoscopeBlockedMessageId',
+        this.blockedMessageId
+      );
     }
   }
 
   isMessageBlocked(message: ChatMessage): boolean {
-    return message.id === this.blockedMessageId && !this.hasUserPaidForHoroscope;
+    return (
+      message.id === this.blockedMessageId && !this.hasUserPaidForHoroscope
+    );
   }
 
   async promptForHoroscopePayment(): Promise<void> {
@@ -273,7 +317,10 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo elemento anterior del horóscopo:', error);
+        console.log(
+          'Error destruyendo elemento anterior del horóscopo:',
+          error
+        );
       }
       this.paymentElement = undefined;
     }
@@ -283,20 +330,25 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
       console.log('📤 Enviando request de payment intent para horóscopo...');
 
       const response = await this.http
-        .post<{ clientSecret: string }>(`${this.backendUrl}/create-payment-intent`, { items })
+        .post<{ clientSecret: string }>(
+          `${this.backendUrl}/create-payment-intent`,
+          { items }
+        )
         .toPromise();
 
       console.log('📥 Respuesta de payment intent del horóscopo:', response);
 
       if (!response || !response.clientSecret) {
-        throw new Error('Error al obtener la información de pago del servidor para horóscopo.');
+        throw new Error(
+          'Error al obtener la información de pago del servidor para horóscopo.'
+        );
       }
       this.clientSecret = response.clientSecret;
 
       if (this.stripe && this.clientSecret) {
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
-          appearance: { 
+          appearance: {
             theme: 'stripe',
             variables: {
               colorPrimary: '#dc2626',
@@ -305,8 +357,8 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
               colorDanger: '#df1b41',
               fontFamily: 'El Messiri, system-ui, sans-serif',
               spacingUnit: '2px',
-              borderRadius: '12px'
-            }
+              borderRadius: '12px',
+            },
           },
         });
         this.paymentElement = this.elements.create('payment');
@@ -314,30 +366,47 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
         this.isProcessingPayment = false;
 
         setTimeout(() => {
-          const paymentElementContainer = document.getElementById('payment-element-container-horoscope');
-          console.log('🎯 Contenedor del horóscopo encontrado:', paymentElementContainer);
+          const paymentElementContainer = document.getElementById(
+            'payment-element-container-horoscope'
+          );
+          console.log(
+            '🎯 Contenedor del horóscopo encontrado:',
+            paymentElementContainer
+          );
 
           if (paymentElementContainer && this.paymentElement) {
             console.log('✅ Montando payment element del horóscopo...');
             this.paymentElement.mount(paymentElementContainer);
           } else {
-            console.error('❌ Contenedor del elemento de pago del horóscopo no encontrado.');
+            console.error(
+              '❌ Contenedor del elemento de pago del horóscopo no encontrado.'
+            );
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
           }
         }, 100);
       } else {
-        throw new Error('Stripe.js o la clave secreta del cliente no están disponibles para horóscopo.');
+        throw new Error(
+          'Stripe.js o la clave secreta del cliente no están disponibles para horóscopo.'
+        );
       }
     } catch (error: any) {
       console.error('❌ Error al preparar el pago del horóscopo:', error);
-      this.paymentError = error.message || 'Error al inicializar el pago del horóscopo. Por favor, inténtalo de nuevo.';
+      this.paymentError =
+        error.message ||
+        'Error al inicializar el pago del horóscopo. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
     }
   }
 
   async handleHoroscopePaymentSubmit(): Promise<void> {
-    if (!this.stripe || !this.elements || !this.clientSecret || !this.paymentElement) {
-      this.paymentError = 'El sistema de pago del horóscopo no está inicializado correctamente.';
+    if (
+      !this.stripe ||
+      !this.elements ||
+      !this.clientSecret ||
+      !this.paymentElement
+    ) {
+      this.paymentError =
+        'El sistema de pago del horóscopo no está inicializado correctamente.';
       this.isProcessingPayment = false;
       return;
     }
@@ -354,7 +423,9 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
     });
 
     if (error) {
-      this.paymentError = error.message || 'Ocurrió un error inesperado durante el pago del horóscopo.';
+      this.paymentError =
+        error.message ||
+        'Ocurrió un error inesperado durante el pago del horóscopo.';
       this.isProcessingPayment = false;
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
@@ -368,20 +439,26 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
           this.blockedMessageId = null;
           sessionStorage.removeItem('horoscopeBlockedMessageId');
 
-          this.addMessage('master', '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y la influencia celestial revelarán todos sus misterios en tu horóscopo personal. ¿Qué otro aspecto de tu signo zodiacal te gustaría explorar?');
+          this.addMessage(
+            'master',
+            '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y la influencia celestial revelarán todos sus misterios en tu horóscopo personal. ¿Qué otro aspecto de tu signo zodiacal te gustaría explorar?'
+          );
 
           this.shouldAutoScroll = true;
           this.saveHoroscopeMessagesToSession();
           break;
         case 'processing':
-          this.paymentError = 'El pago del horóscopo se está procesando. Te notificaremos cuando se complete.';
+          this.paymentError =
+            'El pago del horóscopo se está procesando. Te notificaremos cuando se complete.';
           break;
         case 'requires_payment_method':
-          this.paymentError = 'Pago del horóscopo fallido. Por favor, intenta con otro método de pago.';
+          this.paymentError =
+            'Pago del horóscopo fallido. Por favor, intenta con otro método de pago.';
           this.isProcessingPayment = false;
           break;
         case 'requires_action':
-          this.paymentError = 'Se requiere una acción adicional para completar el pago del horóscopo.';
+          this.paymentError =
+            'Se requiere una acción adicional para completar el pago del horóscopo.';
           this.isProcessingPayment = false;
           break;
         default:
@@ -390,7 +467,8 @@ export class ZodiacoChinoComponent implements OnInit, AfterViewChecked, OnDestro
           break;
       }
     } else {
-      this.paymentError = 'No se pudo determinar el estado del pago del horóscopo.';
+      this.paymentError =
+        'No se pudo determinar el estado del pago del horóscopo.';
       this.isProcessingPayment = false;
     }
   }
@@ -491,8 +569,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         zodiacData: {
           name: 'Astróloga María',
           specialty: 'Astrología occidental y horóscopo personalizado',
-          experience:
-            'Décadas de experiencia en interpretación astrológica',
+          experience: 'Décadas de experiencia en interpretación astrológica',
         },
         userMessage: initialMessage,
         fullName: formData.fullName,
@@ -526,75 +603,77 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   // Enviar mensaje en el chat
-  sendMessage(): void {
-    if (this.currentMessage.trim() && !this.isLoading) {
-      const message = this.currentMessage.trim();
+sendMessage(): void {
+  if (this.currentMessage.trim() && !this.isLoading) {
+    const message = this.currentMessage.trim();
 
-      // Verificar si es la SEGUNDA pregunta y si no ha pagado
-      if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
-        this.saveHoroscopeStateBeforePayment();
-        this.promptForHoroscopePayment();
-        return;
-      }
-
-      this.currentMessage = '';
-      this.isLoading = true;
-
-      // Agregar mensaje del usuario
-      this.addMessage('user', message);
-
-      const formData = this.userForm.value;
-      const consultationData = {
-        zodiacData: {
-          name: 'Astróloga María',
-          specialty: 'Astrología occidental y horóscopo personalizado',
-          experience:
-            'Décadas de experiencia en interpretación astrológica',
-        },
-        userMessage: message,
-        fullName: formData.fullName,
-        birthYear: formData.birthYear?.toString(),
-        birthDate: formData.birthDate,
-        conversationHistory: this.conversationHistory,
-      };
-
-      this.zodiacoChinoService.chatWithMaster(consultationData).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (response.success && response.response) {
-            const messageId = Date.now().toString();
-
-            this.addMessage('master', response.response, messageId);
-
-            // Si no ha pagado y ya hizo la primera pregunta, bloquear el mensaje
-            if (this.firstQuestionAsked && !this.hasUserPaidForHoroscope) {
-              this.blockedMessageId = messageId;
-              sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
-
-              setTimeout(() => {
-                this.saveHoroscopeStateBeforePayment();
-                this.promptForHoroscopePayment();
-              }, 2000);
-            } else if (!this.firstQuestionAsked) {
-              this.firstQuestionAsked = true;
-              sessionStorage.setItem('horoscopeFirstQuestionAsked', 'true');
-            }
-
-            this.saveHoroscopeMessagesToSession();
-          } else {
-            this.handleError('Error en la respuesta de la astróloga');
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.handleError(
-            'Error conectando con la astróloga: ' +
-              (error.error?.error || error.message)
-          );
-        },
-      });
+    // Verificar si es la SEGUNDA pregunta y si no ha pagado
+    if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
+      this.saveHoroscopeStateBeforePayment();
+      this.promptForHoroscopePayment();
+      return;
     }
+
+    this.currentMessage = '';
+    this.isLoading = true;
+    this.isTyping = true; // <-- Activa el indicador de escritura
+
+    // Agregar mensaje del usuario
+    this.addMessage('user', message);
+
+    const formData = this.userForm.value;
+    const consultationData = {
+      zodiacData: {
+        name: 'Astróloga María',
+        specialty: 'Astrología occidental y horóscopo personalizado',
+        experience: 'Décadas de experiencia en interpretación astrológica',
+      },
+      userMessage: message,
+      fullName: formData.fullName,
+      birthYear: formData.birthYear?.toString(),
+      birthDate: formData.birthDate,
+      conversationHistory: this.conversationHistory,
+    };
+
+    this.zodiacoChinoService.chatWithMaster(consultationData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.isTyping = false; // <-- Desactiva el indicador al recibir respuesta
+        if (response.success && response.response) {
+          const messageId = Date.now().toString();
+
+          this.addMessage('master', response.response, messageId);
+
+          // Si no ha pagado y ya hizo la primera pregunta, bloquear el mensaje
+          if (this.firstQuestionAsked && !this.hasUserPaidForHoroscope) {
+            this.blockedMessageId = messageId;
+            sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
+
+            setTimeout(() => {
+              this.saveHoroscopeStateBeforePayment();
+              this.promptForHoroscopePayment();
+            }, 2000);
+          } else if (!this.firstQuestionAsked) {
+            this.firstQuestionAsked = true;
+            sessionStorage.setItem('horoscopeFirstQuestionAsked', 'true');
+          }
+
+          this.saveHoroscopeMessagesToSession();
+        } else {
+          this.handleError('Error en la respuesta de la astróloga');
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.isTyping = false; // <-- Desactiva también en caso de error
+        this.handleError(
+          'Error conectando con la astróloga: ' +
+            (error.error?.error || error.message)
+        );
+      },
+    });
   }
+}
 
   // Calcular animal del zodiaco chino (mantenido para compatibilidad)
   calculateZodiacAnimal(birthYear: number, birthDate?: string): void {
@@ -713,7 +792,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.zodiacAnimal = {};
     this.firstQuestionAsked = false;
     this.blockedMessageId = null;
-    
+
     // Limpiar sessionStorage específico del horóscopo
     if (!this.hasUserPaidForHoroscope) {
       this.clearHoroscopeSessionData();
@@ -722,7 +801,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       sessionStorage.removeItem('horoscopeFirstQuestionAsked');
       sessionStorage.removeItem('horoscopeBlockedMessageId');
     }
-    
+
     this.userForm.reset({
       fullName: '',
       birthYear: '',
@@ -743,19 +822,22 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
 
   // Explorar elementos
   exploreElements(): void {
-    const message =
-      '¿Cómo influyen los planetas en mi personalidad y destino?';
+    const message = '¿Cómo influyen los planetas en mi personalidad y destino?';
     this.currentMessage = message;
     this.sendMessage();
   }
 
   // Métodos auxiliares
-  private addMessage(role: 'user' | 'master', message: string, id?: string): void {
+  private addMessage(
+    role: 'user' | 'master',
+    message: string,
+    id?: string
+  ): void {
     const newMessage: ChatMessage = {
       role,
       message,
       timestamp: new Date().toISOString(),
-      id: id || undefined
+      id: id || undefined,
     };
     this.conversationHistory.push(newMessage);
     this.shouldScrollToBottom = true;
@@ -827,7 +909,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.firstQuestionAsked = false;
     this.blockedMessageId = null;
     this.isLoading = false;
-    
+
     // Limpiar sessionStorage específico del horóscopo
     if (!this.hasUserPaidForHoroscope) {
       this.clearHoroscopeSessionData();
@@ -836,13 +918,13 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       sessionStorage.removeItem('horoscopeFirstQuestionAsked');
       sessionStorage.removeItem('horoscopeBlockedMessageId');
     }
-    
+
     this.shouldScrollToBottom = true;
     this.addWelcomeMessage();
   }
   resetChat(): void {
-  this.conversationHistory = [];
-  this.currentMessage = '';
-  // Si tienes algún estado adicional que resetear, agrégalo aquí
-}
+    this.conversationHistory = [];
+    this.currentMessage = '';
+    // Si tienes algún estado adicional que resetear, agrégalo aquí
+  }
 }

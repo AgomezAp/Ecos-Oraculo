@@ -270,33 +270,26 @@
 
 .interpreter-details h3 {
   margin: 0;
+  color: white;
   font-size: 1.1rem;
-  background: linear-gradient(45deg, #9370db, #8a2be2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   font-weight: 400;
   font-family: "Berkshire Swash", cursive;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .interpreter-title {
   margin: 2px 0 0 0;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.9);
-  font-style: italic;
-  font-family: "Berkshire Swash", cursive;
-  font-weight: 300;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
+  font-family: "Arsenal", sans-serif;
+  font-weight: bold;
 }
 
 .interpreter-specialty {
   margin: 2px 0 0 0;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
-  font-family: var(--font-system);
-  font-weight: 300;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
+  font-family: "Arsenal", sans-serif;
+  font-style: italic;
 }
 
 /* ===== DATOS PERSONALES FORM ===== */
@@ -526,8 +519,7 @@
 }
 
 .user-message .message-time {
-  color: rgba(51, 51, 51, 0.7);
-  font-family: var(--font-system);
+  color: #060606a6;
   font-weight: 300;
   text-align: left;
 }
@@ -541,19 +533,18 @@
 
 .interpreter-message p {
   color: white;
-  font-family: "Cinzel", serif !important;
-  font-size: 16px !important;
+  font-family: "Arsenal", sans-serif !important;
+  font-weight: regular !important;
+  font-size: 18px !important;
   font-weight: 400 !important;
   line-height: 1.4 !important;
   letter-spacing: 0.3px;
   margin: 0 0 10px 0;
   word-wrap: break-word;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .interpreter-message .message-time {
-  font-family: "Berkshire Swash", cursive;
-  color: rgba(255, 255, 255, 0.8);
+  color: #060606ec;
   font-weight: 200;
 }
 
@@ -1294,3 +1285,36 @@
     padding: 12px 15px;
   }
 }
+.interpreter-avatar {
+  position: relative;
+  z-index: 1;
+}
+.interpreter-avatar-small {
+  background: linear-gradient(45deg, #a28eff, #6c5ce7);
+}
+.interpreter-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.interpreter-avatar-small {
+  border: 2px solid #8a5cf600;
+}
+.mystical-orb-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+.user-avatar-image {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-avatar-image {
+  border: 2px solid #3b83f600;
+} 

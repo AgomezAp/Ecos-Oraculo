@@ -1,21 +1,27 @@
-        <!-- Video de fondo -->
-  <video autoplay muted loop playsinline class="background-video">
-    <source src="/MAPA-VOCACIONAL.webm" type="video/webm">
-    Tu navegador no soporta videos HTML5.
-  </video>
+<!-- Video de fondo -->
+<video autoplay muted loop playsinline class="background-video">
+  <source src="/MAPA-VOCACIONAL.webm" type="video/webm" />
+  Tu navegador no soporta videos HTML5.
+</video>
 
-  <!-- Overlay opcional para mejorar legibilidad -->
-  <div class="video-overlay"></div>
+<!-- Overlay opcional para mejorar legibilidad -->
+<div class="video-overlay"></div>
 <div class="main-content">
   <div class="vocational-container">
     <!-- Header del consejero -->
     <div class="counselor-header">
       <div class="counselor-info">
-        <div class="counselor-avatar">🎯</div>
-        <div class="counselor-details">
-          <h1>{{ counselorInfo.name }}</h1>
-          <p>{{ counselorInfo.title }}</p>
-          <span class="specialty">{{ counselorInfo.specialty }}</span>
+        <div class="interpreter-avatar">
+          <img
+            class="mystical-orb-image"
+            src="/Maestra-4.webp"
+            alt="Maestra Avatar"
+          />
+        </div>
+        <div class="interpreter-details">
+          <h3>{{ counselorInfo.name }}</h3>
+          <p class="interpreter-title">{{ counselorInfo.title }}</p>
+          <p class="interpreter-specialty" >{{ counselorInfo.specialty }}</p>
         </div>
       </div>
       <button
@@ -129,8 +135,18 @@
             [class.blocked-message]="isMessageBlocked(message)"
           >
             <div class="message-avatar">
-              <span *ngIf="message.isUser">👤</span>
-              <span *ngIf="!message.isUser">🎯</span>
+              <img
+                *ngIf="message.isUser"
+                class="user-avatar-image"
+                src="/Visitante.webp"
+                alt="Usuario Avatar"
+              />
+               <img
+                *ngIf="!message.isUser"
+                class="interpreter-avatar-small"
+                src="/Maestra-4.webp"
+                alt="Maestra Avatar"
+              />
             </div>
 
             <div class="message-content">
@@ -170,7 +186,11 @@
 
           <!-- Indicador de carga -->
           <div *ngIf="isLoading" class="loading-message">
-            <div class="loading-avatar">🎯</div>
+            <div class="loading-avatar">    <img
+                class="interpreter-avatar-small"
+                src="/Maestra-4.webp"
+                alt="Maestra Avatar"
+              /></div>
             <div class="loading-content">
               <div class="loading-dots">
                 <span></span>

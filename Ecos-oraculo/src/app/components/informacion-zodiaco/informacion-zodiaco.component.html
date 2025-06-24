@@ -1,7 +1,7 @@
 <div class="oracle-container">
-      <!-- Video de fondo -->
+  <!-- Video de fondo -->
   <video autoplay muted loop playsinline class="background-video">
-    <source src="/ZODIACO.webm" type="video/webm">
+    <source src="/ZODIACO.webm" type="video/webm" />
     Tu navegador no soporta videos HTML5.
   </video>
 
@@ -12,7 +12,11 @@
       <!-- Información del astrólogo -->
       <div class="interpreter-info">
         <div class="interpreter-avatar">
-          <div class="mystical-orb">✨</div>
+          <img
+            class="mystical-orb-image"
+            src="/Maestra-2.webp"
+            alt="Maestra Avatar"
+          />
         </div>
         <div class="interpreter-details">
           <h3>{{ astrologerInfo.name }}</h3>
@@ -48,7 +52,11 @@
             <!-- Mensajes del astrólogo -->
             <div *ngIf="!message.isUser" class="interpreter-message-wrapper">
               <div class="message-avatar">
-                <span class="interpreter-avatar-small"></span>
+                <img
+                  class="interpreter-avatar-small"
+                  src="/Maestra-2.webp"
+                  alt="Maestra Avatar"
+                />
               </div>
 
               <div class="message-content">
@@ -95,7 +103,11 @@
             <!-- Mensajes del usuario -->
             <div *ngIf="message.isUser" class="user-message-wrapper">
               <div class="message-avatar">
-                <span class="user-avatar">👤</span>
+                <img
+                  class="user-avatar-image"
+                  src="/Visitante.webp"
+                  alt="Usuario Avatar"
+                />
               </div>
 
               <div class="message-content">
@@ -113,7 +125,11 @@
           <div *ngIf="isLoading" class="message-container typing-indicator">
             <div class="interpreter-message-wrapper">
               <div class="message-avatar">
-                <span class="interpreter-avatar-small">🔮</span>
+                <img
+                  class="interpreter-avatar-small"
+                  src="/Maestra-2.webp"
+                  alt="Maestra Avatar"
+                />
               </div>
               <div class="message-content">
                 <div class="message-bubble interpreter-message typing">

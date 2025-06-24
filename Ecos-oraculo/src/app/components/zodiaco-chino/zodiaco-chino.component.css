@@ -78,7 +78,7 @@
 
 /* Contenedor principal con menos padding */
 .zodiac-modal {
-  font-family: 'Cinzel', serif;
+  font-family: "Cinzel", serif;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
   max-width: 1200px;
@@ -95,6 +95,15 @@
   overflow: hidden;
   padding: 15px;
   z-index: 2; /* Asegurar que esté sobre el video */
+  color: white;
+  font-family: "Arsenal", sans-serif !important;
+  font-weight: regular !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.3px;
+  margin: 0 0 10px 0;
+  word-wrap: break-word;
 }
 
 /* Header más compacto - adaptado para zodiac-header con z-index alto */
@@ -104,7 +113,11 @@
   justify-content: space-between;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.8) 0%, rgba(75, 0, 130, 0.6) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.8) 0%,
+    rgba(75, 0, 130, 0.6) 100%
+  );
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(138, 43, 226, 0.3);
   border-radius: 20px;
@@ -126,7 +139,7 @@
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #FFD700, #FFA500);
+  background: linear-gradient(45deg, #ffd700, #ffa500);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,24 +148,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   position: relative;
   z-index: 1;
-}
-
-.master-details-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: white;
-  font-weight: 400;
-  font-family: "Berkshire Swash", cursive;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
-}
-
-.master-details-header p {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-style: italic;
-  font-family: "Berkshire Swash", cursive;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
 
 .close-button {
@@ -182,7 +177,12 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
+  background: rgba(
+    12,
+    12,
+    38,
+    0.7
+  ); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -202,6 +202,7 @@
   animation: message-appear 0.3s ease-out;
   margin: 0 8px;
   position: relative;
+  width: calc(100% - 16px); /* Asegurar que use todo el ancho disponible */
 }
 
 @keyframes message-appear {
@@ -215,13 +216,20 @@
   }
 }
 
+/* MEJORAR ALINEACIÓN DE MENSAJES DEL USUARIO */
 .user-message {
   flex-direction: row-reverse;
   justify-content: flex-start;
+  margin-left: auto; /* Empujar hacia la derecha */
+  margin-right: 0;
+  max-width: 85%; /* Limitar ancho máximo */
 }
 
 .master-message {
   justify-content: flex-start;
+  margin-right: auto; /* Mantener a la izquierda */
+  margin-left: 0;
+  max-width: 85%; /* Limitar ancho máximo */
 }
 
 /* Avatar posicionado en la esquina del globo de texto */
@@ -243,28 +251,34 @@
 .user-message .message-avatar {
   background: linear-gradient(45deg, #4a90e2, #357abd);
   top: -5px;
-  right: -5px;
+  right: -15px;
 }
 
 /* Posicionamiento del avatar para mensajes del maestro */
 .master-message .message-avatar {
-  background: linear-gradient(45deg,#FFD700,#FFA500);
+  background: linear-gradient(45deg, #ffd700, #ffa500);
   top: -5px;
   left: -5px;
 }
 
+/* MEJORAR CONTENIDO DE MENSAJES */
 .message-content {
-  max-width: 80%;
+  max-width: 100%; /* Usar todo el ancho disponible del contenedor padre */
   position: relative;
+  width: 100%; /* Asegurar que use todo el ancho */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Ajustar padding del contenido para dar espacio al avatar */
 .user-message .message-content {
-  padding-right: 0px;
+  padding-right: 25px; /* Espacio para el avatar */
+  align-items: flex-end; /* Alinear a la derecha */
 }
 
 .master-message .message-content {
-  padding-left: 40px;
+  padding-left: 40px; /* Espacio para el avatar */
+  align-items: flex-start; /* Alinear a la izquierda */
 }
 
 .message-header {
@@ -272,6 +286,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 5px;
+  width: 100%;
 }
 
 .sender-name {
@@ -286,12 +301,18 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* MEJORAR BURBUJAS DE MENSAJE */
 .message-text {
-  padding: 12px 16px;
+  padding: 12px 19px;
   border-radius: 18px;
   backdrop-filter: blur(10px);
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  width: fit-content; /* Ajustar al contenido */
+  min-width: 100px; /* Ancho mínimo */
 }
 
 .user-message .message-text {
@@ -300,6 +321,8 @@
   color: #333;
   padding-top: 20px;
   padding-right: 25px;
+  margin-left: auto; /* Empujar hacia la derecha */
+  text-align: left; /* Mantener texto alineado a la izquierda dentro de la burbuja */
 }
 
 .user-message .message-text p {
@@ -309,14 +332,16 @@
   font-weight: 300;
   line-height: 1.4;
   margin: 0;
+  text-align: left;
 }
 
 .master-message .message-text {
-  background: linear-gradient(135deg, #8A2BE2 0%, #4B0082 100%);
+  background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
   border: 1px solid rgba(138, 43, 226, 0.5);
   color: white;
   padding-top: 20px;
   padding-left: 25px;
+  margin-right: auto; /* Mantener a la izquierda */
 }
 
 .master-message .message-text p {
@@ -360,7 +385,7 @@
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  border: 2px solid #8A2BE2;
+  border: 2px solid #8a2be2;
   max-width: 200px;
   animation: bounce 0.5s ease-out;
 }
@@ -369,7 +394,7 @@
   font-size: 20px;
   display: block;
   margin-bottom: 8px;
-  color: #8A2BE2;
+  color: #8a2be2;
 }
 
 .payment-prompt p {
@@ -382,12 +407,12 @@
 
 .payment-prompt p:first-of-type {
   font-weight: 600;
-  color: #8A2BE2;
+  color: #8a2be2;
   font-size: 13px;
 }
 
 .unlock-button {
-  background: linear-gradient(135deg, #8A2BE2, #4B0082);
+  background: linear-gradient(135deg, #8a2be2, #4b0082);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -420,7 +445,7 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #8A2BE2, #4B0082);
+  background: linear-gradient(45deg, #8a2be2, #4b0082);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -446,7 +471,7 @@
   backdrop-filter: blur(10px);
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #8A2BE2 0%, #4B0082 100%);
+  background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
   border: 1px solid rgba(138, 43, 226, 0.5);
   display: flex;
   gap: 3px;
@@ -479,7 +504,9 @@
 }
 
 @keyframes bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
   }
   40% {
@@ -487,37 +514,40 @@
   }
 }
 
-/* Área de entrada estilo WhatsApp mejorada con z-index alto */
+/* Área de entrada estilo WhatsApp mejorada para autoexpansión */
 .chat-input-area {
   display: flex;
-  align-items: center;
+  align-items: flex-end !important; /* Cambiar a flex-end para alinear botones al final */
   gap: 10px;
   padding: 15px;
   background: rgba(255, 255, 255, 0.1);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
-  border-radius:20px;
+  border-radius: 20px;
   z-index: 3; /* Asegurar que esté sobre el video */
   position: relative;
+  min-height: 75px; /* Altura mínima del área */
 }
 
 .message-input {
   flex: 1;
 }
 
-/* ELIMINAR COMPLETAMENTE TODOS LOS ESTILOS DE ANGULAR MATERIAL */
+/* ESTILOS MEJORADOS PARA TEXTAREA CON AUTOEXPANSIÓN */
 .message-input ::ng-deep .mat-mdc-form-field {
   width: 100% !important;
   font-family: inherit !important;
   background: white !important;
   border-radius: 25px !important;
-  height: 45px !important;
+  min-height: 45px !important;
+  max-height: 120px !important; /* Altura máxima para evitar que crezca demasiado */
   border: 1px solid #e0e0e0 !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
   transition: all 0.3s ease !important;
   display: flex !important;
-  align-items: center !important;
-  padding: 0 20px !important;
+  align-items: flex-start !important; /* Cambiar a flex-start para expansión */
+  padding: 8px 20px !important;
+  overflow: hidden !important; /* Importante para el autoexpand */
 }
 
 .message-input ::ng-deep .mat-mdc-form-field:hover {
@@ -525,7 +555,7 @@
 }
 
 .message-input ::ng-deep .mat-mdc-form-field:focus-within {
-  border-color: #25D366 !important;
+  border-color: #25d366 !important;
   box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2) !important;
 }
 
@@ -544,9 +574,10 @@
   height: auto !important;
   min-height: auto !important;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important; /* Cambiar para expansión */
   width: 100% !important;
   box-shadow: none !important;
+  flex: 1 !important;
 }
 
 /* Eliminar COMPLETAMENTE todos los outlines y bordes de Material Design */
@@ -567,30 +598,37 @@
   visibility: hidden !important;
 }
 
-/* Input completamente limpio */
-.message-input ::ng-deep .mat-mdc-form-field input {
+/* Textarea con autoexpansión mejorada */
+.message-input ::ng-deep .mat-mdc-form-field textarea {
   background: transparent !important;
   border: none !important;
   outline: none !important;
   color: #333 !important;
   font-size: 16px !important;
-  line-height: 1.3 !important;
+  line-height: 1.4 !important; /* Mejorar line-height para expansión */
   font-family: "Arial", sans-serif !important;
   font-weight: 400 !important;
   width: 100% !important;
-  height: auto !important;
-  padding: 0 !important;
+  min-height: 20px !important; /* Altura mínima del textarea */
+  max-height: 90px !important; /* Altura máxima antes de scroll */
+  padding: 8px 0 !important; /* Padding vertical para centrar */
   margin: 0 !important;
   box-shadow: none !important;
+  resize: none !important;
+  overflow-y: auto !important;
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
 }
 
-.message-input ::ng-deep .mat-mdc-form-field input:focus {
+.message-input ::ng-deep .mat-mdc-form-field textarea:focus {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-.message-input ::ng-deep .mat-mdc-form-field input::placeholder {
+.message-input ::ng-deep .mat-mdc-form-field textarea::placeholder {
   color: rgba(0, 0, 0, 0.5) !important;
   font-family: "Arial", sans-serif !important;
   font-weight: 400 !important;
@@ -603,7 +641,10 @@
 .message-input ::ng-deep .mat-mdc-form-field .mat-form-field-hint-wrapper,
 .message-input ::ng-deep .mat-mdc-form-field .mat-form-field-underline,
 .message-input ::ng-deep .mat-mdc-form-field .mdc-line-ripple,
-.message-input ::ng-deep .mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper,
+.message-input
+  ::ng-deep
+  .mat-mdc-form-field
+  .mat-mdc-form-field-subscript-wrapper,
 .message-input ::ng-deep .mat-mdc-form-field .mdc-floating-label,
 .message-input ::ng-deep .mat-mdc-form-field .mat-mdc-form-field-bottom-align {
   display: none !important;
@@ -668,7 +709,7 @@
 .send-button {
   width: 45px;
   height: 45px;
-  background: #25D366;
+  background: #25d366;
   color: white;
   border: none;
   border-radius: 50%;
@@ -743,10 +784,12 @@
 }
 
 .payment-modal {
-  background: linear-gradient(135deg, 
-    rgba(75, 0, 130, 0.98) 0%, 
-    rgba(138, 43, 226, 0.98) 50%, 
-    rgba(147, 112, 219, 0.98) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(75, 0, 130, 0.98) 0%,
+    rgba(138, 43, 226, 0.98) 50%,
+    rgba(147, 112, 219, 0.98) 100%
+  );
   border-radius: 25px;
   padding: 0;
   max-width: 480px;
@@ -754,9 +797,7 @@
   max-height: calc(100vh - 40px);
   color: white;
   position: relative;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(138, 43, 226, 0.3),
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(138, 43, 226, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px);
   border: 2px solid rgba(138, 43, 226, 0.3);
@@ -781,9 +822,11 @@
 
 /* Header del modal */
 .payment-header {
-  background: linear-gradient(135deg, 
-    rgba(138, 43, 226, 0.9) 0%, 
-    rgba(75, 0, 130, 0.8) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.9) 0%,
+    rgba(75, 0, 130, 0.8) 100%
+  );
   padding: 25px 30px;
   display: flex;
   justify-content: space-between;
@@ -795,22 +838,28 @@
 }
 
 .payment-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   animation: shimmer 3s infinite;
 }
 
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .payment-header h3 {
@@ -873,7 +922,7 @@
 }
 
 .payment-content::before {
-  content: '🔮';
+  content: "🔮";
   position: absolute;
   top: 10px;
   left: 20px;
@@ -883,7 +932,7 @@
 }
 
 .payment-content::after {
-  content: '⭐';
+  content: "⭐";
   position: absolute;
   top: 20px;
   right: 30px;
@@ -893,8 +942,13 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .payment-info {
@@ -950,9 +1004,11 @@
 
 /* Precio destacado */
 .payment-price {
-  background: linear-gradient(135deg, 
-    rgba(138, 43, 226, 0.2) 0%, 
-    rgba(75, 0, 130, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(138, 43, 226, 0.2) 0%,
+    rgba(75, 0, 130, 0.1) 100%
+  );
   border: 2px solid rgba(138, 43, 226, 0.3);
   border-radius: 20px;
   padding: 25px;
@@ -963,24 +1019,27 @@
 }
 
 .payment-price::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, 
-    rgba(138, 43, 226, 0.1) 0%, 
-    transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(138, 43, 226, 0.1) 0%,
+    transparent 70%
+  );
   animation: pulse-glow 4s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
     transform: scale(1.1);
   }
@@ -993,9 +1052,10 @@
   margin-bottom: 8px;
 }
 
-.currency, .price-decimal {
+.currency,
+.price-decimal {
   font-size: 1.5rem;
-  color: #FFD700;
+  color: #ffd700;
   font-family: "Cinzel", serif;
   position: relative;
   z-index: 1;
@@ -1004,10 +1064,8 @@
 .price-amount {
   font-size: 3rem;
   font-weight: bold;
-  color: #FFD700;
-  text-shadow: 
-    2px 2px 4px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(255, 215, 0, 0.5);
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.5);
   font-family: "Cinzel", serif;
   position: relative;
   z-index: 1;
@@ -1056,14 +1114,18 @@
   width: 40px;
   height: 40px;
   border: 3px solid rgba(138, 43, 226, 0.3);
-  border-top: 3px solid #8A2BE2;
+  border-top: 3px solid #8a2be2;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .payment-loading p {
@@ -1116,10 +1178,7 @@
 }
 
 .pay-button {
-  background: linear-gradient(135deg, 
-    #8A2BE2 0%, 
-    #4B0082 50%, 
-    #9370DB 100%);
+  background: linear-gradient(135deg, #8a2be2 0%, #4b0082 50%, #9370db 100%);
   color: white;
   border: none;
   padding: 16px 35px;
@@ -1128,8 +1187,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 
-    0 8px 25px rgba(138, 43, 226, 0.4),
+  box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
@@ -1142,16 +1200,18 @@
 }
 
 .pay-button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -1161,8 +1221,7 @@
 
 .pay-button:hover:not(:disabled) {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 
-    0 12px 35px rgba(138, 43, 226, 0.6),
+  box-shadow: 0 12px 35px rgba(138, 43, 226, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -1236,22 +1295,28 @@
 
 /* Efectos especiales de fondo */
 .payment-modal::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at center, 
-    rgba(138, 43, 226, 0.05) 0%, 
-    transparent 50%);
+  background: radial-gradient(
+    circle at center,
+    rgba(138, 43, 226, 0.05) 0%,
+    transparent 50%
+  );
   animation: rotate-bg 20s linear infinite;
   z-index: -1;
 }
 
 @keyframes rotate-bg {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Modal backdrop */
@@ -1271,23 +1336,23 @@
     max-width: 95%;
     margin: 20px;
   }
-  
+
   .payment-header {
     padding: 20px 25px;
   }
-  
+
   .payment-header h3 {
     font-size: 1.2rem;
   }
-  
+
   .payment-content {
     padding: 25px 20px;
   }
-  
+
   .price-amount {
     font-size: 2.5rem;
   }
-  
+
   .pay-button {
     padding: 14px 30px;
     font-size: 15px;
@@ -1317,11 +1382,18 @@
   .chat-input-area {
     padding: 12px;
     gap: 8px;
+    min-height: 65px;
   }
 
   .message-input ::ng-deep .mat-mdc-form-field {
-    height: 42px !important;
-    padding: 0 18px !important;
+    min-height: 42px !important;
+    max-height: 100px !important;
+    padding: 6px 18px !important;
+  }
+
+  .message-input ::ng-deep .mat-mdc-form-field textarea {
+    max-height: 75px !important;
+    padding: 6px 0 !important;
   }
 
   .reset-button,
@@ -1330,7 +1402,12 @@
     height: 42px;
   }
 
-  /* Ajustes responsivos para avatares */
+  /* Ajustes responsivos para mensajes */
+  .user-message,
+  .master-message {
+    max-width: 90%;
+  }
+
   .message-avatar {
     width: 30px;
     height: 30px;
@@ -1342,17 +1419,17 @@
   }
 
   .master-message .message-content {
-    padding-left: 20px;
+    padding-left: 35px;
   }
 
   .user-message .message-text {
     padding-top: 18px;
-    padding-right: 18px;
+    padding-right: 20px;
   }
 
   .master-message .message-text {
     padding-top: 18px;
-    padding-left: 18px;
+    padding-left: 20px;
   }
 }
 
@@ -1361,34 +1438,34 @@
     max-width: 98%;
     margin: 10px;
   }
-  
+
   .payment-header {
     padding: 18px 20px;
   }
-  
+
   .payment-header h3 {
     font-size: 1.1rem;
   }
-  
+
   .payment-content {
     padding: 20px 18px;
   }
-  
+
   .payment-price {
     padding: 20px;
     margin: 20px 0;
   }
-  
+
   .price-amount {
     font-size: 2.2rem;
   }
-  
+
   .pay-button {
     padding: 12px 25px;
     font-size: 14px;
     min-width: 160px;
   }
-  
+
   .close-payment-button {
     width: 30px;
     height: 30px;
@@ -1432,15 +1509,19 @@
   .chat-input-area {
     padding: 10px;
     gap: 6px;
+    min-height: 60px;
   }
 
   .message-input ::ng-deep .mat-mdc-form-field {
-    height: 40px !important;
-    padding: 0 16px !important;
+    min-height: 40px !important;
+    max-height: 90px !important;
+    padding: 6px 16px !important;
   }
 
-  .message-input ::ng-deep .mat-mdc-form-field input {
+  .message-input ::ng-deep .mat-mdc-form-field textarea {
     font-size: 16px !important; /* Importante: mantener 16px para evitar zoom automático */
+    max-height: 65px !important;
+    padding: 5px 0 !important;
   }
 
   .reset-button,
@@ -1454,14 +1535,19 @@
     font-size: 13px;
   }
 
-  /* Ajustes extra pequeños para avatares */
+  /* Ajustes para móviles */
+  .user-message,
+  .master-message {
+    max-width: 95%;
+  }
+
   .user-message .message-content {
     padding-right: 15px;
   }
 
   .master-message .message-content,
   .loading-content {
-    padding-left: 15px;
+    padding-left: 30px;
   }
 
   .user-message .message-text {
@@ -1507,4 +1593,59 @@
     opacity: 0;
     backdrop-filter: blur(0px);
   }
+}
+
+.interpreter-avatar {
+  position: relative;
+  z-index: 1;
+}
+
+.interpreter-avatar-small {
+  background: linear-gradient(45deg, #a28eff, #6c5ce7);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8a5cf600;
+}
+
+.mystical-orb-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.user-avatar-image {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b83f600;
+}
+
+.interpreter-title {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Arsenal", sans-serif;
+  font-weight: bold;
+}
+
+.interpreter-specialty {
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: "Arsenal", sans-serif;
+  font-style: italic;
+}
+
+.master-details-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 400;
+  font-family: "Berkshire Swash", cursive;
 }

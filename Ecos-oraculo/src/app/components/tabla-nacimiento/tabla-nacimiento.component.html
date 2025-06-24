@@ -1,6 +1,6 @@
 <!-- Fondo con estrellas animadas -->
 <video autoplay muted loop playsinline class="background-video">
-  <source src="/CARTANATAL.webm" type="video/webm">
+  <source src="/CARTANATAL.webm" type="video/webm" />
   Tu navegador no soporta videos HTML5.
 </video>
 
@@ -13,12 +13,21 @@
     <!-- Header -->
     <div class="birth-chart-header">
       <div class="astrologer-info">
-        <div class="astrologer-avatar">
-          <span class="astrologer-icon">🌟</span>
+        <div class="interpreter-avatar">
+          <img
+            class="mystical-orb-image"
+            src="/Maestra-6.webp"
+            alt="Maestra Avatar"
+          />
         </div>
         <div class="astrologer-details">
-          <h3>{{ astrologerInfo.name }}</h3>
-          <p>{{ astrologerInfo.title }}</p>
+          <h3>Maestra Emma</h3>
+          <p class="interpreter-title">
+            Guardiana de las Configuraciones Celestiales
+          </p>
+          <p class="interpreter-specialty">
+            Especialista en cartas natales y astrología transpersonal
+          </p>
         </div>
       </div>
       <button
@@ -35,77 +44,6 @@
           />
         </svg>
       </button>
-    </div>
-
-    <!-- Personal Data Form -->
-    <div class="personal-data-section" *ngIf="showDataForm">
-      <h4>📋 Datos para Tabla de Nacimiento</h4>
-      <div class="data-form">
-        <mat-form-field class="full-width">
-          <mat-label>Nombre completo</mat-label>
-          <input
-            matInput
-            [(ngModel)]="fullName"
-            placeholder="Ej: María Elena García"
-          />
-        </mat-form-field>
-
-        <mat-form-field class="full-width">
-          <mat-label>Fecha de nacimiento</mat-label>
-          <input matInput [(ngModel)]="birthDate" type="date" />
-        </mat-form-field>
-
-        <mat-form-field class="full-width">
-          <mat-label>Hora de nacimiento</mat-label>
-          <input
-            matInput
-            [(ngModel)]="birthTime"
-            type="time"
-            placeholder="HH:MM"
-          />
-        </mat-form-field>
-
-        <mat-form-field class="full-width">
-          <mat-label>Lugar de nacimiento</mat-label>
-          <input
-            matInput
-            [(ngModel)]="birthPlace"
-            placeholder="Ej: Madrid, España"
-          />
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="savePersonalData()"
-          >
-            Guardar datos
-          </button>
-          <button mat-button (click)="toggleDataForm()">
-            Continuar sin datos completos
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Birth Chart Preview -->
-    <div class="chart-preview" *ngIf="chartData.sunSign || chartData.moonSign">
-      <h4>🌌 Tu Configuración Celestial</h4>
-      <div class="chart-grid">
-        <div class="chart-card" *ngIf="chartData.sunSign">
-          <span class="sign">{{ chartData.sunSign }}</span>
-          <span class="label">Sol</span>
-        </div>
-        <div class="chart-card" *ngIf="chartData.moonSign">
-          <span class="sign">{{ chartData.moonSign }}</span>
-          <span class="label">Luna</span>
-        </div>
-        <div class="chart-card" *ngIf="chartData.ascendant">
-          <span class="sign">{{ chartData.ascendant }}</span>
-          <span class="label">Ascendente</span>
-        </div>
-      </div>
     </div>
 
     <!-- Chat Messages -->
@@ -126,7 +64,12 @@
         }"
       >
         <div class="message-avatar" *ngIf="!message.isUser">
-          <span class="avatar-icon">🌟</span>
+          <img
+            *ngIf="!message.isUser"
+            class="interpreter-avatar-small"
+            src="/Maestra-6.webp"
+            alt="Maestra Avatar"
+          />
         </div>
 
         <div
@@ -147,7 +90,12 @@
         </div>
 
         <div class="message-avatar" *ngIf="message.isUser">
-          <span class="avatar-icon">👤</span>
+          <img
+            *ngIf="message.isUser"
+            class="user-avatar-image"
+            src="/Visitante.webp"
+            alt="Usuario Avatar"
+          />
         </div>
 
         <!-- Overlay de pago para mensajes bloqueados -->
@@ -166,7 +114,12 @@
       <!-- Loading indicator -->
       <div *ngIf="isLoading" class="loading-message">
         <div class="loading-avatar">
-          <span class="avatar-icon">🌟</span>
+          <span class="avatar-icon">
+            <img
+              class="interpreter-avatar-small"
+              src="/Maestra-6.webp"
+              alt="Maestra Avatar"
+          /></span>
         </div>
         <div class="loading-content">
           <div class="loading-dots">

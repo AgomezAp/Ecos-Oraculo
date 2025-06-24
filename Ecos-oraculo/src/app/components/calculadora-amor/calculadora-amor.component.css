@@ -83,7 +83,9 @@
 
 /* Contenedor principal de la calculadora de amor con z-index alto */
 .love-calculator-modal {
-  font-family: "Cinzel", serif;
+  font-family: "Arsenal", sans-serif !important;
+  font-weight: regular !important;
+  font-size: 18px !important;
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 25px;
   max-width: 1200px;
@@ -158,16 +160,6 @@
   font-family: "Berkshire Swash", cursive;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
 }
-
-.expert-details p {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-style: italic;
-  font-family: "Berkshire Swash", cursive;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
-}
-
 .close-button {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -195,7 +187,12 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
+  background: rgba(
+    12,
+    12,
+    38,
+    0.7
+  ); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -215,6 +212,7 @@
   animation: message-appear 0.3s ease-out;
   margin: 0 8px;
   position: relative;
+  width: calc(100% - 16px); /* Asegurar que use todo el ancho disponible */
 }
 
 @keyframes message-appear {
@@ -228,13 +226,20 @@
   }
 }
 
+/* MEJORAR ALINEACIÓN DE MENSAJES DEL USUARIO */
 .user-message {
   flex-direction: row-reverse;
   justify-content: flex-start;
+  margin-left: auto; /* Empujar hacia la derecha */
+  margin-right: 0;
+  max-width: 85%; /* Limitar ancho máximo */
 }
 
 .expert-message {
   justify-content: flex-start;
+  margin-right: auto; /* Mantener a la izquierda */
+  margin-left: 0;
+  max-width: 85%; /* Limitar ancho máximo */
 }
 
 /* Avatar posicionado en la esquina del globo de texto */
@@ -256,7 +261,7 @@
 .user-message .message-avatar {
   background: linear-gradient(45deg, #4a90e2, #357abd);
   top: -5px;
-  right: -5px;
+  right: -6px;
 }
 
 /* Posicionamiento del avatar para mensajes del experto */
@@ -270,18 +275,24 @@
   font-size: 16px;
 }
 
+/* MEJORAR CONTENIDO DE MENSAJES */
 .message-content {
-  max-width: 80%;
+  max-width: 100%; /* Usar todo el ancho disponible del contenedor padre */
   position: relative;
+  width: 100%; /* Asegurar que use todo el ancho */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Ajustar padding del contenido para dar espacio al avatar */
 .user-message .message-content {
-  padding-right: 40px;
+  padding-right: 25px; /* Espacio para el avatar */
+  align-items: flex-end; /* Alinear a la derecha */
 }
 
 .expert-message .message-content {
-  padding-left: 40px;
+  padding-left: 40px; /* Espacio para el avatar */
+  align-items: flex-start; /* Alinear a la izquierda */
 }
 
 .message-header {
@@ -289,6 +300,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 5px;
+  width: 100%;
 }
 
 .sender-name {
@@ -303,12 +315,18 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* MEJORAR BURBUJAS DE MENSAJE */
 .message-text {
-  padding: 12px 16px;
+  padding: 12px 19px;
   border-radius: 18px;
   backdrop-filter: blur(10px);
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  width: fit-content; /* Ajustar al contenido */
+  min-width: 100px; /* Ancho mínimo */
 }
 
 .user-message .message-text {
@@ -317,6 +335,9 @@
   color: #333;
   padding-top: 20px;
   padding-right: 25px;
+  margin-left: auto; /* Empujar hacia la derecha */
+  text-align: left; /* Mantener texto alineado a la izquierda dentro de la burbuja */
+   right: 11px;
 }
 
 .user-message .message-text p {
@@ -326,6 +347,7 @@
   font-weight: 300;
   line-height: 1.4;
   margin: 0;
+  text-align: left;
 }
 
 .expert-message .message-text {
@@ -334,6 +356,7 @@
   color: white;
   padding-top: 20px;
   padding-left: 25px;
+  margin-right: auto; /* Mantener a la izquierda */
 }
 
 .expert-message .message-text p {
@@ -530,7 +553,12 @@
 
 /* Formulario de datos de compatibilidad con z-index alto */
 .data-form-container {
-  background: rgba(12, 12, 38, 0.7); /* Aumentar opacidad para mejor contraste */
+  background: rgba(
+    12,
+    12,
+    38,
+    0.7
+  ); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -605,10 +633,10 @@
   font-family: "Arsenal", sans-serif;
 }
 
-/* Área de entrada de chat con z-index alto */
+/* Área de entrada de chat con autoexpansión mejorada */
 .chat-input-area {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-end !important; /* Cambiar a flex-end para alinear botones al final */
   gap: 10px;
   padding: 15px;
   background: rgba(255, 255, 255, 0.1);
@@ -617,6 +645,7 @@
   border-radius: 20px;
   z-index: 3; /* Asegurar que esté sobre el video */
   position: relative;
+  min-height: 75px; /* Altura mínima del área */
 }
 
 .message-input {
@@ -624,10 +653,11 @@
   position: relative;
 }
 
+/* ESTILOS MEJORADOS PARA TEXTAREA CON AUTOEXPANSIÓN */
 .message-input textarea {
   width: 100%;
   min-height: 45px;
-  max-height: 120px;
+  max-height: 120px; /* Altura máxima antes de scroll */
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 25px;
@@ -639,6 +669,12 @@
   outline: none;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  line-height: 1.4; /* Mejorar line-height para expansión */
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  vertical-align: top;
+  box-sizing: border-box;
+  overflow-y: auto; /* Scroll cuando excede altura máxima */
 }
 
 .message-input textarea:focus {
@@ -1223,12 +1259,25 @@
   .chat-input-area {
     padding: 12px;
     gap: 8px;
+    min-height: 65px; /* Altura mínima en tablet */
+  }
+
+  .message-input textarea {
+    min-height: 42px;
+    max-height: 100px; /* Altura máxima reducida en tablet */
+    padding: 10px 18px;
   }
 
   .reset-button,
   .send-button {
     width: 42px;
     height: 42px;
+  }
+
+  /* Ajustes responsivos para mensajes */
+  .user-message,
+  .expert-message {
+    max-width: 90%;
   }
 
   .message-avatar {
@@ -1238,7 +1287,7 @@
   }
 
   .user-message .message-content {
-    padding-right: 35px;
+    padding-right: 20px;
   }
 
   .expert-message .message-content {
@@ -1335,10 +1384,12 @@
   .chat-input-area {
     padding: 10px;
     gap: 6px;
+    min-height: 60px; /* Altura mínima en móvil */
   }
 
   .message-input textarea {
     min-height: 40px;
+    max-height: 90px; /* Altura máxima reducida en móvil */
     padding: 10px 16px;
     font-size: 16px; /* Importante: mantener 16px para evitar zoom automático */
   }
@@ -1350,7 +1401,7 @@
   }
 
   .user-message .message-content {
-    padding-right: 30px;
+    padding-right: 15px;
   }
 
   .expert-message .message-content,
@@ -1369,6 +1420,12 @@
   .typing-dots {
     padding-top: 15px;
     padding-left: 18px;
+  }
+
+  /* Ajustes para móviles */
+  .user-message,
+  .expert-message {
+    max-width: 95%;
   }
 
   .data-form-container {
@@ -1423,4 +1480,51 @@
     opacity: 0;
     backdrop-filter: blur(0px);
   }
+}
+.interpreter-avatar {
+  position: relative;
+  z-index: 1;
+}
+.interpreter-avatar-small {
+  background: linear-gradient(45deg, #a28eff, #6c5ce7);
+}
+.interpreter-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.interpreter-avatar-small {
+  border: 2px solid #8a5cf600;
+}
+.mystical-orb-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+.user-avatar-image {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-avatar-image {
+  border: 2px solid #3b83f600;
+}
+.interpreter-title {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Arsenal", sans-serif;
+  font-weight: bold;
+}
+.interpreter-specialty {
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Arsenal", sans-serif;
+  font-style: italic;
 }

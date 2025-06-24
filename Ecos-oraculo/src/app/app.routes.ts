@@ -3,7 +3,6 @@ import { BienvenidaComponent } from './components/bienvenida/bienvenida.componen
 import { CalculadoraAmorComponent } from './components/calculadora-amor/calculadora-amor.component';
 import { SignificadoSuenosComponent } from './components/significado-suenos/significado-suenos.component';
 import { InformacionZodiacoComponent } from './components/informacion-zodiaco/informacion-zodiaco.component';
-import { LecturaTarotComponent } from './components/lectura-tarot/lectura-tarot.component';
 import { MapaVocacionalComponent } from './components/mapa-vocacional/mapa-vocacional.component';
 import { AnimalInteriorComponent } from './components/animal-interior/animal-interior.component';
 import { TablaNacimientoComponent } from './components/tabla-nacimiento/tabla-nacimiento.component';
