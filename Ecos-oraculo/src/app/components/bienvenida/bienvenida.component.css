@@ -19,6 +19,7 @@
   height: auto;
   transform: translateX(-50%) translateY(-50%);
   z-index: -2;
+  filter: hue-rotate(320deg) saturate(120%) grayscale(23%);
 }
 
 .video-background video {
