@@ -19,17 +19,24 @@ export class BienvenidaComponent implements AfterViewInit {
       const video = card.querySelector('.card-video') as HTMLVideoElement;
 
       if (video) {
-        // Reproducir video en hover
-        card.addEventListener('mouseenter', () => {
-          video.play().catch((error) => {
-            console.log('Error al reproducir video:', error);
-          });
+        // Precargar el video
+        video.load();
+
+        card.addEventListener('mouseenter', async () => {
+          try {
+            // Intentar reproducir con manejo de promesas
+            await video.play();
+          } catch (error) {
+            // Si falla, intentar con click simulado
+            console.log('Autoplay bloqueado, intentando alternativa');
+            video.muted = true;
+            video.play();
+          }
         });
 
-        // Pausar video cuando el mouse sale
         card.addEventListener('mouseleave', () => {
           video.pause();
-          video.currentTime = 0; // Reiniciar el video
+          video.currentTime = 0;
         });
       }
     });
