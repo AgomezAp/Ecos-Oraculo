@@ -123,7 +123,7 @@
   padding: 8px 20px;
   background: linear-gradient(135deg, #17214c, #594c85);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-purple);
+  border-bottom: 1px solid #17214c;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -386,16 +386,11 @@
   justify-content: center;
   font-size: 16px;
   flex-shrink: 0;
-  box-shadow: var(--shadow-soft);
   position: relative;
 }
 
 .message.astrologer-message .message-avatar {
-  background: linear-gradient(
-    135deg,
-    var(--primary-purple),
-    var(--secondary-purple)
-  );
+  background: #594c85
 }
 
 .message.user-message .message-avatar {
@@ -411,13 +406,6 @@
   position: relative;
 }
 
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
 .sender-name {
   font-weight: 600;
   color: var(--primary-purple);
@@ -427,11 +415,14 @@
 
 .message-time {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-  font-family: var(--font-system);
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  color: white;
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
 }
-
 .message-text {
   padding: 12px 16px;
   border-radius: 18px;
@@ -447,9 +438,8 @@
 
 .message.astrologer-message .message-text {
   background: linear-gradient(135deg, #594c85, #17214c);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid #594c85;
   color: white;
-  border-bottom-left-radius: 6px;
 }
 
 .message.astrologer-message .message-text p {
@@ -464,12 +454,8 @@
 
 .message.user-message .message-text {
   border-bottom-right-radius: 6px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-purple),
-    var(--secondary-purple)
-  );
-  color: white;
+  background: white;
+  color: rgb(0, 0, 0);
   border: 1px solid var(--border-purple);
 }
 
@@ -594,11 +580,10 @@
 
 .loading-content {
   flex: 1;
-  background: white;
+  background: linear-gradient(135deg, #594c85, #17214c);
+
   padding: 12px 16px;
   border-radius: 18px;
-  border-bottom-left-radius: 6px;
-  box-shadow: var(--shadow-soft);
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
@@ -1429,9 +1414,7 @@
   position: relative;
   z-index: 1;
 }
-.interpreter-avatar-small {
-  background: linear-gradient(45deg, #a28eff, #6c5ce7);
-}
+
 .interpreter-avatar-small {
   width: 32px;
   height: 32px;
@@ -1439,15 +1422,14 @@
   object-fit: cover;
 }
 .interpreter-avatar-small {
-  border: 2px solid #8a5cf600;
+  border: 1px solid #8a5cf600;
 }
 .mystical-orb-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border: 1px solid #17214c;
 }
 .interpreter-title {
   margin: 6px 0 0 0;

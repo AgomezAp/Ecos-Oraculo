@@ -172,7 +172,7 @@
   padding: 8px 20px;
   background: linear-gradient(135deg, #58344e, #926671);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid #58344E;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -386,10 +386,6 @@
   background: linear-gradient(45deg, #4a90e2, #357abd);
 }
 
-.counselor-message .message-avatar {
-  background: linear-gradient(45deg, #60a5fa, #3b82f6);
-}
-
 .message-content {
   max-width: 80%;
   position: relative;
@@ -440,7 +436,7 @@
 
 .counselor-message .message-text {
   background: linear-gradient(135deg, #926671, #58344e);
-  border: 1px solid rgba(96, 165, 250, 0.5);
+  border: 1px solid #926671;
   color: white;
 }
 
@@ -697,7 +693,7 @@
 .send-button {
   width: 40px;
   height: 40px;
-  background-color: #E57373; /* Color rojo/coral sólido */
+  background-color: #e57373; /* Color rojo/coral sólido */
   color: white;
   border: none;
   border-radius: 50%;
@@ -712,12 +708,12 @@
 }
 
 .send-button:hover:not(:disabled) {
-  background-color: #EF5350; /* Un poco más oscuro al hover */
+  background-color: #ef5350; /* Un poco más oscuro al hover */
   transform: scale(1.05); /* Solo escalar, sin translateY */
 }
 
 .send-button:disabled {
-  background-color: #9E9E9E; /* Gris cuando está deshabilitado */
+  background-color: #9e9e9e; /* Gris cuando está deshabilitado */
   color: rgba(255, 255, 255, 0.6);
   cursor: not-allowed;
   transform: none;
@@ -726,7 +722,7 @@
 .clear-button {
   width: 40px; /* Mismo tamaño que send-button */
   height: 40px;
-  background-color: #9E9E9E; /* Gris oscuro */
+  background-color: #9e9e9e; /* Gris oscuro */
   color: white;
   border: none;
   border-radius: 50%;
@@ -744,7 +740,7 @@
 }
 
 .clear-button:disabled {
-  background-color: #E0E0E0; /* Gris claro cuando está deshabilitado */
+  background-color: #e0e0e0; /* Gris claro cuando está deshabilitado */
   color: rgba(255, 255, 255, 0.6);
   cursor: not-allowed;
   transform: none;
@@ -1658,9 +1654,7 @@
   position: relative;
   z-index: 1;
 }
-.interpreter-avatar-small {
-  background: linear-gradient(45deg, #a28eff, #6c5ce7);
-}
+
 .interpreter-avatar-small {
   width: 32px;
   height: 32px;
@@ -1668,15 +1662,14 @@
   object-fit: cover;
 }
 .interpreter-avatar-small {
-  border: 2px solid #8a5cf600;
+  border: 1px solid  #926671;
 }
 .mystical-orb-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border: 1px solid #58344e;
 }
 .user-avatar-image {
   width: 28px;

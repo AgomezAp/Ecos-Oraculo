@@ -14,12 +14,6 @@ body {
   left: 0;
 }
 .background {
-  /* Remover la imagen de fondo estática */
-  /* background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed; */
-  /* background-size: cover; */
-  /* background-position: center center; */
-
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -39,6 +33,7 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: -1;
+  filter: hue-rotate(319deg) saturate(190%) sepia(10%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
@@ -76,40 +71,32 @@ body {
 }
 
 h1 {
-  font-family: Arial, sans-serif;
+  font-family: "Berkshire Swash";
   color: #fff;
   font-size: 1.8rem;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6),
-    0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.4);
-  animation: goldenGlow 5s infinite;
 }
 
 button {
-  background: linear-gradient(45deg, #ffdd44, #bb8800);
+  background: #7d6ac3;
   color: #fff;
   border: none;
   padding: 15px 30px;
   font-size: 1.5rem;
   font-weight: bold;
   border-radius: 8px;
+  margin-top: 60px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 221, 68, 0.7);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 button:hover {
   transform: scale(1.15);
   /* Agranda el botón ligeramente */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4),
-    /* Sombra inicial */ 0 0 25px rgba(203, 161, 53, 1);
+  box-shadow: 1px 1px 20px rgb(255 255 255 / 100%);
   /* Brillo dorado sutil */
 }
 
 button:active {
   transform: scale(0.95);
   /* Reduce ligeramente el tamaño */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5),
-    /* Sombra reducida */ 0 0 10px rgba(255, 255, 255, 0.6);
-  /* Brillo blanco reducido */
-  background: linear-gradient(45deg, #b68e4c, #8f6f2d);
-  /* Gradiente más oscuro para el efecto de clic */
+  box-shadow: 1px 1px 20px rgb(255 255 255 / 100%)
 }

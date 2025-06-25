@@ -75,17 +75,17 @@
             class="message-content"
             [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
           >
-            <div class="message-header" *ngIf="message.role === 'master'">
-              <span class="sender-name">{{ "Astróloga María" }}</span>
-              <span class="message-time">{{
-                formatTime(message.timestamp)
-              }}</span>
-            </div>
+            <!-- Eliminar el message-header de aquí -->
 
             <div
               class="message-text"
               [innerHTML]="formatMessage(message.message)"
             ></div>
+
+            <!-- Mover la hora dentro del message-content, después del message-text -->
+            <span class="message-time" *ngIf="message.role === 'master'">
+              {{ formatTime(message.timestamp) }}
+            </span>
           </div>
 
           <div class="message-avatar" *ngIf="message.role === 'user'">

@@ -4,7 +4,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -14,11 +15,6 @@ html, body {
 }
 
 .background {
-  /* Remover la imagen de fondo estática */
-  /* background: url("/IMAGEN-ORIGEN-scaled-1.webp") no-repeat center center fixed; */
-  /* background-size: cover; */
-  /* background-position: center center; */
-  
   position: relative;
   display: flex;
   flex-direction: column;
@@ -39,11 +35,12 @@ html, body {
   height: 100%;
   object-fit: cover;
   z-index: -1;
+  filter: hue-rotate(319deg) saturate(190%) sepia(10%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
 .background::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -62,9 +59,10 @@ h2 {
   text-align: center;
   margin-top: 40px;
   font-size: 60px;
-  color: #ffffff;
-  text-shadow: 1px 1px 4px rgba(255, 215, 0, 0.6);
+  color: #29176d;
+  text-shadow: 1px 1px 20px rgb(255 255 255 / 100%);
   z-index: 2; /* Asegurar que esté sobre el video */
+  font-family: "Berkshire Swash", cursive;
 }
 
 .particulas {
@@ -206,7 +204,7 @@ h2 {
   background-color: #1a1a2e;
   color: #fff;
   border-radius: 15px;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+  box-shadow: 1px 1px 20px rgb(255 255 255 / 100%);
   padding: 30px;
   width: 90%;
   max-width: 500px;
@@ -310,14 +308,14 @@ h2 {
 }
 
 .pay-button {
-  background: linear-gradient(135deg, #ffd700, #ffaa00);
-  color: #1a1a2e;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  background: #7d6ac3;
+  color: #ffffff;
 }
 
 .pay-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+  box-shadow: 1px 1px 20px rgb(255 255 255 / 100%);
+  background: #29176d;
 }
 
 .pay-button:disabled {

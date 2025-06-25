@@ -106,7 +106,7 @@ export class CalculadoraAmorComponent
 
   // Info del experto en amor
   loveExpertInfo_display = {
-    name: 'Maestra Paula',
+    name: 'Maestra Valentina',
     title: 'Guardiana del Amor Eterno',
     specialty: 'Numerología amorosa y compatibilidad de almas',
   };

@@ -150,7 +150,7 @@ export class CardsComponent implements OnInit, OnDestroy {
         card.dataset['descriptions'] = cardData.descriptions.join('.,');
         card.addEventListener('mouseenter', () => {
           card.style.boxShadow =
-            '0 0 8px rgba(255, 215, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.6)';
+            '1px 1px 20px rgb(255 255 255 / 100%)';
         });
 
         card.addEventListener('mouseleave', () => {

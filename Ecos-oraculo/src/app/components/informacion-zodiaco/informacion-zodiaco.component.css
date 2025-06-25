@@ -187,7 +187,7 @@
   padding: 8px 20px;
   background: linear-gradient(135deg, #3b2850, #754f9f);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(147, 112, 219, 0.3);
+  border: 1px solid #3b2850;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -417,7 +417,6 @@
 }
 
 .interpreter-avatar-small {
-  background: linear-gradient(45deg, #9370db, #8a2be2);
   border-radius: 50%;
   width: 35px;
   height: 35px;
@@ -427,7 +426,7 @@
 }
 
 .interpreter-avatar-small {
-  border: 2px solid #8a5cf600;
+  border: 1px solid #754f9f;
 }
 
 .message-content {
@@ -469,7 +468,7 @@
 /* ===== MENSAJES DEL INTÉRPRETE ===== */
 .interpreter-message {
   background: linear-gradient(135deg, #754f9f, #3b2850);
-  border: 1px solid rgba(139, 124, 246, 0.5);
+  border: 1px solid #754f9f;
   color: white;
 }
 
@@ -488,7 +487,7 @@
 
 .interpreter-message .message-time {
   font-family: var(--font-interpreter);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255, 255, 255);
   font-weight: 200;
 }
 
@@ -1386,16 +1385,13 @@
   border-radius: 50%;
   object-fit: cover;
 }
-.interpreter-avatar-small {
-  background: linear-gradient(45deg, #a28eff, #6c5ce7);
-}
+
 .mystical-orb-image {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border: 1px solid #3b2850;
 }
 .user-avatar-image {
   width: 28px;

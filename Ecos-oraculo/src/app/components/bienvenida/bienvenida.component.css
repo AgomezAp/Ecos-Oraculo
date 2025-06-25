@@ -34,7 +34,6 @@
   object-fit: cover;
 }
 
-
 .overlay {
   position: fixed;
   top: 0;
@@ -73,7 +72,7 @@
   font-size: 1.8rem;
   margin-bottom: 1rem;
   font-weight: 700;
-  font-family: 'El Messiri', sans-serif;
+  font-family: "El Messiri", sans-serif;
 }
 
 .main-title {
@@ -90,7 +89,7 @@
   font-size: 2rem;
   margin: 1rem 0;
   font-weight: 700;
-  font-family: 'El Messiri', sans-serif;
+  font-family: "El Messiri", sans-serif;
 }
 
 .services-text {
@@ -309,7 +308,14 @@
 }
 /* ===== FOOTER TAMAÑO MODERADO Y HASTA LOS BORDES ===== */
 .footer-section {
-  background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 20, 0.4) 20%, rgba(5, 5, 15, 0.8) 50%, rgba(2, 2, 8, 0.95) 75%, #000000 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(8, 8, 20, 0.4) 20%,
+    rgba(5, 5, 15, 0.8) 50%,
+    rgba(2, 2, 8, 0.95) 75%,
+    #000000 100%
+  );
   color: white;
   padding: 80px 0 0 0; /* ✅ Sin padding inferior */
   position: relative;
@@ -349,9 +355,8 @@
   text-align: center;
 }
 
-
 .logo-image {
-  width: 150px; 
+  width: 150px;
   height: 150px;
   filter: brightness(0) saturate(100%) invert(1) brightness(1.2);
   margin-bottom: 20px;
@@ -359,7 +364,7 @@
 }
 
 .footer-title {
-  font-family: 'El Messiri', serif;
+  font-family: "El Messiri", serif;
   font-size: 1.8rem;
   margin: 0;
   color: white;
@@ -389,7 +394,7 @@
 }
 
 .contact-text {
-  font-family: 'Arsenal', sans-serif;
+  font-family: "Arsenal", sans-serif;
   font-size: 0.95rem; /* ✅ Tamaño normal */
   color: #f0f0f0;
   font-weight: 400;
@@ -417,7 +422,7 @@
   transition: all 0.3s ease;
   font-size: 20px; /* ✅ Tamaño para iconos */
   font-weight: bold;
-  font-family: 'Arsenal', sans-serif;
+  font-family: "Arsenal", sans-serif;
   position: relative;
   overflow: hidden;
 }
@@ -442,7 +447,14 @@
 
 /* ✅ ESTILOS ESPECÍFICOS POR PLATAFORMA */
 .social-link.instagram:hover {
-  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  background: linear-gradient(
+    45deg,
+    #f09433 0%,
+    #e6683c 25%,
+    #dc2743 50%,
+    #cc2366 75%,
+    #bc1888 100%
+  );
   border-color: #e6683c;
 }
 
@@ -480,7 +492,7 @@
 }
 
 .footer-link {
-  font-family: 'Arsenal', sans-serif;
+  font-family: "Arsenal", sans-serif;
   font-size: 1rem; /* ✅ Tamaño normal */
   font-weight: 400;
   color: #f0f0f0;
@@ -502,7 +514,18 @@
     flex-direction: column;
     text-align: center;
   }
-
+  .hero-content {
+    flex: 1.2;
+    max-width: 700px;
+    padding-left: 0rem;
+  }
+  .rotating-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: clockwiseRotation 90s linear infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+  }
   .main-title {
     font-size: 2.5rem;
     font-family: "Berkshire Swash", cursive;
@@ -527,37 +550,37 @@
     text-align: center;
     padding: 0 15px;
   }
-  
+
   .footer-title {
     font-size: 1.5rem;
   }
-  
+
   .logo-image {
     width: 60px;
     height: 60px;
   }
-  
+
   .social-link {
     width: 45px;
     height: 45px;
     font-size: 18px;
   }
-  
+
   .social-link svg {
     width: 20px;
     height: 20px;
   }
-  
+
   .social-link i {
     font-size: 18px;
   }
-  
+
   .footer-nav {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
   }
-  
+
   .footer-link {
     font-size: 0.9rem;
     padding: 6px 12px;
@@ -569,30 +592,30 @@
     padding: 50px 0 35px 0;
     min-height: 200px;
   }
-  
+
   .footer-content {
     gap: 25px;
   }
-  
+
   .footer-title {
     font-size: 1.3rem;
   }
-  
+
   .contact-text {
     font-size: 0.85rem;
   }
-  
-.social-link {
+
+  .social-link {
     width: 45px;
     height: 45px;
     font-size: 18px;
   }
-  
+
   .social-link svg {
     width: 20px;
     height: 20px;
   }
-  
+
   .social-link i {
     font-size: 18px;
   }

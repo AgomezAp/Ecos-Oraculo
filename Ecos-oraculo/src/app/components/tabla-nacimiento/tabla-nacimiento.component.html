@@ -76,17 +76,17 @@
           class="message-content"
           [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
         >
-          <div class="message-header" *ngIf="!message.isUser">
-            <span class="sender-name">{{ message.sender }}</span>
-            <span class="message-time">{{
-              message.timestamp | date : "HH:mm"
-            }}</span>
-          </div>
+          <!-- Eliminar el message-header de aquí -->
 
           <div
             class="message-text"
             [innerHTML]="formatMessage(message.content)"
           ></div>
+
+          <!-- Mover la hora aquí, dentro del message-content -->
+          <span class="message-time" *ngIf="!message.isUser">
+            {{ message.timestamp | date : "HH:mm" }}
+          </span>
         </div>
 
         <div class="message-avatar" *ngIf="message.isUser">
@@ -134,7 +134,6 @@
         </div>
       </div>
     </div>
-
     <!-- Input Area -->
     <div class="chat-input-area">
       <div class="input-container">

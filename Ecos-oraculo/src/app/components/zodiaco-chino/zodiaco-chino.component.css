@@ -89,7 +89,7 @@
   color: white;
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
-   border: 1px solid rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -115,7 +115,7 @@
   padding: 8px 20px;
   background: linear-gradient(135deg, #172131, #5d3565);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+  border: 1px solid #172131;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -240,21 +240,19 @@
 .user-message .message-avatar {
   background: linear-gradient(45deg, #4a90e2, #357abd);
   top: -5px;
-  right: -15px;
+  right: -11px;
 }
 
 /* Posicionamiento del avatar para mensajes del maestro */
 .master-message .message-avatar {
-  background: linear-gradient(45deg, #ffd700, #ffa500);
+  background: #5d3565;
   top: -5px;
   left: -5px;
 }
 
 /* MEJORAR CONTENIDO DE MENSAJES */
 .message-content {
-  max-width: 100%; /* Usar todo el ancho disponible del contenedor padre */
   position: relative;
-  width: 100%; /* Asegurar que use todo el ancho */
   display: flex;
   flex-direction: column;
 }
@@ -269,15 +267,6 @@
   padding-left: 40px; /* Espacio para el avatar */
   align-items: flex-start; /* Alinear a la izquierda */
 }
-
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-  width: 100%;
-}
-
 .sender-name {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
@@ -287,7 +276,13 @@
 
 .message-time {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  color: rgb(255, 255, 255);
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
 }
 
 /* MEJORAR BURBUJAS DE MENSAJE */
@@ -326,11 +321,13 @@
 
 .master-message .message-text {
   background: linear-gradient(135deg, #5d3565, #172131);
-  border: 1px solid rgba(138, 43, 226, 0.5);
+  border: 1px solid #5d3565;
   color: white;
   padding-top: 20px;
   padding-left: 25px;
   margin-right: auto; /* Mantener a la izquierda */
+  padding-bottom: 28px; 
+  position: relative;
 }
 
 .master-message .message-text p {
@@ -509,7 +506,7 @@
   align-items: flex-end !important; /* Cambiar a flex-end para alinear botones al final */
   gap: 10px;
   padding: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   z-index: 3; /* Asegurar que esté sobre el video */
   position: relative;
@@ -1593,7 +1590,7 @@
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #8a5cf600;
+  border: 1px solid #5d3565;
 }
 
 .mystical-orb-image {
@@ -1601,8 +1598,7 @@
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border: 1px solid #5d3565;
 }
 
 .user-avatar-image {

@@ -23,7 +23,7 @@
           <h3>{{ loveExpertInfo.loveExpert.name }}</h3>
           <p class="interpreter-title">{{ loveExpertInfo.loveExpert.title }}</p>
           <p class="interpreter-specialty">
-           Canalizadora del amor universal y numerología amorosa 
+            Canalizadora del amor universal y numerología amorosa
           </p>
         </div>
       </div>
@@ -45,6 +45,7 @@
 
     <!-- Chat Messages -->
     <div class="chat-messages" #scrollContainer (scroll)="onScroll($event)">
+      <!-- Modifica la estructura del mensaje para mover la hora dentro del message-text -->
       <div
         *ngFor="let message of conversationHistory; trackBy: trackByMessage"
         class="message"
@@ -66,19 +67,15 @@
           class="message-content"
           [ngClass]="{ 'blocked-content': isMessageBlocked(message) }"
         >
-          <div class="message-header" *ngIf="message.role === 'love_expert'">
-            <span class="sender-name">{{
-              loveExpertInfo?.loveExpert?.name || loveExpertInfo_display.name
-            }}</span>
-            <span class="message-time">{{
-              formatTime(message.timestamp)
-            }}</span>
-          </div>
-
           <div
             class="message-text"
             [innerHTML]="formatMessage(message.message)"
           ></div>
+
+          <!-- Mover la hora aquí, dentro del message-text -->
+          <span class="message-time" *ngIf="message.role === 'love_expert'">
+            {{ formatTime(message.timestamp) }}
+          </span>
 
           <!-- Overlay para mensajes bloqueados -->
           <div *ngIf="isMessageBlocked(message)" class="blocked-overlay">
@@ -149,7 +146,10 @@
           [style.height.px]="textareaHeight"
           maxlength="1000"
         ></textarea>
-        <div class="character-count" *ngIf="(currentMessage?.length || 0) > 800">
+        <div
+          class="character-count"
+          *ngIf="(currentMessage?.length || 0) > 800"
+        >
           {{ currentMessage || 0 }}/1000
         </div>
       </div>

@@ -113,7 +113,7 @@
   padding: 8px 20px;
   background: linear-gradient(135deg, #2a1c36, #773a58);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 20, 147, 0.3);
+  border: 1px solid #773a58;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -266,9 +266,9 @@
 
 /* MEJORAR CONTENIDO DE MENSAJES */
 .message-content {
-  max-width: 100%; /* Usar todo el ancho disponible del contenedor padre */
+  max-width: 100%;
   position: relative;
-  width: 100%; /* Asegurar que use todo el ancho */
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -292,16 +292,15 @@
   width: 100%;
 }
 
-.sender-name {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 600;
-  font-family: "Berkshire Swash", cursive;
-}
-
 .message-time {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  color: rgb(255, 255, 255); /* Color más suave para la hora */
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
 }
 
 /* MEJORAR BURBUJAS DE MENSAJE */
@@ -341,11 +340,13 @@
 
 .expert-message .message-text {
   background: linear-gradient(135deg, #773a58, #2a1c36);
-  border: 1px solid rgba(255, 20, 147, 0.5);
+  border: 1px solid #773a58;
   color: white;
   padding-top: 20px;
   padding-left: 25px;
-  margin-right: auto; /* Mantener a la izquierda */
+  padding-bottom: 28px; /* Añade espacio extra para la hora */
+  margin-right: auto;
+  position: relative; /* Importante para posicionar la hora */
 }
 
 .expert-message .message-text p {
@@ -443,7 +444,7 @@
   backdrop-filter: blur(10px);
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #ff1493 0%, #c7158b 100%);
+  background: linear-gradient(135deg, #773a58, #2a1c36);
   border: 1px solid rgba(255, 20, 147, 0.5);
   display: flex;
   gap: 3px;
@@ -644,7 +645,7 @@
 .message-input textarea {
   width: 100%;
   min-height: 45px;
-  max-height: 120px; /* Altura máxima antes de scroll */
+  max-height: 120px;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 25px;
@@ -656,12 +657,15 @@
   outline: none;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  line-height: 1.4; /* Mejorar line-height para expansión */
+  line-height: 1.4;
   word-wrap: break-word;
   white-space: pre-wrap;
   vertical-align: top;
   box-sizing: border-box;
-  overflow-y: auto; /* Scroll cuando excede altura máxima */
+  overflow-y: auto;
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 .message-input textarea:focus {
@@ -1361,7 +1365,11 @@
   .message-text {
     padding: 10px 14px;
   }
-
+  .message-time {
+    font-size: 0.6rem;
+    bottom: 6px;
+    right: 12px;
+  }
   .message-avatar {
     width: 25px;
     height: 25px;
@@ -1489,8 +1497,7 @@
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8b5cf6;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border: 1px solid #773a58;
 }
 .user-avatar-image {
   width: 28px;
