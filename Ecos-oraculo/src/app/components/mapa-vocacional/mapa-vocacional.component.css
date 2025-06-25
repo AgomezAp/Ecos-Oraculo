@@ -11,7 +11,7 @@
   right: 16px;
   width: 30px;
   height: 30px;
-  background: rgba(80, 65, 130, 0.199);
+  background: white;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -23,7 +23,7 @@
 }
 
 .close-chat-btn:hover {
-  background: rgba(55, 10, 201, 0.178);
+  background: #ffffff80;
 }
 
 .close-icon {
@@ -39,12 +39,6 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-  /* Remover la imagen de fondo estática */
-  /* background-image: url("/MapaVocacionalFondo.png"); */
-  /* background-size: cover; */
-  /* background-position: center; */
-  /* background-repeat: no-repeat; */
-  /* background-attachment: fixed; */
 }
 
 /* Video de fondo */
@@ -57,6 +51,7 @@
   object-fit: cover;
   z-index: -3;
   pointer-events: none;
+  filter: hue-rotate(58deg) saturate(91%) grayscale(15%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
@@ -151,7 +146,7 @@
 
 .vocational-container {
   font-family: "Arsenal", sans-serif !important;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #00000026;
   border-radius: 25px;
   max-width: 1200px;
   width: 95%;
@@ -160,8 +155,8 @@
   position: relative;
   color: white;
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -175,11 +170,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(96, 165, 250, 0.8) 0%,
-    rgba(59, 130, 246, 0.6) 100%
-  );
+  background: linear-gradient(135deg, #58344e, #926671);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 20px;
@@ -255,9 +246,9 @@
 }
 
 .tab-button.active {
-  background: rgba(96, 165, 250, 0.2);
-  color: #60a5fa;
-  border-bottom: 2px solid #60a5fa;
+  background: linear-gradient(135deg, #58344e, #926671);
+  color: linear-gradient(135deg, #926671, #58344e);
+  border-bottom: 2px solid #af60fa;
 }
 
 .tab-button:disabled {
@@ -329,9 +320,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(12, 12, 38, 0.6);
   border-radius: 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   margin: 0 0 12px 0;
   min-height: 0;
@@ -344,10 +333,14 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 15px;
+  padding: 17px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .message {
@@ -446,7 +439,7 @@
 }
 
 .counselor-message .message-text {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #926671, #58344e);
   border: 1px solid rgba(96, 165, 250, 0.5);
   color: white;
 }
@@ -622,10 +615,8 @@
 
 /* Área de entrada con estructura exacta de sueños */
 .chat-input-area {
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 15px 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
   z-index: 4; /* Asegurar que esté sobre el video */
@@ -697,7 +688,6 @@
   font-style: italic;
   opacity: 0.7;
 }
-
 .action-buttons {
   display: flex;
   gap: 10px;
@@ -707,7 +697,7 @@
 .send-button {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background-color: #E57373; /* Color rojo/coral sólido */
   color: white;
   border: none;
   border-radius: 50%;
@@ -715,29 +705,28 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 15px rgba(96, 165, 250, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: none; /* Sin sombra */
   position: relative;
   overflow: hidden;
 }
 
 .send-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(96, 165, 250, 0.4);
+  background-color: #EF5350; /* Un poco más oscuro al hover */
+  transform: scale(1.05); /* Solo escalar, sin translateY */
 }
 
 .send-button:disabled {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.3);
+  background-color: #9E9E9E; /* Gris cuando está deshabilitado */
+  color: rgba(255, 255, 255, 0.6);
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 .clear-button {
-  width: 35px;
-  height: 35px;
-  background: linear-gradient(135deg, #ff6b6b, #e55656);
+  width: 40px; /* Mismo tamaño que send-button */
+  height: 40px;
+  background-color: #9E9E9E; /* Gris oscuro */
   color: white;
   border: none;
   border-radius: 50%;
@@ -745,15 +734,21 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: none; /* Sin sombra */
 }
 
 .clear-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+  background-color: #757575; /* Gris más oscuro al hover */
+  transform: scale(1.05); /* Solo escalar */
 }
 
+.clear-button:disabled {
+  background-color: #E0E0E0; /* Gris claro cuando está deshabilitado */
+  color: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+  transform: none;
+}
 .input-hint {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
@@ -762,7 +757,10 @@
   font-family: var(--font-system);
   font-weight: 300;
 }
-
+.send-button i,
+.clear-button i {
+  color: #616161; /* Gris oscuro para los iconos */
+}
 /* ===== SECCIÓN DE ASSESSMENT ===== */
 .assessment-section {
   padding: 20px;

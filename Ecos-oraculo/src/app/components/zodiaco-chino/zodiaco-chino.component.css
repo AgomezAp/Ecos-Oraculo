@@ -6,7 +6,7 @@
   right: 16px;
   width: 30px;
   height: 30px;
-  background: rgba(80, 65, 130, 0.8);
+  background: white;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -18,7 +18,7 @@
 }
 
 .close-chat-btn:hover {
-  background: rgba(100, 85, 150, 0.9);
+  background: #ffffff80;
 }
 
 .close-icon {
@@ -79,7 +79,7 @@
 /* Contenedor principal con menos padding */
 .zodiac-modal {
   font-family: "Cinzel", serif;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #00000026;
   border-radius: 25px;
   max-width: 1200px;
   width: 95%;
@@ -88,8 +88,8 @@
   position: relative;
   color: white;
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+   border: 1px solid rgba(255, 255, 255, .2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -113,11 +113,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(138, 43, 226, 0.8) 0%,
-    rgba(75, 0, 130, 0.6) 100%
-  );
+  background: linear-gradient(135deg, #172131, #5d3565);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(138, 43, 226, 0.3);
   border-radius: 20px;
@@ -177,14 +173,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(
-    12,
-    12,
-    38,
-    0.7
-  ); /* Aumentar opacidad para mejor contraste */
   border-radius: 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   margin: 0 0 12px 0;
   min-height: 0;
@@ -336,7 +325,7 @@
 }
 
 .master-message .message-text {
-  background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+  background: linear-gradient(135deg, #5d3565, #172131);
   border: 1px solid rgba(138, 43, 226, 0.5);
   color: white;
   padding-top: 20px;
@@ -520,9 +509,7 @@
   align-items: flex-end !important; /* Cambiar a flex-end para alinear botones al final */
   gap: 10px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   border-radius: 20px;
   z-index: 3; /* Asegurar que esté sobre el video */
   position: relative;

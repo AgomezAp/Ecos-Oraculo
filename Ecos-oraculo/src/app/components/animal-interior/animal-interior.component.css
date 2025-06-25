@@ -24,7 +24,7 @@
   right: 16px;
   width: 30px;
   height: 30px;
-  background: rgba(112, 98, 69, 0.8);
+  background: white;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -36,7 +36,7 @@
 }
 
 .close-chat-btn:hover {
-  background: rgba(112, 98, 69, 0.8);
+  background: #ffffff80;
 }
 
 .close-icon {
@@ -54,6 +54,7 @@
   object-fit: cover;
   z-index: -2;
   pointer-events: none;
+  filter: hue-rotate(274deg) saturate(130%);
 }
 
 /* Overlay opcional para mejorar legibilidad */
@@ -102,7 +103,8 @@
 /* Contenedor principal con z-index alto */
 .oracle-main {
   font-family: "Cinzel", serif;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #00000026;
+
   border-radius: 25px;
   max-width: 1193px;
   width: calc(100vw - 20px);
@@ -111,8 +113,8 @@
   position: relative;
   color: white;
   box-shadow: 0 0 40px rgba(139, 69, 19, 0.3);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(139, 69, 19, 0.4);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -127,11 +129,7 @@
   justify-content: flex-start;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(139, 69, 19, 0.2) 0%,
-    rgba(34, 139, 34, 0.1) 100%
-  );
+  background: linear-gradient(135deg, #095a59, #3a8394);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--animal-border);
   border-radius: 20px;
@@ -235,9 +233,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(22, 42, 22, 0.7);
   border-radius: 20px;
-  backdrop-filter: blur(15px);
   border: 1px solid rgba(139, 69, 19, 0.3);
   margin: 0 0 12px 0;
   min-height: 0;
@@ -409,12 +405,7 @@
 }
 
 .interpreter-message .message-bubble {
-  background: linear-gradient(
-    135deg,
-    var(--animal-primary) 0%,
-    var(--animal-secondary) 50%,
-    var(--animal-earth) 100%
-  );
+  background: linear-gradient(135deg, #3a8394, #095a59);
   border: 1px solid var(--animal-border);
   color: white;
   padding-top: 20px;
@@ -583,11 +574,9 @@
 
 /* Área de entrada con z-index alto */
 .input-area {
-  background: rgba(139, 69, 19, 0.2);
-  border-radius: 20px;
   padding: 15px 20px;
-  backdrop-filter: blur(15px);
-  border: 1px solid var(--animal-border);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
   flex-shrink: 0;
   z-index: 4; /* Asegurar que esté sobre el video */
   position: relative;

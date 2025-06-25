@@ -17,7 +17,7 @@
   right: 16px;
   width: 30px;
   height: 30px;
-  background: rgba(80, 65, 130, 0.8);
+  background: white;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -29,7 +29,7 @@
 }
 
 .close-chat-btn:hover {
-  background: rgba(100, 85, 150, 0.9);
+  background: #ffffff80;
 }
 
 .close-icon {
@@ -42,12 +42,6 @@
   position: relative;
   height: 100vh;
   width: 100%;
-  /* Remover la imagen de fondo estática */
-  /* background-image: url("/ZignozoodiaFondo.png"); */
-  /* background-size: cover; */
-  /* background-position: center; */
-  /* background-repeat: no-repeat; */
-  /* background-attachment: fixed; */
   overflow: hidden;
   font-family: var(--font-system);
   padding: 20px;
@@ -159,13 +153,13 @@
   width: 100%;
   max-width: 1200px;
   height: 100%;
-  background: rgba(30, 30, 60, 0.15);
-  backdrop-filter: blur(20px);
+  background-color: #00000026;
+  backdrop-filter: blur(5px);
   border-radius: 25px;
   overflow: hidden;
   color: white;
   box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   animation: modal-appear 0.5s ease-out;
   display: flex;
   flex-direction: column;
@@ -191,11 +185,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(147, 112, 219, 0.3) 0%,
-    rgba(138, 43, 226, 0.1) 100%
-  );
+  background: linear-gradient(135deg, #3b2850, #754f9f);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(147, 112, 219, 0.3);
   border-radius: 20px;
@@ -349,9 +339,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px);
   min-height: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   margin: 0 0 12px 0;
   overflow: hidden;
@@ -479,7 +468,7 @@
 
 /* ===== MENSAJES DEL INTÉRPRETE ===== */
 .interpreter-message {
-  background: linear-gradient(135deg, #8b7cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #754f9f, #3b2850);
   border: 1px solid rgba(139, 124, 246, 0.5);
   color: white;
 }
@@ -567,9 +556,7 @@
 /* ===== ÁREA DE ENTRADA ===== */
 .input-area {
   padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(15px);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   flex-shrink: 0;
   z-index: 4; /* Asegurar que esté sobre el video */

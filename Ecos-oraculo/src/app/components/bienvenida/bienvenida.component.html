@@ -11,7 +11,7 @@
       [defaultMuted]="true"
       webkit-playsinline
     >
-      <source src="/Oráculo Galaxia Fondo.mp4" type="video/mp4" />
+      <source src="/fondo-home.webm" type="video/webm" />
       Tu navegador no soporta videos HTML5.
     </video>
   </div>
@@ -50,107 +50,157 @@
     <div class="services-section">
       <h2 class="services-title">¿Qué quieres saber hoy?</h2>
       <div class="services-grid">
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 1 Sueños C-1.webp')"
-          (click)="navigateTo('/significado-sueños')"
-        >
-          <div class="service-icon">
-            <img src="/Oráculo Servicio (1).svg" alt="Sueños" />
+        <!-- Tarjeta 1 - Sueños -->
+        <div class="service-card" (click)="navigateTo('/significado-sueños')">
+          <div
+            class="card-background"
+            style="background-image: url('/SUENOS.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/SUENOS.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (1).svg" alt="Sueños" />
+            </div>
+            <span>Significado de Sueños</span>
           </div>
-          <span>Significado de Sueños</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 2 Zodiaco C.webp')"
-          (click)="navigateTo('/Informacion-zodiaco')"
-        >
-          <div class="service-icon">
-            <img src="/Oráculo Servicio (2)-1.svg" alt="Zodiaco" />
+
+        <!-- Tarjeta 2 - Zodiaco -->
+        <div class="service-card" (click)="navigateTo('/Informacion-zodiaco')">
+          <div
+            class="card-background"
+            style="background-image: url('/ZODIACO.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/ZODIACO.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (2)-1.svg" alt="Zodiaco" />
+            </div>
+            <span>Información de Zodiaco</span>
           </div>
-          <span>Información de Zodiaco</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Fondotarot.webp')"
-          (click)="navigateTo('/lectura-tarot')"
-        >
-          <div class="service-icon">
-            <img src="/Oráculo Servicio (3).svg" alt="Tarot" />
+
+        <!-- Tarjeta 3 - Tarot -->
+        <div class="service-card" (click)="navigateTo('/lectura-tarot')">
+          <div
+            class="card-background"
+            style="background-image: url('/TAROT.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/TAROT.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (3).svg" alt="Tarot" />
+            </div>
+            <span>Lectura de Tarot</span>
           </div>
-          <span>Lectura de Tarot</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 4 Numerología C.webp')"
-          (click)="navigateTo('/lectura-numerologia')"
-        >
-          <div class="service-icon">
-            <img
-              src="/Oráculo Servicio (4).svg"
-              alt="Numerología"
-            />
+
+        <!-- Tarjeta 4 - Numerología -->
+        <div class="service-card" (click)="navigateTo('/lectura-numerologia')">
+          <div
+            class="card-background"
+            style="background-image: url('/NUMEROLOGIA.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/NUMEROLOGIA.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (4).svg" alt="Numerología" />
+            </div>
+            <span>Lectura de Numerología</span>
           </div>
-          <span>Lectura de Numerología</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 5 Vocacional C.webp')"
-          (click)="navigateTo('/mapa-vocacional')"
-        >
-          <div class="service-icon">
-            <img src="/Oráculo Servicio (5).svg" alt="Vocacional" />
+
+        <!-- Tarjeta 5 - Mapa Vocacional -->
+        <div class="service-card" (click)="navigateTo('/mapa-vocacional')">
+          <div
+            class="card-background"
+            style="background-image: url('/MAPA-VOCACIONAL.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/MAPA-VOCACIONAL.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (5).svg" alt="Vocacional" />
+            </div>
+            <span>Mapa Vocacional</span>
           </div>
-          <span>Mapa Vocacional</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 6 Animal C.webp')"
-          (click)="navigateTo('/animal-interior')"
-        >
-          <div class="service-icon">
-            <img src="/Oráculo Servicio (6).svg" alt="Animal" />
+
+        <!-- Tarjeta 6 - Animal Interior -->
+        <div class="service-card" (click)="navigateTo('/animal-interior')">
+          <div
+            class="card-background"
+            style="background-image: url('/ANIMAL.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/ANIMAL.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (6).svg" alt="Animal" />
+            </div>
+            <span>Descubre tu Animal Interior</span>
           </div>
-          <span>Descubre tu Animal Interior</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 7 Tabla Nacimiento C-1.webp')"
-          (click)="navigateTo('/tabla-nacimiento')"
-        >
-          <div class="service-icon">
-            <img
-              src="/Oráculo Servicio (7).svg"
-              alt="Tabla Nacimiento"
-            />
+
+        <!-- Tarjeta 7 - Carta Natal -->
+        <div class="service-card" (click)="navigateTo('/tabla-nacimiento')">
+          <div
+            class="card-background"
+            style="background-image: url('/CARTA NATAL.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/CARTA NATAL.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (7).svg" alt="Tabla Nacimiento" />
+            </div>
+            <span>Tabla de Nacimiento</span>
           </div>
-          <span>Tabla de Nacimiento</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 2 Horóscopo C-1.webp')"
-          (click)="navigateTo('/horoscopo')"
-        >
-          <div class="service-icon">
-            <img
-              src="/Oráculo Servicio (9)-2.svg"
-              alt="Horóscopo"
-            />
+
+        <!-- Tarjeta 8 - Horóscopo -->
+        <div class="service-card" (click)="navigateTo('/horoscopo')">
+          <div
+            class="card-background"
+            style="background-image: url('/HOROSCOPO.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/HOROSCOPO.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (9)-2.svg" alt="Horóscopo" />
+            </div>
+            <span>Horóscopo</span>
           </div>
-          <span>Horóscopo</span>
         </div>
-        <div
-          class="service-card"
-          style="background-image: url('/Oráculo 8 Calculadora Amor C.webp')"
-          (click)="navigateTo('/calculadora-amor')"
-        >
-          <div class="service-icon">
-            <img
-              src="/Oráculo Servicio (8)-1.svg"
-              alt="Calculadora Amor"
-            />
+
+        <!-- Tarjeta 9 - Calculadora del Amor -->
+        <div class="service-card" (click)="navigateTo('/calculadora-amor')">
+          <div
+            class="card-background"
+            style="background-image: url('/CALCULADORA.webp')"
+          ></div>
+          <video class="card-video" muted loop playsinline>
+            <source src="/CALCULADORA.webm" type="video/webm" />
+          </video>
+          <div class="card-content">
+            <div class="service-icon">
+              <img src="/Oráculo Servicio (8)-1.svg" alt="Calculadora Amor" />
+            </div>
+            <span>Calculadora del Amor</span>
           </div>
-          <span>Calculadora del Amor</span>
         </div>
       </div>
     </div>
@@ -170,7 +220,7 @@
       <!-- Información de contacto -->
       <div class="footer-contact">
         <div class="contact-item">
-           <i class="fas fa-envelope contact-icon"></i>
+          <i class="fas fa-envelope contact-icon"></i>
           <span class="contact-text">contacto&#64;ecosdeloraculo.com</span>
         </div>
 
@@ -193,7 +243,6 @@
           </a>
         </div>
       </div>
-    
     </div>
   </footer>
 </div>

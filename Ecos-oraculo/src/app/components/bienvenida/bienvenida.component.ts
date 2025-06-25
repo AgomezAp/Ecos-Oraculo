@@ -13,6 +13,26 @@ export class BienvenidaComponent implements AfterViewInit {
   constructor(private router: Router) {}
   ngAfterViewInit() {
     this.startVideo();
+    const serviceCards = document.querySelectorAll('.service-card');
+
+    serviceCards.forEach((card) => {
+      const video = card.querySelector('.card-video') as HTMLVideoElement;
+
+      if (video) {
+        // Reproducir video en hover
+        card.addEventListener('mouseenter', () => {
+          video.play().catch((error) => {
+            console.log('Error al reproducir video:', error);
+          });
+        });
+
+        // Pausar video cuando el mouse sale
+        card.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0; // Reiniciar el video
+        });
+      }
+    });
   }
   navigateTo(route: string): void {
     this.router.navigate([route]);
@@ -24,7 +44,7 @@ export class BienvenidaComponent implements AfterViewInit {
       // Asegurar que está silenciado
       video.muted = true;
       video.volume = 0;
-      video.playbackRate = 0.80;
+      video.playbackRate = 0.8;
       // Intentar reproducir
       const playPromise = video.play();
 
