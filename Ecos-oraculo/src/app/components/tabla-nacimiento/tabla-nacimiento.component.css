@@ -119,8 +119,8 @@
 .birth-chart-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 20px;
+  justify-content: space-between;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #17214c, #594c85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #17214c;
@@ -128,16 +128,15 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
-  justify-content: space-between;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 2;
+  min-height: 65px;
 }
 
 .astrologer-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
+  gap: 15px;
+  flex: 1;
 }
 
 .astrologer-avatar {
@@ -168,15 +167,37 @@
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1));
   }
 }
+.astrologer-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
 
 .astrologer-details h3 {
   margin: 0;
   color: white;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   font-family: "Berkshire Swash", cursive;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
 }
 
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
 .close-button {
   color: white;
   background: rgba(255, 255, 255, 0.1);
@@ -390,7 +411,7 @@
 }
 
 .message.astrologer-message .message-avatar {
-  background: #594c85
+  background: #594c85;
 }
 
 .message.user-message .message-avatar {
@@ -1413,6 +1434,7 @@
 .interpreter-avatar {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .interpreter-avatar-small {
@@ -1425,18 +1447,21 @@
   border: 1px solid #8a5cf600;
 }
 .mystical-orb-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #17214c;
 }
 .interpreter-title {
-  margin: 6px 0 0 0;
+  margin: 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
   font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .interpreter-details h3 {
   margin: 0;
@@ -1446,12 +1471,13 @@
 }
 
 .interpreter-specialty {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   font-family: "Arsenal", sans-serif;
-  font-weight: 400;
   font-style: italic;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
 }
 .user-avatar-image {
   width: 28px;

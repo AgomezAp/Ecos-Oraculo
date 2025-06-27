@@ -168,12 +168,13 @@
   border-radius: 10px;
   padding: 2rem;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.5zs ease;
   cursor: pointer;
   overflow: hidden;
   border: 1px solid rgb(87, 87, 87);
   background: transparent;
   min-height: 200px;
+  background: linear-gradient(350deg, #000000a3, #92667100);
 }
 
 /* Imagen de fondo */
@@ -200,7 +201,7 @@
   object-fit: cover;
   z-index: 1;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease; /* Agregar transición suave */
 }
 
 /* Overlay oscuro */
@@ -211,9 +212,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(30, 30, 50, 0.603);
+  background: linear-gradient(350deg, #000000a3, #92667100);
   z-index: 2;
-  transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -242,22 +242,143 @@
 }
 
 .service-card:hover::before {
-  background: rgba(30, 30, 50, 0.4);
+  background: linear-gradient(350deg, #000000a3, #92667100);
 }
-
+.service-card:hover .card-video::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(350deg, #000000a3, #92667100);
+  z-index: 1;
+  pointer-events: none;
+}
 /* Icono del servicio */
 .service-icon {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 1rem;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.suenos-card .service-icon {
+  background: #cf629a9c;
 }
 
+.suenos-card:hover .service-icon {
+  background: #cf629acc;
+  box-shadow: 0 12px 35px rgba(207, 98, 154, 0.4);
+}
+
+/* Zodiaco */
+.zodiaco-card .service-icon {
+  background: #8747cd99;
+}
+
+.zodiaco-card:hover .service-icon {
+  background: #8747cdcc;
+  box-shadow: 0 12px 35px rgba(135, 71, 205, 0.4);
+}
+
+/* Tarot */
+.tarot-card .service-icon {
+  background: #20009999;
+  padding: 8px;
+}
+
+.tarot-card:hover .service-icon {
+  background: #200099cc;
+  box-shadow: 0 12px 35px rgba(32, 0, 153, 0.4);
+}
+
+/* Numerología */
+.numerologia-card .service-icon {
+  background: #3b5c5db3;
+}
+
+.numerologia-card:hover .service-icon {
+  background: #3b5c5dd9;
+  box-shadow: 0 12px 35px rgba(59, 92, 93, 0.4);
+}
+
+/* Mapa Vocacional */
+.vocacional-card .service-icon {
+  background: #744c5fba;
+}
+
+.vocacional-card:hover .service-icon {
+  background: #744c5fe6;
+  box-shadow: 0 12px 35px rgba(116, 76, 95, 0.4);
+}
+
+/* Animal Interior */
+.animal-card .service-icon {
+  background: #317b89b8;
+}
+
+.animal-card:hover .service-icon {
+  background: #317b89e4;
+  box-shadow: 0 12px 35px rgba(49, 123, 137, 0.4);
+}
+
+/* Tabla de Nacimiento */
+.natal-card .service-icon {
+  background: #4e4487c2;
+}
+
+.natal-card:hover .service-icon {
+  background: #4e4487ee;
+  box-shadow: 0 12px 35px rgba(78, 68, 135, 0.4);
+}
+
+/* Horóscopo */
+.horoscopo-card .service-icon {
+  background: #8a3d9dc9;
+  padding: 5px;
+}
+
+.horoscopo-card:hover .service-icon {
+  background: #8a3d9df5;
+  box-shadow: 0 12px 35px rgba(138, 61, 157, 0.4);
+}
+
+/* Calculadora del Amor */
+.calculadora-card .service-icon {
+  background: #995677cf;
+}
+
+.calculadora-card:hover .service-icon {
+  background: #995677fb;
+  box-shadow: 0 12px 35px rgba(153, 86, 119, 0.4);
+}
+
+/* Mantener el resto de estilos del icono */
+.service-icon img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: brightness(0) saturate(100%) invert(1);
+  z-index: 1;
+}
+
+.service-card:hover .service-icon {
+  transform: scale(1.05);
+}
+
+.service-card:hover .service-icon img {
+  transform: scale(1.1);
+}
 .service-icon img {
   width: 70%;
   height: 70%;
@@ -530,7 +651,19 @@
     font-size: 2.5rem;
     font-family: "Berkshire Swash", cursive;
   }
+  .service-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.2rem;
+  }
 
+  .tarot-card .service-icon {
+    padding: 6px;
+  }
+
+  .horoscopo-card .service-icon {
+    padding: 4px;
+  }
   .services-grid {
     grid-template-columns: 1fr;
   }
@@ -610,7 +743,19 @@
     height: 45px;
     font-size: 18px;
   }
+  .service-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1rem;
+  }
 
+  .tarot-card .service-icon {
+    padding: 5px;
+  }
+
+  .horoscopo-card .service-icon {
+    padding: 3px;
+  }
   .social-link svg {
     width: 20px;
     height: 20px;

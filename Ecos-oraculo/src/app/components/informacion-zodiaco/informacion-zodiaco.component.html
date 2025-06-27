@@ -19,8 +19,13 @@
           />
         </div>
         <div class="interpreter-details">
-          <h3>{{ astrologerInfo.name }}</h3>
-          <p class="interpreter-title">{{ astrologerInfo.title }}</p>
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>{{ astrologerInfo.name }}</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">{{ astrologerInfo.title }}</p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
           <p class="interpreter-specialty">
             Especialista en Astrología y Signos Zodiacales
           </p>
@@ -139,7 +144,7 @@
                     <span></span>
                   </div>
                   <p class="typing-text">
-                    Maestra Celestine está consultando las estrellas...
+                    Maestra Carla está consultando las estrellas...
                   </p>
                 </div>
               </div>

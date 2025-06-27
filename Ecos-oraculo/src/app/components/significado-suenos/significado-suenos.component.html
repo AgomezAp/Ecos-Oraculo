@@ -20,8 +20,13 @@
           />
         </div>
         <div class="interpreter-details">
-          <h3>{{ interpreterData.name }}</h3>
-          <p class="interpreter-title">Guardián de los Sueños</p>
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>{{ interpreterData.name }}</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">Guardián de los Sueños</p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
           <p class="interpreter-specialty">{{ interpreterData.specialty }}</p>
         </div>
         <button
@@ -105,7 +110,7 @@
           <div
             *ngIf="isTyping"
             class="message interpreter-message typing-indicator"
-            >
+          >
             <div class="message-avatar">
               <span class="interpreter-avatar-small">
                 <img
@@ -122,7 +127,7 @@
                   <span></span>
                 </div>
                 <p class="typing-text">
-                  Maestro Oneiros está interpretando las energías...
+                  Maestra alma está interpretando las energías...
                 </p>
               </div>
             </div>
@@ -143,7 +148,10 @@
               [style.height.px]="textareaHeight"
               [disabled]="isLoading"
             ></textarea>
-            <div class="character-count" *ngIf="(messageText?.length || 0) > 1200">
+            <div
+              class="character-count"
+              *ngIf="(messageText?.length || 0) > 1200"
+            >
               {{ messageText.length || 0 }}/1500
             </div>
           </div>

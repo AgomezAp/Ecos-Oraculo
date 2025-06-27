@@ -168,26 +168,30 @@
 .counselor-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 20px;
+  justify-content: space-between;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #58344e, #926671);
   backdrop-filter: blur(10px);
-  border: 1px solid #58344E;
+  border: 1px solid #58344e;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 2;
+  min-height: 65px;
 }
 
 .counselor-info {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1;
+}
+.interpreter-avatar {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
-
 .counselor-avatar {
   position: relative;
   z-index: 1;
@@ -560,12 +564,11 @@
 }
 
 .loading-content {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #926671, #58344e);
   padding: 12px 16px;
   border-radius: 18px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(96, 165, 250, 0.5);
+  border: 1px solid #926671;
 }
 
 .loading-dots {
@@ -1662,11 +1665,11 @@
   object-fit: cover;
 }
 .interpreter-avatar-small {
-  border: 1px solid  #926671;
+  border: 1px solid #926671;
 }
 .mystical-orb-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #58344e;
@@ -1680,25 +1683,54 @@
 .user-avatar-image {
   border: 2px solid #3b83f600;
 }
+ .interpreter-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
 .interpreter-details h3 {
   margin: 0;
   color: white;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   font-family: "Berkshire Swash", cursive;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
 }
 
 .interpreter-title {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
   font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .interpreter-specialty {
-  margin: 2px 0 0 0;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   font-family: "Arsenal", sans-serif;
   font-style: italic;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }

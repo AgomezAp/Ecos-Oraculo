@@ -19,9 +19,14 @@
           />
         </div>
         <div class="interpreter-details">
-          <h3>{{ counselorInfo.name }}</h3>
-          <p class="interpreter-title">{{ counselorInfo.title }}</p>
-          <p class="interpreter-specialty" >{{ counselorInfo.specialty }}</p>
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>{{ counselorInfo.name }}</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">{{ counselorInfo.title }}</p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
+          <p class="interpreter-specialty">{{ counselorInfo.specialty }}</p>
         </div>
       </div>
       <button
@@ -141,7 +146,7 @@
                 src="/Visitante.webp"
                 alt="Usuario Avatar"
               />
-               <img
+              <img
                 *ngIf="!message.isUser"
                 class="interpreter-avatar-small"
                 src="/Maestra-4.webp"
@@ -186,11 +191,13 @@
 
           <!-- Indicador de carga -->
           <div *ngIf="isLoading" class="loading-message">
-            <div class="loading-avatar">    <img
+            <div class="loading-avatar">
+              <img
                 class="interpreter-avatar-small"
                 src="/Maestra-4.webp"
                 alt="Maestra Avatar"
-              /></div>
+              />
+            </div>
             <div class="loading-content">
               <div class="loading-dots">
                 <span></span>
@@ -198,7 +205,7 @@
                 <span></span>
               </div>
               <p class="loading-text">
-                Dr. Mentor está analizando tu consulta...
+                Dra. Valeria está analizando tu consulta...
               </p>
             </div>
           </div>

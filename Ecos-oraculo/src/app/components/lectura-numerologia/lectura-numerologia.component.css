@@ -184,47 +184,23 @@
 .interpreter-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 20px;
+  gap: 15px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #274a4a, #638382);
+
   backdrop-filter: blur(10px);
-  border: 1px solid #274a4a;
+  border-bottom: 1px solid rgba(162, 142, 255, 0.3);
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
-  z-index: 4; /* Asegurar que esté sobre el video */
+  z-index: 2;
+  min-height: 65px;
 }
-
-.interpreter-info::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(147, 112, 219, 0.1) 50%,
-    transparent 70%
-  );
-  animation: header-shine 3s ease-in-out infinite;
-}
-
-@keyframes header-shine {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 .interpreter-avatar {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .mystical-orb {
@@ -255,32 +231,57 @@
 }
 
 .interpreter-details {
-  position: relative;
-  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .interpreter-details h3 {
   margin: 0;
   color: white;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   font-family: "Berkshire Swash", cursive;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
 }
 
 .interpreter-title {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .interpreter-specialty {
-  margin: 2px 0 0 0;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   font-family: "Arsenal", sans-serif;
   font-style: italic;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 /* ===== DATOS PERSONALES FORM ===== */
@@ -633,8 +634,8 @@
 /* ===== INDICADOR DE ESCRITURA ===== */
 .typing-indicator .message-bubble,
 .typing {
-  background: linear-gradient(135deg, #8b7cf6 0%, #7c3aed 100%);
-  border: 1px solid rgba(139, 124, 246, 0.5);
+  background: linear-gradient(135deg, #638382, #274a4a);
+  border: 1px solid #638382;
 }
 
 .typing-dots {
@@ -1282,8 +1283,8 @@
   border: 1px solid #638382;
 }
 .mystical-orb-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #638382;

@@ -41,6 +41,11 @@ const handleWebhook = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             console.log(`Payment succeeded: ${paymentIntent.id}`);
             // Here you can update your database, send confirmation emails, etc.
         }
+        else if (event.type === 'payment_intent.payment_failed') {
+            const paymentIntent = event.data.object;
+            console.log(`Payment failed: ${paymentIntent.id}`);
+            // Handle the failed payment, e.g., notify the user, log the error, etc.
+        }
         res.json({ received: true });
     }
     catch (err) {

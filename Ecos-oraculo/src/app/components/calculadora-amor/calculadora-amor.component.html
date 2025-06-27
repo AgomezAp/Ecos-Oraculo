@@ -20,8 +20,15 @@
           />
         </div>
         <div class="expert-details" *ngIf="loveExpertInfo">
-          <h3>{{ loveExpertInfo.loveExpert.name }}</h3>
-          <p class="interpreter-title">{{ loveExpertInfo.loveExpert.title }}</p>
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>{{ loveExpertInfo.loveExpert.name }}</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">
+              {{ loveExpertInfo.loveExpert.title }}
+            </p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
           <p class="interpreter-specialty">
             Canalizadora del amor universal y numerología amorosa
           </p>

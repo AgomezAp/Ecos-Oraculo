@@ -126,43 +126,16 @@
 .interpreter-info {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 8px 20px;
+  gap: 15px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #095a59, #3a8394);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--animal-border);
+  border: 1px solid #095a59;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
-  z-index: 4; /* Asegurar que esté sobre el video */
-}
-
-.interpreter-info::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(50, 205, 50, 0.1) 50%,
-    transparent 70%
-  );
-  animation: header-shine 3s ease-in-out infinite;
-}
-
-@keyframes header-shine {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
+  z-index: 2;
+  min-height: 65px;
 }
 
 .interpreter-avatar {
@@ -203,29 +176,56 @@
     transform: scale(1.05);
   }
 }
+.interpreter-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
 
 .interpreter-details h3 {
   margin: 0;
   color: white;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   font-family: "Berkshire Swash", cursive;
+  line-height: 1.2;
+  flex-shrink: 0;
 }
-
-.interpreter-title {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
   font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
+}
+.interpreter-title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .interpreter-specialty {
-  margin: 2px 0 0 0;
-  font-size: 0.75rem;
-  color: rgb(255, 255, 255, 0.8);
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   font-family: "Arsenal", sans-serif;
   font-style: italic;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 /* Área de chat con z-index alto */
@@ -523,13 +523,8 @@
 
 /* Indicador de escritura - typing-indicator */
 .typing-indicator .message-bubble {
-  background: linear-gradient(
-    135deg,
-    var(--animal-primary) 0%,
-    var(--animal-secondary) 50%,
-    var(--animal-earth) 100%
-  );
-  border: 1px solid var(--animal-border);
+  background: linear-gradient(135deg, #3a8394, #095a59);
+  border: 1px solid #3a8394;
   padding-top: 20px;
   padding-left: 25px;
 }
@@ -1437,8 +1432,8 @@
   border: 1px solid #3a8394;
 }
 .mystical-orb-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #095a59;

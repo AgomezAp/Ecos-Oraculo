@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import { createPaymentIntentModel } from "../models/Pagos";
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import Stripe from 'stripe';
 
 dotenv.config();
@@ -35,6 +35,12 @@ export const handleWebhook = async (req: express.Request, res: express.Response)
       console.log(`Payment succeeded: ${paymentIntent.id}`);
       
       // Here you can update your database, send confirmation emails, etc.
+
+    }else if (event.type === 'payment_intent.payment_failed') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      console.log(`Payment failed: ${paymentIntent.id}`);
+      
+      // Handle the failed payment, e.g., notify the user, log the error, etc.
     }
     
     res.json({ received: true });

@@ -51,7 +51,7 @@ export class BienvenidaComponent implements AfterViewInit {
       // Asegurar que está silenciado
       video.muted = true;
       video.volume = 0;
-      video.playbackRate = 0.8;
+      video.playbackRate = 1;
       // Intentar reproducir
       const playPromise = video.play();
 

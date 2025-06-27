@@ -19,8 +19,13 @@
           />
         </div>
         <div class="interpreter-details">
-          <h3>{{ numerologistInfo.name }}</h3>
-          <p class="interpreter-title">Guardiana de los Números Sagrados</p>
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>{{ numerologistInfo.name }}</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">Guardiana de los Números Sagrados</p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
           <p class="interpreter-specialty">{{ numerologistInfo.specialty }}</p>
         </div>
         <button
@@ -38,7 +43,6 @@
           </svg>
         </button>
       </div>
-
       <!-- Área de conversación -->
       <div class="chat-area">
         <div
@@ -106,10 +110,11 @@
             class="message interpreter-message typing-indicator"
           >
             <div class="message-avatar">
-              <span class="interpreter-avatar-small"> <img
-                class="interpreter-avatar-small"
-                src="/Maestra-3.webp"
-                alt="Maestra Avatar"
+              <span class="interpreter-avatar-small">
+                <img
+                  class="interpreter-avatar-small"
+                  src="/Maestra-3.webp"
+                  alt="Maestra Avatar"
               /></span>
             </div>
             <div class="message-content">
@@ -120,7 +125,7 @@
                   <span></span>
                 </div>
                 <p class="typing-text">
-                  Maestra Pythia está consultando los números sagrados...
+                  Maestra Sofia está consultando los números sagrados...
                 </p>
               </div>
             </div>

@@ -109,8 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 20px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, #2a1c36, #773a58);
   backdrop-filter: blur(10px);
   border: 1px solid #773a58;
@@ -118,15 +117,15 @@
   position: relative;
   flex-shrink: 0;
   margin-bottom: 12px;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 2;
+  min-height: 65px;
 }
 
 .love-expert-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
+  gap: 15px;
+  flex: 1;
 }
 
 .expert-avatar {
@@ -147,14 +146,34 @@
 .expert-icon {
   font-size: 20px;
 }
-
+.expert-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
 .expert-details h3 {
   margin: 0;
-  font-size: 1.1rem;
   color: white;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 600;
   font-family: "Berkshire Swash", cursive;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
 }
 .close-button {
   background: rgba(255, 255, 255, 0.1);
@@ -1479,6 +1498,7 @@
 .interpreter-avatar {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 .interpreter-avatar-small {
   background: linear-gradient(45deg, #a28eff, #6c5ce7);
@@ -1493,8 +1513,8 @@
   border: 2px solid #8a5cf600;
 }
 .mystical-orb-image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #773a58;
@@ -1509,16 +1529,22 @@
   border: 2px solid #3b83f600;
 }
 .interpreter-title {
-  margin: 2px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
   font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .interpreter-specialty {
-  margin: 2px 0 0 0;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   font-family: "Arsenal", sans-serif;
   font-style: italic;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
