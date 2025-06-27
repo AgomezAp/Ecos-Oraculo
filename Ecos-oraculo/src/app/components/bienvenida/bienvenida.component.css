@@ -257,8 +257,8 @@
 }
 /* Icono del servicio */
 .service-icon {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto 1.5rem;
   border-radius: 50%;
   display: flex;
