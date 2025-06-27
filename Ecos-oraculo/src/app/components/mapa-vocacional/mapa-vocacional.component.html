@@ -46,7 +46,7 @@
     </div>
 
     <!-- Pestañas de navegación -->
-    <div class="navigation-tabs">
+    <!--   <div class="navigation-tabs">
       <button
         class="tab-button"
         [class.active]="currentTab === 'chat'"
@@ -72,14 +72,14 @@
         <mat-icon>analytics</mat-icon>
         Resultados
       </button>
-    </div>
+    </div> -->
 
     <!-- Contenido de pestañas -->
     <div class="tab-content">
       <!-- TAB: CHAT -->
       <div *ngIf="currentTab === 'chat'" class="chat-section">
         <!-- Sección de datos personales (opcional) -->
-        <div *ngIf="showPersonalForm" class="personal-data-section">
+        <!--  <div *ngIf="showPersonalForm" class="personal-data-section">
           <h3>📋 Información Personal para Análisis</h3>
           <div class="personal-form">
             <div class="form-row">
@@ -128,7 +128,7 @@
               </button>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Área de mensajes -->
         <div class="chat-messages" #chatContainer (scroll)="onScroll($event)">
@@ -157,16 +157,13 @@
             <div class="message-content">
               <!-- CONTENIDO ORIGINAL (se difumina si está bloqueado) -->
               <div [class.blurred-content]="isMessageBlocked(message)">
-                <div class="message-header">
-                  <span class="sender-name">{{ message.sender }}</span>
-                  <span class="message-time">{{
-                    getTimeString(message.timestamp)
-                  }}</span>
+                <div class="message-text">
+                  <div [innerHTML]="formatMessage(message.content)"></div>
+                  <!-- HORA DENTRO DE LA BURBUJA DE TEXTO -->
+                  <div class="message-time-inside">
+                    {{ getTimeString(message.timestamp) }}
+                  </div>
                 </div>
-                <div
-                  class="message-text"
-                  [innerHTML]="formatMessage(message.content)"
-                ></div>
               </div>
 
               <!-- OVERLAY DE PAGO (solo aparece si está bloqueado) -->
@@ -210,7 +207,6 @@
             </div>
           </div>
         </div>
-
         <!-- Área de entrada de mensajes -->
         <div class="chat-input-area">
           <div class="input-container">
@@ -249,8 +245,8 @@
       </div>
 
       <!-- TAB: ASSESSMENT -->
-      <div *ngIf="currentTab === 'assessment'" class="assessment-section">
-        <!-- Barra de progreso -->
+      <!--    <div *ngIf="currentTab === 'assessment'" class="assessment-section">
+        <!-- Barra de progreso 
         <div class="progress-section">
           <h3>🧭 Assessment Vocacional RIASEC</h3>
           <div class="progress-bar">
@@ -267,7 +263,7 @@
           </span>
         </div>
 
-        <!-- Pregunta actual -->
+        <!-- Pregunta actual 
         <div *ngIf="currentQuestion" class="question-card">
           <h4>{{ currentQuestion.question }}</h4>
 
@@ -288,7 +284,7 @@
           </div>
         </div>
 
-        <!-- Navegación del assessment -->
+        <!-- Navegación del assessment 
         <div class="assessment-navigation">
           <button
             mat-raised-button
@@ -321,14 +317,14 @@
             Finalizar Assessment
           </button>
         </div>
-      </div>
+      </div> -->
 
       <!-- TAB: RESULTADOS -->
-      <div *ngIf="currentTab === 'results'" class="results-section">
-        <h3>📊 Tu Perfil Vocacional</h3>
+      <!--    <div *ngIf="currentTab === 'results'" class="results-section">
+        <h3>📊 Tu Perfil Vocacional</h3> -->
 
-        <!-- Perfil dominante -->
-        <div
+      <!-- Perfil dominante -->
+      <!--     <div
           *ngIf="assessmentResults?.dominantProfile"
           class="dominant-profile"
         >
@@ -371,10 +367,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <!-- Distribución de perfiles -->
-        <div
+      <!-- Distribución de perfiles -->
+      <!--       <div
           *ngIf="assessmentResults?.profileDistribution"
           class="profile-distribution"
         >
@@ -400,10 +396,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <!-- Recomendaciones profesionales -->
-        <div
+      <!-- Recomendaciones profesionales -->
+      <!--    <div
           *ngIf="assessmentResults?.recommendations"
           class="career-recommendations"
         >
@@ -417,10 +413,10 @@
               <span>{{ recommendation }}</span>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <!-- Acciones de resultados -->
-        <div class="results-actions">
+      <!-- Acciones de resultados -->
+      <!--     <div class="results-actions">
           <button mat-raised-button color="primary" (click)="switchTab('chat')">
             <mat-icon>chat</mat-icon>
             Discutir resultados con el consejero
@@ -434,55 +430,62 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
-<!-- MODAL DE PAGO -->
-<div *ngIf="showPaymentModal" class="payment-modal-overlay">
-  <div class="payment-modal">
-    <div class="payment-header">
-      <h3>🎯 Desbloquea Orientación Vocacional Ilimitada</h3>
-      <button (click)="cancelPayment()" class="close-payment-button">✕</button>
-    </div>
+      <!-- MODAL DE PAGO -->
+      <div *ngIf="showPaymentModal" class="payment-modal-overlay">
+        <div class="payment-modal">
+          <div class="payment-header">
+            <h3>🎯 Desbloquea Orientación Vocacional Ilimitada</h3>
+            <button (click)="cancelPayment()" class="close-payment-button">
+              ✕
+            </button>
+          </div>
 
-    <div class="payment-content">
-      <div class="payment-info">
-        <p>Primera consulta vocacional gratis completada.</p>
-        <p>Para continuar explorando tu camino profesional ilimitadamente:</p>
-      </div>
+          <div class="payment-content">
+            <div class="payment-info">
+              <p>Primera consulta vocacional gratis completada.</p>
+              <p>
+                Para continuar explorando tu camino profesional ilimitadamente:
+              </p>
+            </div>
 
-      <div class="payment-price">
-        <span class="price-amount">€5.00</span>
-        <span class="price-description"
-          >Acceso completo a orientación vocacional</span
-        >
-      </div>
+            <div class="payment-price">
+              <span class="price-amount">€5.00</span>
+              <span class="price-description"
+                >Acceso completo a orientación vocacional</span
+              >
+            </div>
 
-      <div *ngIf="isProcessingPayment" class="payment-loading">
-        <div class="loading-spinner"></div>
-        <p>Preparando sistema de pago...</p>
-      </div>
+            <div *ngIf="isProcessingPayment" class="payment-loading">
+              <div class="loading-spinner"></div>
+              <p>Preparando sistema de pago...</p>
+            </div>
 
-      <div
-        id="payment-element-container"
-        class="payment-element-container"
-        [hidden]="isProcessingPayment"
-      >
-        <!-- Stripe Payment Element se monta aquí -->
-      </div>
+            <div
+              id="payment-element-container"
+              class="payment-element-container"
+              [hidden]="isProcessingPayment"
+            >
+              <!-- Stripe Payment Element se monta aquí -->
+            </div>
 
-      <div *ngIf="paymentError" class="payment-error">
-        <span>{{ paymentError }}</span>
-      </div>
+            <div *ngIf="paymentError" class="payment-error">
+              <span>{{ paymentError }}</span>
+            </div>
 
-      <div class="payment-actions">
-        <button
-          (click)="handlePaymentSubmit()"
-          [disabled]="isProcessingPayment || !paymentElement"
-          class="pay-button"
-        >
-          <span *ngIf="!isProcessingPayment">💳 Pagar y Continuar</span>
-          <span *ngIf="isProcessingPayment">Procesando...</span>
-        </button>
+            <div class="payment-actions">
+              <button
+                (click)="handlePaymentSubmit()"
+                [disabled]="isProcessingPayment || !paymentElement"
+                class="pay-button"
+              >
+                <span *ngIf="!isProcessingPayment">💳 Pagar y Continuar</span>
+                <span *ngIf="isProcessingPayment">Procesando...</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

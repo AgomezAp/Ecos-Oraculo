@@ -235,13 +235,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
   initializeWelcomeMessage(): void {
     this.addMessage({
       sender: this.counselorInfo.name,
-      content: `¡Saludos! Soy ${this.counselorInfo.name}, tu consejero vocacional especialista. Estoy aquí para ayudarte a descubrir tu verdadera vocación y diseñar un mapa profesional personalizado. 
-
-      Puedes elegir entre:
-      📋 **Realizar nuestro assessment vocacional completo** - Te ayudará a identificar tu perfil RIASEC
-      💬 **Conversar directamente conmigo** - Podemos explorar tus intereses y aptitudes
-      
-      ¿Por dónde te gustaría comenzar?`,
+      content: `¡Saludos! Soy ${this.counselorInfo.name}, tu consejero vocacional especialista. Estoy aquí para ayudarte a descubrir tu verdadera vocación y diseñar un mapa profesional personalizado. `,
       timestamp: new Date(),
       isUser: false
     });

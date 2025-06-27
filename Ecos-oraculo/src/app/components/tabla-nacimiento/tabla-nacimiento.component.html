@@ -21,15 +21,10 @@
           />
         </div>
         <div class="astrologer-details">
-          <!-- Primera línea: nombre + icono + título juntos -->
-          <div class="name-title-row">
-            <h3>Maestra Emma</h3>
-            <span class="separator-icon">»</span>
-            <p class="interpreter-title">
-              Guardiana de las Configuraciones Celestiales
-            </p>
-          </div>
-          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
+          <h3>Maestra Emma</h3>
+          <p class="interpreter-title">
+            Guardiana de las Configuraciones Celestiales
+          </p>
           <p class="interpreter-specialty">
             Especialista en cartas natales y astrología transpersonal
           </p>
@@ -70,7 +65,6 @@
       >
         <div class="message-avatar" *ngIf="!message.isUser">
           <img
-            *ngIf="!message.isUser"
             class="interpreter-avatar-small"
             src="/Maestra-6.webp"
             alt="Maestra Avatar"
@@ -81,22 +75,20 @@
           class="message-content"
           [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
         >
-          <!-- Eliminar el message-header de aquí -->
-
-          <div
-            class="message-text"
-            [innerHTML]="formatMessage(message.content)"
-          ></div>
-
-          <!-- Mover la hora aquí, dentro del message-content -->
-          <span class="message-time" *ngIf="!message.isUser">
-            {{ message.timestamp | date : "HH:mm" }}
-          </span>
+          <div class="message-text">
+            <div [innerHTML]="formatMessage(message.content)"></div>
+            <!-- Mover la hora DENTRO del message-text -->
+            <span
+              class="message-time"
+              *ngIf="!message.isUser || message.isUser"
+            >
+              {{ message.timestamp | date : "HH:mm" }}
+            </span>
+          </div>
         </div>
 
         <div class="message-avatar" *ngIf="message.isUser">
           <img
-            *ngIf="message.isUser"
             class="user-avatar-image"
             src="/Visitante.webp"
             alt="Usuario Avatar"
@@ -133,7 +125,7 @@
             <span></span>
           </div>
           <span class="loading-text"
-            >Maestra Emma está consultando las configuraciones
+            >Maestra Astra está consultando las configuraciones
             celestiales...</span
           >
         </div>

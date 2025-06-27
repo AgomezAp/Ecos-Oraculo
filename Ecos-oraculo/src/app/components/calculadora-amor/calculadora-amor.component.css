@@ -112,7 +112,6 @@
   padding: 12px 20px;
   background: linear-gradient(135deg, #2a1c36, #773a58);
   backdrop-filter: blur(10px);
-  border: 1px solid #773a58;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -267,14 +266,16 @@
 
 /* Posicionamiento del avatar para mensajes del usuario */
 .user-message .message-avatar {
-  background: linear-gradient(45deg, #4a90e2, #357abd);
+  background-color: #2a1c36;
+  border: 1px solid #773a58;
   top: -5px;
   right: -6px;
 }
 
 /* Posicionamiento del avatar para mensajes del experto */
 .expert-message .message-avatar {
-  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  background-color: #2a1c36;
+  border: 1px solid #773a58;
   top: -5px;
   left: -5px;
 }
@@ -316,10 +317,15 @@
   display: block;
   text-align: right;
   margin-top: 4px;
-  color: rgb(255, 255, 255); /* Color más suave para la hora */
-  position: absolute;
-  bottom: 8px;
-  right: 15px;
+  font-family: "Arsenal", sans-serif !important;
+}
+.interpreter-message .message-time {
+  color: #ffffff;
+}
+
+/* Hora para mensajes del usuario (negra) */
+.user-message .message-time {
+  color: #000000; /* Negro para contraste con el fondo blanco */
 }
 
 /* MEJORAR BURBUJAS DE MENSAJE */
@@ -456,9 +462,7 @@
 }
 
 .loading-dots {
-  padding: 12px 16px;
-  padding-top: 20px;
-  padding-left: 25px;
+  padding: 12px 20px 16px 25px; /* Aumentar padding inferior */
   border-radius: 18px;
   backdrop-filter: blur(10px);
   position: relative;
@@ -466,33 +470,40 @@
   background: linear-gradient(135deg, #773a58, #2a1c36);
   border: 1px solid rgba(255, 20, 147, 0.5);
   display: flex;
-  gap: 3px;
+  flex-direction: column; /* Cambiar a columna para apilar puntos y texto */
+  gap: 8px; /* Espacio entre puntos y texto */
   margin-bottom: 4px;
+  min-height: 50px; /* Altura mínima para la burbuja */
 }
-
-.loading-dots span {
+.dots-container {
+  display: flex;
+  gap: 3px;
+  justify-content: flex-start; /* Alinear puntos a la izquierda */
+}
+.loading-dots .dots-container span {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: white;
   animation: bounce 1.4s infinite ease-in-out both;
 }
-
-.loading-dots span:nth-child(1) {
+.loading-dots .dots-container span:nth-child(1) {
   animation-delay: -0.32s;
 }
 
-.loading-dots span:nth-child(2) {
+.loading-dots .dots-container span:nth-child(2) {
   animation-delay: -0.16s;
 }
 
 .loading-text {
   font-size: 0.75rem;
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   margin: 0;
-  font-family: "Berkshire Swash", cursive;
-  padding: 0 16px;
+  font-family: "Arsenal", regular;
+  padding: 0; /* Quitar padding ya que está dentro de loading-dots */
+  line-height: 1.3;
+  text-align: left;
 }
 
 @keyframes bounce {
@@ -666,15 +677,14 @@
   min-height: 45px;
   max-height: 120px;
   background: white;
-  border: 1px solid #e0e0e0;
   border-radius: 25px;
   padding: 12px 20px;
   resize: none;
-  font-family: "Arial", sans-serif;
-  font-size: 16px;
+  font-family: "Arsenal", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
   color: #333;
   outline: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   line-height: 1.4;
   word-wrap: break-word;
@@ -682,19 +692,14 @@
   vertical-align: top;
   box-sizing: border-box;
   overflow-y: auto;
-  /* Ocultar scrollbar pero mantener funcionalidad */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
-
-.message-input textarea:focus {
-  border-color: #ff1493;
-  box-shadow: 0 2px 8px rgba(255, 20, 147, 0.2);
-}
-
-.message-input textarea::placeholder {
-  color: rgba(0, 0, 0, 0.5);
-  font-family: "Arial", sans-serif;
+.message-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
+  font-size: 14px;
 }
 
 .character-count {
@@ -1200,8 +1205,8 @@
 
 .loading-overlay .loading-content p {
   margin-top: 20px;
-  font-size: 16px;
-  font-family: "Berkshire Swash", cursive;
+  font-size: 0.75rem;
+  font-family: "Arsenal", sans-serif;
 }
 
 /* Scrollbar personalizado */
@@ -1500,18 +1505,14 @@
   z-index: 1;
   flex-shrink: 0;
 }
-.interpreter-avatar-small {
-  background: linear-gradient(45deg, #a28eff, #6c5ce7);
-}
+
 .interpreter-avatar-small {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
-.interpreter-avatar-small {
-  border: 2px solid #8a5cf600;
-}
+
 .mystical-orb-image {
   width: 50px;
   height: 50px;
@@ -1525,9 +1526,7 @@
   border-radius: 50%;
   object-fit: cover;
 }
-.user-avatar-image {
-  border: 2px solid #3b83f600;
-}
+
 .interpreter-title {
   margin: 0;
   font-size: 0.95rem;
@@ -1547,4 +1546,515 @@
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+}
+/* ===== MEDIA QUERIES PARA MÓVILES - CONSERVANDO TODA LA INFORMACIÓN ===== */
+@media (max-width: 768px) {
+  /* Contenedor principal */
+  .main-content {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .love-calculator-modal {
+    height: calc(100vh - 20px);
+    width: 100%;
+    max-width: calc(100vw - 20px);
+    border-radius: 15px;
+    padding: 8px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  /* HEADER - Manteniendo toda la información visible */
+  .love-header {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    min-height: 60px;
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .love-expert-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Avatar ajustado pero visible */
+  .expert-avatar,
+  .mystical-orb-image {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .expert-icon {
+    font-size: 17px;
+  }
+
+  /* Información del experto - asegurar que todo se vea */
+  .expert-details {
+    flex: 1;
+    gap: 1px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Fila del nombre y título - SIN wrap para mantener en una línea */
+  .name-title-row {
+    gap: 4px;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Nombre - reducido pero legible */
+  .expert-details h3 {
+    font-size: 0.95rem !important;
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Separador visible */
+  .separator-icon {
+    font-size: 0.8rem !important;
+    margin: 0 1px;
+    flex-shrink: 0;
+  }
+
+  /* Título - MÁS PEQUEÑO para que quepa "GUARDIANA DEL AMOR" */
+  .interpreter-title {
+    font-size: 0.65rem !important; /* Reducido significativamente */
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+  }
+
+  /* Especialidad - más pequeña pero visible */
+  .interpreter-specialty {
+    font-size: 0.6rem !important; /* Muy pequeño pero legible */
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Botón de cerrar ajustado */
+  .close-button,
+  .close-chat-btn {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 14px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .close-icon {
+    width: 9px;
+    height: 9px;
+  }
+
+  /* Formulario de datos */
+  .data-form-container {
+    max-height: 300px;
+    padding: 15px;
+    margin-bottom: 8px;
+  }
+
+  .data-form h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+
+  .person-section {
+    margin-bottom: 20px;
+    padding: 12px;
+  }
+
+  .person-section h5 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  .full-width {
+    margin-bottom: 12px;
+  }
+
+  .data-form ::ng-deep .mat-mdc-form-field .mat-mdc-form-field-infix {
+    padding: 12px;
+  }
+
+  .form-actions {
+    gap: 12px;
+    margin-top: 15px;
+  }
+
+  .form-actions button {
+    min-width: 100px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  /* Área de chat */
+  .chat-messages {
+    padding: 10px;
+    gap: 10px;
+    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Mensajes */
+  .message {
+    margin: 0 4px;
+    gap: 6px;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
+  }
+
+  .user-message {
+    margin-left: auto;
+    margin-right: 0;
+    max-width: 85%;
+  }
+
+  .expert-message {
+    margin-right: auto;
+    margin-left: 0;
+    max-width: 85%;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Ajustar posiciones de avatares */
+  .user-message .message-avatar {
+    top: -3px;
+    right: -4px;
+  }
+
+  .expert-message .message-avatar {
+    top: -3px;
+    left: -3px;
+  }
+
+  .avatar-icon {
+    font-size: 13px;
+  }
+
+  /* Ajustar padding de contenido */
+  .user-message .message-content {
+    padding-right: 20px;
+    align-items: flex-end;
+  }
+
+  .expert-message .message-content {
+    padding-left: 32px;
+    align-items: flex-start;
+  }
+
+  .message-text {
+    padding: 10px 16px;
+    border-radius: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 80px;
+  }
+
+  .user-message .message-text {
+    padding-top: 16px;
+    padding-right: 20px;
+    margin-left: auto;
+    right: 8px;
+  }
+
+  .expert-message .message-text {
+    padding-top: 16px;
+    padding-left: 20px;
+    padding-bottom: 24px;
+    margin-right: auto;
+  }
+
+  .user-message .message-text p {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .expert-message .message-text p {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .message-time {
+    font-size: 0.6rem;
+    margin-top: 3px;
+  }
+
+  /* Contenido bloqueado */
+  .blocked-content {
+    position: relative;
+  }
+
+  .blocked-overlay {
+    left: 30px;
+  }
+
+  .blocked-message {
+    padding: 12px;
+    max-width: 180px;
+  }
+
+  .blocked-message mat-icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .blocked-message p {
+    font-size: 11px;
+  }
+
+  .blocked-message small {
+    font-size: 10px;
+  }
+
+  /* Indicador de carga */
+  .loading-message {
+    gap: 6px;
+    margin: 0 4px;
+  }
+
+  .loading-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    top: -3px;
+    left: -3px;
+  }
+
+  .loading-content {
+    padding-left: 32px;
+  }
+
+  .loading-dots {
+    padding: 10px 16px 12px 20px;
+    min-height: 45px;
+  }
+
+  .dots-container {
+    gap: 2px;
+  }
+
+  .loading-dots .dots-container span {
+    width: 4px;
+    height: 4px;
+  }
+
+  .loading-text {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  /* Typing indicator */
+  .typing-message {
+    gap: 6px;
+    margin: 0 4px;
+  }
+
+  .typing-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    top: -3px;
+    left: -3px;
+  }
+
+  .typing-content {
+    padding-left: 32px;
+  }
+
+  .typing-dots {
+    padding: 10px 16px;
+    padding-top: 16px;
+    padding-left: 20px;
+    gap: 2px;
+  }
+
+  .typing-dots span {
+    width: 4px;
+    height: 4px;
+  }
+
+  /* Área de entrada */
+  .chat-input-area {
+    padding: 10px 12px;
+    gap: 8px;
+    min-height: 65px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .message-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .message-input textarea {
+    min-height: 42px;
+    max-height: 100px;
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
+  .character-count {
+    bottom: 4px;
+    right: 12px;
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+
+  .input-buttons {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .reset-button,
+  .send-button {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  /* Modal de pago */
+  .payment-modal {
+    width: calc(100vw - 20px);
+    max-width: 95%;
+    margin: 10px;
+    border-radius: 18px;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 12px 15px;
+  }
+
+  .payment-header h3 {
+    font-size: 1em;
+  }
+
+  .close-payment-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .love-package {
+    margin-bottom: 20px;
+  }
+
+  .package-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .love-package h4 {
+    font-size: 1.2rem;
+    margin: 12px 0 8px 0;
+  }
+
+  .package-description {
+    font-size: 14px;
+    margin: 12px 0;
+  }
+
+  .features-list {
+    margin: 15px 0;
+  }
+
+  .feature {
+    gap: 8px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+
+  .pricing {
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .amount {
+    font-size: 2.5rem;
+  }
+
+  .currency {
+    font-size: 1.3rem;
+  }
+
+  .period {
+    font-size: 0.9rem;
+  }
+
+  .price-note {
+    font-size: 13px;
+  }
+
+  .stripe-payment-element {
+    padding: 15px;
+  }
+
+  .payment-actions button {
+    min-width: 140px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .security-badges {
+    gap: 15px;
+  }
+
+  .security-badge {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .security-text {
+    font-size: 10px;
+  }
 }

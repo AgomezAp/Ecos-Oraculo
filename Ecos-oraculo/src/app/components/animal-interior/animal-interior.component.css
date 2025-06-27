@@ -112,7 +112,6 @@
   margin: 0 auto;
   position: relative;
   color: white;
-  box-shadow: 0 0 40px rgba(139, 69, 19, 0.3);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
@@ -129,7 +128,6 @@
   gap: 15px;
   padding: 12px 20px;
   background: linear-gradient(135deg, #095a59, #3a8394);
-  border: 1px solid #095a59;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -234,7 +232,7 @@
   flex-direction: column;
   flex: 1;
   border-radius: 20px;
-  border: 1px solid #095a59;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   margin: 0 0 12px 0;
   min-height: 0;
   overflow: hidden;
@@ -298,7 +296,8 @@
 
 /* Posicionamiento del avatar para mensajes del usuario */
 .user-message .message-avatar {
-  background: linear-gradient(45deg, #4a90e2, #357abd);
+  background-color: #095a59;
+  border: 1px solid #3a8394;
   top: -5px;
   right: -20px;
 }
@@ -312,10 +311,6 @@
   );
   top: -5px;
   left: -5px;
-}
-
-.user-avatar {
-  background: linear-gradient(45deg, #4a90e2, #357abd);
 }
 
 .interpreter-avatar-small {
@@ -367,16 +362,21 @@
   font-weight: 600;
   font-family: var(--font-interpreter);
 }
-
 .message-time {
   font-size: 0.65rem;
-  color: rgb(255, 255, 255);
   display: block;
   text-align: right;
   margin-top: 4px;
-  font-family: var(--font-system);
+  font-family: "Arsenal", sans-serif !important;
+}
+.interpreter-message .message-time {
+  color: #ffffff;
 }
 
+/* Hora para mensajes del usuario (negra) */
+.user-message .message-time {
+  color: #000000; /* Negro para contraste con el fondo blanco */
+}
 .message-bubble {
   padding: 12px 16px;
   border-radius: 18px;
@@ -604,27 +604,27 @@
 
 .message-input {
   width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #333;
-  font-size: 14px;
-  line-height: 1.3;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #333 !important;
+  font-size: 14px !important; /* REDUCIDO: de 16px a 14px */
   resize: none;
-  max-height: 80px;
-  min-height: 18px;
-  font-family: var(--font-user) !important;
-  font-weight: 500 !important;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
   overflow-y: auto;
   padding: 0;
+  display: flex;
+  align-items: center;
+  text-align: left; /* Mantener alineación izquierda para escritura natural */
+  line-height: 1.4;
 }
 
 .message-input::placeholder {
   color: rgba(0, 0, 0, 0.4);
-  font-family: var(--font-user) !important;
-  font-weight: 400 !important;
-  font-style: italic;
-  opacity: 0.7;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
+  font-size: 14px;
 }
 
 .action-buttons {
@@ -649,11 +649,6 @@
   backdrop-filter: blur(3px);
 }
 
-.send-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(34, 139, 34, 0.4);
-}
-
 .send-button:disabled {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.3);
@@ -674,12 +669,10 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .clear-button:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
 }
 
 .clear-button:hover:not(:disabled),
@@ -1446,4 +1439,621 @@
 }
 .user-avatar-image {
   border: 2px solid #3b83f600;
+}
+/* ===== MEDIA QUERIES PARA MÓVILES - CONSERVANDO TODA LA INFORMACIÓN ===== */
+@media (max-width: 768px) {
+  /* Contenedor principal */
+  .oracle-container {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .content-with-navbar {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .oracle-main {
+    height: calc(100vh - 20px);
+    width: 100%;
+    max-width: calc(100vw - 20px);
+    border-radius: 15px;
+    padding: 8px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  /* HEADER - Manteniendo toda la información visible */
+  .interpreter-info {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    min-height: 60px;
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Avatar ajustado pero visible */
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  /* Información del intérprete - asegurar que todo se vea */
+  .interpreter-details {
+    flex: 1;
+    gap: 1px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Fila del nombre y título - SIN wrap para mantener en una línea */
+  .name-title-row {
+    gap: 4px;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Nombre - reducido pero legible */
+  .interpreter-details h3 {
+    font-size: 0.95rem !important;
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Separador visible */
+  .separator-icon {
+    font-size: 0.8rem !important;
+    margin: 0 1px;
+    flex-shrink: 0;
+  }
+
+  /* Título - MÁS PEQUEÑO para que quepa "GUÍA DE ANIMALES INTERIORES" */
+  .interpreter-title {
+    font-size: 0.65rem !important; /* Reducido significativamente */
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+  }
+
+  /* Especialidad - más pequeña pero visible */
+  .interpreter-specialty {
+    font-size: 0.6rem !important; /* Muy pequeño pero legible */
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Botón de cerrar ajustado */
+  .close-chat-btn {
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .close-icon {
+    width: 9px;
+    height: 9px;
+  }
+
+  /* Área de chat */
+  .chat-area {
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .messages-container {
+    padding: 8px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Mensajes - ajustar avatares y burbujas */
+  .message {
+    margin: 0 4px;
+    gap: 6px;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Ajustar posiciones de avatares */
+  .user-message .message-avatar {
+    top: -2px;
+    right: -12px;
+  }
+
+  .interpreter-message .message-avatar {
+    top: -2px;
+    left: -2px;
+  }
+
+  .interpreter-avatar-small {
+    left: -12px;
+  }
+
+  /* Ajustar padding de contenido */
+  .user-message .message-content {
+    padding-right: 32px;
+    padding-top: 10px;
+    max-width: calc(100% - 40px);
+  }
+
+  .interpreter-message .message-content {
+    padding-left: 32px;
+    padding-top: 10px;
+    max-width: calc(100% - 40px);
+  }
+
+  .interpreter-message .message-content::before {
+    content: "Xamán Kiara";
+    left: 30px;
+    font-size: 0.7rem;
+  }
+
+  .message-bubble {
+    padding: 8px 12px;
+    border-radius: 14px;
+    left: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .user-message .message-bubble {
+    padding-top: 14px;
+    padding-right: 16px;
+  }
+
+  .interpreter-message .message-bubble {
+    padding-top: 14px;
+    padding-left: 16px;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+
+  .user-message .message-bubble p {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .interpreter-message .message-bubble p {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .message-time {
+    font-size: 0.6rem;
+    margin-top: 2px;
+  }
+
+  /* Área de entrada */
+  .input-area {
+    padding: 8px 12px;
+    border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-container {
+    gap: 8px;
+    width: 100%;
+  }
+
+  .text-input-wrapper {
+    padding: 8px 12px;
+    border-radius: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .message-input {
+    font-size: 13px !important;
+    width: 100%;
+  }
+
+  .message-input::placeholder {
+    font-size: 13px;
+  }
+
+  .send-button,
+  .clear-button {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .action-buttons {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Modal de pago */
+  .payment-modal {
+    width: calc(100vw - 20px);
+    max-width: 95%;
+    margin: 10px;
+    border-radius: 18px;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 12px 15px;
+  }
+
+  .payment-header h3 {
+    font-size: 1em;
+  }
+
+  .price-amount {
+    font-size: 1.8em;
+  }
+
+  .pay-button {
+    padding: 10px 25px;
+    font-size: 0.9em;
+    min-width: 150px;
+  }
+}
+
+/* ===== MEDIA QUERY PARA MÓVILES PEQUEÑOS ===== */
+@media (max-width: 480px) {
+  .oracle-container {
+    padding: 5px;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .oracle-main {
+    height: calc(100vh - 10px);
+    width: 100%;
+    max-width: calc(100vw - 10px);
+    border-radius: 12px;
+    padding: 5px;
+    margin: 0;
+  }
+
+  /* Header compacto pero completo */
+  .interpreter-info {
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    gap: 8px;
+    min-height: 50px;
+    border-radius: 12px;
+  }
+
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .interpreter-details h3 {
+    font-size: 0.9rem !important;
+  }
+
+  .separator-icon {
+    font-size: 0.75rem !important;
+    margin: 0;
+  }
+
+  .interpreter-title {
+    font-size: 0.6rem !important;
+    letter-spacing: 0.1px;
+  }
+
+  .interpreter-specialty {
+    font-size: 0.55rem !important;
+    display: block !important;
+  }
+
+  .close-chat-btn {
+    width: 22px;
+    height: 22px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .close-icon {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Chat */
+  .chat-area {
+    padding: 6px;
+    border-radius: 12px;
+  }
+
+  .messages-container {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .message {
+    margin: 0 2px;
+    gap: 4px;
+  }
+
+  .message-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Ajustar posiciones de avatares para móvil pequeño */
+  .user-message .message-avatar {
+    top: -1px;
+    right: -10px;
+  }
+
+  .interpreter-message .message-avatar {
+    top: -1px;
+    left: -1px;
+  }
+
+  .interpreter-avatar-small {
+    left: -10px;
+  }
+
+  /* Ajustar padding de contenido */
+  .user-message .message-content {
+    padding-right: 30px;
+    padding-top: 8px;
+    max-width: calc(100% - 35px);
+  }
+
+  .interpreter-message .message-content {
+    padding-left: 30px;
+    padding-top: 8px;
+    max-width: calc(100% - 35px);
+  }
+
+  .interpreter-message .message-content::before {
+    content: "Xamán Kiara";
+    left: 26px;
+    font-size: 0.65rem;
+  }
+
+  .message-bubble {
+    padding: 6px 10px;
+    border-radius: 12px;
+    left: 10px;
+  }
+
+  .user-message .message-bubble {
+    padding-top: 12px;
+    padding-right: 14px;
+  }
+
+  .interpreter-message .message-bubble {
+    padding-top: 12px;
+    padding-left: 14px;
+  }
+
+  .user-message .message-bubble p {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+
+  .interpreter-message .message-bubble p {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Entrada */
+  .input-area {
+    padding: 6px 10px;
+    border-radius: 14px;
+  }
+
+  .text-input-wrapper {
+    padding: 6px 10px;
+    border-radius: 14px;
+  }
+
+  .message-input {
+    font-size: 12px !important;
+  }
+
+  .send-button,
+  .clear-button {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .action-buttons {
+    gap: 4px;
+  }
+
+  /* Modal */
+  .payment-modal {
+    width: calc(100vw - 10px);
+    max-width: 98%;
+    margin: 5px;
+    border-radius: 15px;
+  }
+
+  .payment-header {
+    padding: 10px 12px;
+  }
+
+  .payment-content {
+    padding: 12px;
+  }
+
+  .payment-header h3 {
+    font-size: 0.9em;
+  }
+
+  .price-amount {
+    font-size: 1.6em;
+  }
+
+  .pay-button {
+    padding: 8px 20px;
+    font-size: 0.8em;
+    min-width: 140px;
+  }
+}
+
+/* ===== MEDIA QUERY PARA PANTALLAS MUY PEQUEÑAS ===== */
+@media (max-width: 360px) {
+  .oracle-container {
+    padding: 3px;
+  }
+
+  .oracle-main {
+    height: calc(100vh - 6px);
+    width: calc(100vw - 6px);
+    padding: 3px;
+  }
+
+  /* Layout vertical para el header en pantallas muy pequeñas si es necesario */
+  .interpreter-info {
+    padding: 5px 8px;
+    gap: 6px;
+    min-height: 45px;
+  }
+
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .interpreter-details h3 {
+    font-size: 0.8rem !important;
+  }
+
+  .interpreter-title {
+    font-size: 0.55rem !important;
+  }
+
+  .interpreter-specialty {
+    font-size: 0.5rem !important;
+  }
+
+  /* Ajustar mensajes para pantallas muy pequeñas */
+  .message-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 24px;
+    height: 24px;
+  }
+
+  .user-message .message-content {
+    padding-right: 28px;
+    padding-top: 6px;
+  }
+
+  .interpreter-message .message-content {
+    padding-left: 28px;
+    padding-top: 6px;
+  }
+
+  .message-bubble {
+    left: 8px;
+  }
+
+  .user-message .message-bubble {
+    padding-top: 10px;
+    padding-right: 12px;
+  }
+
+  .interpreter-message .message-bubble {
+    padding-top: 10px;
+    padding-left: 12px;
+  }
+
+  .user-message .message-bubble p,
+  .interpreter-message .message-bubble p {
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* ===== ASEGURAR QUE NADA SE SALGA DE LA PANTALLA ===== */
+@media (max-width: 768px) {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .oracle-container,
+  .content-with-navbar,
+  .oracle-main,
+  .interpreter-info,
+  .chat-area,
+  .input-area {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
 }

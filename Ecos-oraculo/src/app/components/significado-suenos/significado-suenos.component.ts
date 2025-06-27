@@ -69,7 +69,7 @@ export class SignificadoSuenosComponent
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
 
-  textareaHeight: number = 45; // Altura inicial
+  textareaHeight: number = 25; // Altura inicial
   private readonly minTextareaHeight = 45;
   private readonly maxTextareaHeight = 120;
 

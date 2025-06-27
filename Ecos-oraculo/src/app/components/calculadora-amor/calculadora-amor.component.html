@@ -74,15 +74,16 @@
           class="message-content"
           [ngClass]="{ 'blocked-content': isMessageBlocked(message) }"
         >
-          <div
-            class="message-text"
-            [innerHTML]="formatMessage(message.message)"
-          ></div>
-
-          <!-- Mover la hora aquí, dentro del message-text -->
-          <span class="message-time" *ngIf="message.role === 'love_expert'">
-            {{ formatTime(message.timestamp) }}
-          </span>
+          <div class="message-text">
+            <div [innerHTML]="formatMessage(message.message)"></div>
+            <!-- MOVER LA HORA DENTRO DEL message-text -->
+            <span
+              class="message-time"
+              *ngIf="message.role === 'love_expert' || message.role === 'user'"
+            >
+              {{ formatTime(message.timestamp) }}
+            </span>
+          </div>
 
           <!-- Overlay para mensajes bloqueados -->
           <div *ngIf="isMessageBlocked(message)" class="blocked-overlay">
@@ -105,6 +106,7 @@
       </div>
 
       <!-- Loading indicator -->
+      
       <div *ngIf="isLoading" class="loading-message">
         <div class="loading-avatar">
           <span class="avatar-icon">
@@ -112,17 +114,21 @@
               class="interpreter-avatar-small"
               src="/Maestra-9.webp"
               alt="Maestra Avatar"
-          /></span>
+            />
+          </span>
         </div>
         <div class="loading-content">
           <div class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
+            <div class="dots-container">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <!-- MOVER EL TEXTO DENTRO DE loading-dots -->
+            <span class="loading-text">
+              Maestra Valentina está consultando los números del amor...
+            </span>
           </div>
-          <span class="loading-text"
-            >Maestra Valentina está consultando los números del amor...</span
-          >
         </div>
       </div>
 

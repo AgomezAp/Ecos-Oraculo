@@ -114,7 +114,6 @@
   padding: 12px 20px;
   background: linear-gradient(135deg, #172131, #5d3565);
   backdrop-filter: blur(10px);
-  border: 1px solid #172131;
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -237,7 +236,8 @@
 
 /* Posicionamiento del avatar para mensajes del usuario */
 .user-message .message-avatar {
-  background: linear-gradient(45deg, #4a90e2, #357abd);
+  background-color: #172131;
+  border: 1px solid #5d3565;
   top: -5px;
   right: -11px;
 }
@@ -519,13 +519,14 @@
 /* ESTILOS MEJORADOS PARA TEXTAREA CON AUTOEXPANSIÓN */
 .message-input ::ng-deep .mat-mdc-form-field {
   width: 100% !important;
-  font-family: inherit !important;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
+  font-size: 14px !important;
+
   background: white !important;
   border-radius: 25px !important;
   min-height: 45px !important;
   max-height: 120px !important; /* Altura máxima para evitar que crezca demasiado */
-  border: 1px solid #e0e0e0 !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
   transition: all 0.3s ease !important;
   display: flex !important;
   align-items: flex-start !important; /* Cambiar a flex-start para expansión */
@@ -535,11 +536,6 @@
 
 .message-input ::ng-deep .mat-mdc-form-field:hover {
   border-color: #d0d0d0 !important;
-}
-
-.message-input ::ng-deep .mat-mdc-form-field:focus-within {
-  border-color: #25d366 !important;
-  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2) !important;
 }
 
 /* Eliminar TODOS los contenedores internos de Material Design */
@@ -587,10 +583,10 @@
   border: none !important;
   outline: none !important;
   color: #333 !important;
-  font-size: 16px !important;
   line-height: 1.4 !important; /* Mejorar line-height para expansión */
-  font-family: "Arial", sans-serif !important;
-  font-weight: 400 !important;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
+  font-size: 14px !important;
   width: 100% !important;
   min-height: 20px !important; /* Altura mínima del textarea */
   max-height: 90px !important; /* Altura máxima antes de scroll */
@@ -613,9 +609,9 @@
 
 .message-input ::ng-deep .mat-mdc-form-field textarea::placeholder {
   color: rgba(0, 0, 0, 0.5) !important;
-  font-family: "Arial", sans-serif !important;
-  font-weight: 400 !important;
-  font-size: 16px !important;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
+  font-size: 14px !important;
 }
 
 /* Eliminar labels, hints y underlines */
@@ -692,28 +688,29 @@
 .send-button {
   width: 45px;
   height: 45px;
-  background: #25d366;
-  color: white;
-  border: none;
+  background-color: rgba(90, 90, 100, 0);
+  color: rgba(255, 255, 255, 0.9);
+  border: #ffffff80;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(37, 211, 102, 0.3);
+  transition: background-color 0.25s ease;
+  position: relative;
+  backdrop-filter: blur(3px);
 }
 
 .send-button:hover:not(:disabled) {
-  background: #20b658;
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.4);
+  background-color: #ffffff80;
+  border: #ffffff80;
 }
 
 .send-button:disabled {
   background: #ccc;
   cursor: not-allowed;
   transform: none;
+  border: #ffffff80;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -1635,7 +1632,7 @@
   margin: 0;
   color: white;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 100;
   font-family: "Berkshire Swash", cursive;
   line-height: 1.2;
   flex-shrink: 0;
@@ -1659,4 +1656,370 @@
   font-weight: bold;
   line-height: 1.2;
   margin: 0 2px;
+}
+/* ===== MEDIA QUERIES PARA MÓVILES - CONSERVANDO TODA LA INFORMACIÓN ===== */
+@media (max-width: 768px) {
+  /* Contenedor principal */
+  .main-content {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .zodiac-modal {
+    height: calc(100vh - 20px);
+    width: 100%;
+    max-width: calc(100vw - 20px);
+    border-radius: 15px;
+    padding: 8px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  /* HEADER - Manteniendo toda la información visible */
+  .zodiac-header {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    min-height: 60px;
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .master-info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Avatar ajustado pero visible */
+  .master-avatar-header,
+  .mystical-orb-image {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  /* Información del maestro - asegurar que todo se vea */
+  .master-details-header {
+    flex: 1;
+    gap: 1px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Fila del nombre y título - SIN wrap para mantener en una línea */
+  .name-title-row {
+    gap: 4px;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Nombre - reducido pero legible */
+  .master-details-header h3 {
+    font-size: 0.95rem !important;
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Separador visible */
+  .separator-icon {
+    font-size: 0.8rem !important;
+    margin: 0 1px;
+    flex-shrink: 0;
+  }
+
+  /* Título - MÁS PEQUEÑO para que quepa "GUÍA CELESTIAL DEL HORÓSCOPO" */
+  .interpreter-title {
+    font-size: 0.65rem !important; /* Reducido significativamente */
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+  }
+
+  /* Especialidad - más pequeña pero visible */
+  .interpreter-specialty {
+    font-size: 0.6rem !important; /* Muy pequeño pero legible */
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Botón de cerrar ajustado */
+  .close-button,
+  .close-chat-btn {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 14px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .close-icon {
+    width: 9px;
+    height: 9px;
+  }
+
+  /* Área de chat */
+  .chat-messages {
+    padding: 10px;
+    gap: 10px;
+    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Mensajes */
+  .message-wrapper {
+    margin: 0 4px;
+    gap: 6px;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
+  }
+
+  .user-message {
+    margin-left: auto;
+    margin-right: 0;
+    max-width: 85%;
+  }
+
+  .master-message {
+    margin-right: auto;
+    margin-left: 0;
+    max-width: 85%;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Ajustar posiciones de avatares */
+  .user-message .message-avatar {
+    top: -3px;
+    right: -8px;
+  }
+
+  .master-message .message-avatar {
+    top: -3px;
+    left: -3px;
+  }
+
+  /* Ajustar padding de contenido */
+  .user-message .message-content {
+    padding-right: 20px;
+    align-items: flex-end;
+  }
+
+  .master-message .message-content {
+    padding-left: 32px;
+    align-items: flex-start;
+  }
+
+  .message-text {
+    padding: 10px 16px;
+    border-radius: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 80px;
+  }
+
+  .user-message .message-text {
+    padding-top: 16px;
+    padding-right: 20px;
+    margin-left: auto;
+  }
+
+  .master-message .message-text {
+    padding-top: 16px;
+    padding-left: 20px;
+    margin-right: auto;
+    padding-bottom: 24px;
+  }
+
+  .user-message .message-text p {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .master-message .message-text p {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    word-break: break-word;
+  }
+
+  .message-time {
+    font-size: 0.6rem;
+    bottom: 6px;
+    right: 12px;
+  }
+
+  /* Mensajes bloqueados */
+  .message-payment-overlay {
+    left: 30px;
+  }
+
+  .payment-prompt {
+    padding: 12px;
+    max-width: 180px;
+  }
+
+  .lock-icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .payment-prompt p {
+    font-size: 11px;
+  }
+
+  .payment-prompt p:first-of-type {
+    font-size: 12px;
+  }
+
+  .unlock-button {
+    padding: 6px 12px;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  /* Indicador de carga */
+  .loading-message {
+    gap: 6px;
+    margin: 0 4px;
+  }
+
+  .loading-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    top: -3px;
+    left: -3px;
+  }
+
+  .loading-content {
+    padding-left: 32px;
+  }
+
+  .loading-dots {
+    padding: 10px 16px;
+    padding-top: 16px;
+    padding-left: 20px;
+  }
+
+  .loading-dots span {
+    width: 4px;
+    height: 4px;
+  }
+
+  .loading-text {
+    font-size: 0.7rem;
+    padding: 0 16px;
+  }
+
+  /* Área de entrada */
+  .chat-input-area {
+    padding: 10px 12px;
+    gap: 8px;
+    min-height: 65px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .message-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .message-input ::ng-deep .mat-mdc-form-field {
+    min-height: 42px !important;
+    max-height: 100px !important;
+    padding: 6px 18px !important;
+  }
+
+  .message-input ::ng-deep .mat-mdc-form-field textarea {
+    max-height: 75px !important;
+    padding: 6px 0 !important;
+    font-size: 13px !important;
+  }
+
+  .input-buttons {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .reset-button,
+  .send-button {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  /* Modal de pago */
+  .payment-modal {
+    width: calc(100vw - 20px);
+    max-width: 95%;
+    margin: 10px;
+    border-radius: 18px;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 12px 15px;
+  }
+
+  .payment-header h3 {
+    font-size: 1em;
+  }
+
+  .close-payment-button {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .price-amount {
+    font-size: 2em;
+  }
+
+  .pay-button {
+    padding: 12px 28px;
+    font-size: 0.9em;
+    min-width: 160px;
+  }
 }

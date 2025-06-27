@@ -46,7 +46,6 @@
   margin: 0 auto;
   position: relative;
   color: white;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
@@ -64,7 +63,6 @@
   padding: 12px 20px;
   background: linear-gradient(135deg, #9f4272, #cd82a9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(162, 142, 255, 0.3);
   border-radius: 20px;
   position: relative;
   flex-shrink: 0;
@@ -203,7 +201,6 @@
   justify-content: center;
   font-size: 16px;
   flex-shrink: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-avatar {
@@ -266,9 +263,16 @@
   display: block;
   text-align: right;
   margin-top: 4px;
+  font-family: "Arsenal", sans-serif !important;
+}
+.interpreter-message .message-time {
   color: #ffffff;
 }
 
+/* Hora para mensajes del usuario (negra) */
+.user-message .message-time {
+  color: #000000; /* Negro para contraste con el fondo blanco */
+}
 /* Indicador de escritura */
 .typing-indicator .message-bubble {
   background: linear-gradient(120deg, #cd82a9, #9f4272);
@@ -323,6 +327,7 @@
   flex-shrink: 0;
   position: relative;
   z-index: 2; /* Asegurar que esté sobre el video */
+  align-items: center;
 }
 
 .input-container {
@@ -335,9 +340,11 @@
   flex: 1;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 22px;
-  padding: 10px 18px;
+  padding: 12px 18px; /* AUMENTADO: de 10px a 12px para mejor centrado */
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  display: flex; /* NUEVO: Para ayudar con el centrado */
+  align-items: center;
 }
 
 .message-input {
@@ -346,19 +353,23 @@
   border: none !important;
   outline: none !important;
   color: #333 !important;
-  font-size: 16px !important;
+  font-size: 14px !important; /* REDUCIDO: de 16px a 14px */
   resize: none;
-  min-height: 18px;
-  font-family: "Arial", sans-serif !important;
-  font-weight: 400 !important;
+  font-family: "Arsenal", sans-serif;
+  font-weight: 300;
   overflow-y: auto;
   padding: 0;
+  display: flex;
+  align-items: center;
+  text-align: left; /* Mantener alineación izquierda para escritura natural */
+  line-height: 1.4;
 }
 
 .message-input::placeholder {
   color: rgba(0, 0, 0, 0.4);
   font-family: "Arsenal", sans-serif;
   font-weight: 300;
+  font-size: 14px;
 }
 
 .action-buttons {
@@ -1178,8 +1189,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 32px;
+  width: 35px;
+  height: 35px;
+  background-color: #9f4272;
+  border: 1px solid #cd82a9;
 }
 .mystical-orb-image {
   width: 50px;
@@ -1188,4 +1201,321 @@
   object-fit: cover;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 20px rgba(162, 142, 255, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.3);
+}
+/* MEDIA QUERIES PARA MÓVILES - CONSERVANDO TODA LA INFORMACIÓN */
+@media (max-width: 768px) {
+  /* Contenedor principal */
+  .oracle-container {
+    padding: 10px;
+    min-height: 100vh;
+  }
+
+  .oracle-main {
+    height: calc(100vh - 20px);
+    width: 100%;
+    max-width: 100%;
+    border-radius: 15px;
+    padding: 8px;
+    margin: 0;
+  }
+
+  /* HEADER - Manteniendo toda la información visible */
+  .interpreter-info {
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    min-height: 60px;
+    gap: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Avatar ajustado pero visible */
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Información del intérprete - asegurar que todo se vea */
+  .interpreter-details {
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  /* Fila del nombre y título - SIN wrap para mantener en una línea */
+  .name-title-row {
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    display: flex;
+    min-width: 0;
+  }
+
+  /* Nombre - reducido pero legible */
+  .interpreter-details h3 {
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Separador visible */
+  .separator-icon {
+    font-size: 0.9rem;
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  /* Título - permitir que se ajuste si es necesario */
+  .interpreter-title {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* Especialidad - SIEMPRE visible */
+  .interpreter-specialty {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important; /* Forzar que se muestre */
+  }
+
+  /* Botón de cerrar ajustado */
+  .close-chat-btn {
+    top: 12px;
+    right: 12px;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .close-icon {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Área de chat */
+  .chat-area {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+  }
+
+  .messages-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* Mensajes */
+  .message {
+    margin: 0 6px;
+    gap: 8px;
+  }
+
+  .message-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 30px;
+    height: 30px;
+  }
+
+  .message-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 80%;
+  }
+
+  .user-message .message-bubble p,
+  .interpreter-message .message-bubble p {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .message-time {
+    font-size: 0.65rem;
+    margin-top: 3px;
+  }
+
+  /* Área de entrada */
+  .input-area {
+    padding: 10px 15px;
+    border-radius: 18px;
+  }
+
+  .input-container {
+    gap: 10px;
+  }
+
+  .text-input-wrapper {
+    padding: 10px 15px;
+    border-radius: 20px;
+  }
+
+  .message-input {
+    font-size: 14px;
+  }
+
+  .message-input::placeholder {
+    font-size: 14px;
+  }
+
+  .send-button,
+  .clear-button {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .input-hint {
+    font-size: 0.7rem;
+    margin-top: 6px;
+  }
+}
+
+/* MEDIA QUERY PARA MÓVILES PEQUEÑOS - Manteniendo información */
+@media (max-width: 480px) {
+  .oracle-container {
+    padding: 8px;
+  }
+
+  .oracle-main {
+    height: calc(100vh - 16px);
+    border-radius: 12px;
+    padding: 6px;
+  }
+
+  /* Header compacto pero completo */
+  .interpreter-info {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    gap: 10px;
+    min-height: 55px;
+  }
+
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .interpreter-details h3 {
+    font-size: 1rem;
+  }
+
+  .separator-icon {
+    font-size: 0.8rem;
+    margin: 0 1px;
+  }
+
+  .interpreter-title {
+    font-size: 0.8rem;
+  }
+
+  .interpreter-specialty {
+    font-size: 0.7rem;
+    display: block !important; /* Asegurar que se muestre */
+  }
+
+  .close-chat-btn {
+    width: 24px;
+    height: 24px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .close-icon {
+    width: 9px;
+    height: 9px;
+  }
+}
+
+/* MEDIA QUERY PARA PANTALLAS MUY PEQUEÑAS - Layout alternativo */
+@media (max-width: 360px) {
+  /* Si el espacio es muy limitado, cambiar a layout vertical */
+  .interpreter-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+    gap: 8px;
+    min-height: 70px;
+  }
+
+  .interpreter-avatar {
+    order: 1;
+  }
+
+  .interpreter-details {
+    order: 2;
+    width: 100%;
+    text-align: center;
+  }
+
+  .name-title-row {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .interpreter-specialty {
+    text-align: center;
+    width: 100%;
+  }
+
+  .close-chat-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+}
+
+/* MEDIA QUERY PARA LANDSCAPE EN MÓVILES */
+@media (max-width: 768px) and (orientation: landscape) {
+  .oracle-main {
+    height: calc(100vh - 10px);
+  }
+
+  .interpreter-info {
+    padding: 6px 15px;
+    min-height: 50px;
+  }
+
+  .mystical-orb,
+  .mystical-orb-image {
+    width: 35px;
+    height: 35px;
+  }
+
+  .interpreter-details h3 {
+    font-size: 1rem;
+  }
+
+  .interpreter-title {
+    font-size: 0.8rem;
+  }
+
+  .interpreter-specialty {
+    font-size: 0.7rem;
+  }
 }
