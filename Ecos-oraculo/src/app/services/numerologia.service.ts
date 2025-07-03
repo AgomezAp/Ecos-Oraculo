@@ -46,7 +46,7 @@ export class NumerologiaService {
   private apiUrl: string;
   // Datos por defecto del numerólogo
   private defaultNumerologyData: NumerologyData = {
-    name: "Maestra Pythia",
+    name: "Maestra Sofía",
     specialty: "Numerología pitagórica",
     experience: "Décadas de experiencia"
   };
@@ -99,7 +99,7 @@ export class NumerologiaService {
         return of({
           success: false,
           numerologist: {
-            name: "Maestra Pythia",
+            name: "Maestra Sofía",
             title: "Guardiana de los Números Sagrados",
             specialty: "Numerología pitagórica",
             description: "Error al conectar con el numerólogo",

@@ -906,17 +906,17 @@
 }
 
 .payment-content::-webkit-scrollbar-track {
-  background: rgba(167, 139, 250, 0.1);
+  background: #274A4A;
   border-radius: 3px;
 }
 
 .payment-content::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.3);
+  background: #638382;
   border-radius: 3px;
 }
 
 .payment-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.5);
+  background: #638382;
 }
 
 .payment-info {
@@ -1040,17 +1040,17 @@
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background: rgba(167, 139, 250, 0.1);
+  background:  #274A4A;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.3);
+  background:  #638382;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.5);
+  background: #638382;
 }
 
 /* ===== RESPONSIVE ===== */

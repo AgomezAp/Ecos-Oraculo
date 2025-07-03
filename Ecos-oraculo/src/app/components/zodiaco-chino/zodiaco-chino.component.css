@@ -720,17 +720,17 @@
 }
 
 .chat-messages::-webkit-scrollbar-track {
-  background: rgba(138, 43, 226, 0.1);
+  background: #172131;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(138, 43, 226, 0.3);
+  background: #5d3565;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(138, 43, 226, 0.5);
+  background: #5d3565;
 }
 
 /* Modal de pago con temática del horóscopo con z-index máximo */

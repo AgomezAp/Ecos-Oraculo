@@ -12,82 +12,132 @@ import tablaNacimientoRoutes from "../routes/tabla-nacimiento";
 import zodiacoChino from "../routes/zodiaco-chino";
 import calculadoraAmor from "../routes/calculadora-amor";
 import RPagos from "../routes/Pagos";
+import Recolecta from "../routes/recolecta";
+import { recolecta } from "./recolecta-datos";
+
 // Cargar variables de entorno
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 3010;
+class Server {
+  private app: express.Application;
+  private port: string;
 
-// Middleware
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+  constructor() {
+    this.app = express();
+    this.port = process.env.PORT || "3010";
 
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+    this.middlewares();
+    this.routes();
+  }
 
-app.use(interpretadorsueno);
-app.use(numerologyRoutes);
-app.use(vocationalRoutes);
-app.use(zodiacoRoutes);
-app.use(animalInteriorRoutes);
-app.use(tablaNacimientoRoutes);
-app.use(zodiacoChino);
-app.use(calculadoraAmor);
-app.use(RPagos);
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    service: "Hagiografia Chat API",
-  });
-});
+  async DBconnect() {
+    try {
+      await recolecta.sync({ alter: true });
+      console.log("✅ Conexión a base de datos establecida correctamente");
+    } catch (error) {
+      console.error("❌ Error de conexión a la base de datos:", error);
+    }
+  }
 
-// Error handling middleware
-app.use(
-  (
-    err: any,
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    console.error("Error:", err);
-    res.status(500).json({
-      success: false,
-      error: "Error interno del servidor",
-      code: "INTERNAL_ERROR",
+  middlewares() {
+    this.app.use(express.json());
+    this.app.use(
+      cors({
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
+    this.app.use(express.json({ limit: "10mb" }));
+    this.app.use(express.urlencoded({ extended: true }));
+
+    // Logging middleware
+    this.app.use((req, res, next) => {
+      console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+      next();
     });
   }
-);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Endpoint no encontrado",
-    code: "NOT_FOUND",
-  });
-});
+  routes() {
+    this.app.use(interpretadorsueno);
+    this.app.use(numerologyRoutes);
+    this.app.use(vocationalRoutes);
+    this.app.use(zodiacoRoutes);
+    this.app.use(animalInteriorRoutes);
+    this.app.use(tablaNacimientoRoutes);
+    this.app.use(zodiacoChino);
+    this.app.use(calculadoraAmor);
+    this.app.use(RPagos);
+    this.app.use(Recolecta);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`💬 Chat API: http://localhost:${PORT}/api/chat`);
-  console.log(`🔢 Numerology API: http://localhost:${PORT}/api/numerology`);
-  console.log(`🎯 Vocational API: http://localhost:${PORT}/api/vocational`);
-  console.log(`- Zodíaco: http://localhost:${PORT}/api/zodiaco`);
-  console.log(
-    `🦅 Animal Interior API: http://localhost:${PORT}/api/animal-interior`
-  );
-});
-export default app;
+    // Health check endpoint
+    this.app.get("/health", (req, res) => {
+      res.json({
+        status: "OK",
+        timestamp: new Date().toISOString(),
+        service: "Hagiografia Chat API",
+      });
+    });
+
+    // Error handling middleware
+    this.app.use(
+      (
+        err: any,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        console.error("Error:", err);
+        res.status(500).json({
+          success: false,
+          error: "Error interno del servidor",
+          code: "INTERNAL_ERROR",
+        });
+      }
+    );
+
+    // 404 handler
+    this.app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        error: "Endpoint no encontrado",
+        code: "NOT_FOUND",
+      });
+    });
+  }
+
+  async listen() {
+    // Conectar a la base de datos primero
+    await this.DBconnect();
+
+    // Luego iniciar el servidor
+    this.app.listen(this.port, () => {
+      console.log(`🚀 Servidor corriendo en puerto ${this.port}`);
+      console.log(`📍 Health check: http://localhost:${this.port}/health`);
+      console.log(`💬 Chat API: http://localhost:${this.port}/api/chat`);
+      console.log(
+        `🔢 Numerology API: http://localhost:${this.port}/api/numerology`
+      );
+      console.log(
+        `🎯 Vocational API: http://localhost:${this.port}/api/vocational`
+      );
+      console.log(`- Zodíaco: http://localhost:${this.port}/api/zodiaco`);
+      console.log(
+        `🦅 Animal Interior API: http://localhost:${this.port}/api/animal-interior`
+      );
+      console.log(
+        `Recolecta datos: http://localhost:${this.port}/api/recolecta`
+      );
+    });
+  }
+
+  getApp() {
+    return this.app;
+  }
+}
+
+// Crear e inicializar el servidor
+const server = new Server();
+server.listen().catch(console.error);
+
+export default server.getApp();

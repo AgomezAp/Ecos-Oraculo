@@ -178,8 +178,13 @@
       </div>
     </div>
   </div>
-
-  <!-- MODAL DE PAGO: Cambiar *ngIf por [hidden] para el contenedor de Stripe -->
+  <app-recolecta-datos
+    *ngIf="showDataModal"
+    (onDataSubmitted)="onUserDataSubmitted($event)"
+    (onModalClosed)="onDataModalClosed()"
+  >
+  </app-recolecta-datos>
+  
   <div *ngIf="showPaymentModal" class="payment-modal-overlay">
     <div class="payment-modal">
       <div class="payment-header">

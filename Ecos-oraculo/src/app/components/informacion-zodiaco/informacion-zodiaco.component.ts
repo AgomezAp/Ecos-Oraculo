@@ -24,6 +24,7 @@ import {
   StripePaymentElement,
 } from '@stripe/stripe-js';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 
 interface ZodiacMessage {
   content: string;
@@ -49,6 +50,7 @@ interface AstrologerData {
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './informacion-zodiaco.component.html',
   styleUrl: './informacion-zodiaco.component.css',
@@ -68,6 +70,9 @@ export class InformacionZodiacoComponent
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
 
+  showDataModal: boolean = false;
+  userData: any = null;
+  
   // Variables para control de pagos
   showPaymentModal: boolean = false;
   stripe: Stripe | null = null;
@@ -276,7 +281,7 @@ export class InformacionZodiacoComponent
       // Verificar si es la SEGUNDA pregunta y si no ha pagado
       if (!this.hasUserPaidForAstrology && this.firstQuestionAsked) {
         this.saveStateBeforePayment();
-        this.promptForPayment();
+        this.showDataModal = true;
         return;
       }
 
@@ -596,5 +601,17 @@ export class InformacionZodiacoComponent
   getZodiacModality(sign: string): string {
     // Implementar lógica para modalidades
     return 'Cardinal'; // Ejemplo
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

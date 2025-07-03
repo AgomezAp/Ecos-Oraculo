@@ -17,9 +17,10 @@ import { ParticlesComponent } from '../../../shared/particles/particles.componen
 import { CommonModule } from '@angular/common';
 import { CardService } from '../../../services/tarot/card.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { RecolectaDatosComponent } from '../../recolecta-datos/recolecta-datos.component';
 @Component({
   selector: 'app-cards',
-  imports: [ CommonModule],
+  imports: [CommonModule, RecolectaDatosComponent],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.css',
   animations: [
@@ -29,11 +30,13 @@ import { ActivatedRoute, Router } from '@angular/router';
     ]),
   ],
 })
-
 export class CardsComponent implements OnInit, OnDestroy {
   cards: any[] = [];
   selectedCards: { src: string; name: string; descriptions: string[] }[] = [];
   private theme: string = '';
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
 
   // Stripe and Payment Modal Properties
   showPaymentModal: boolean = false;
@@ -149,8 +152,7 @@ export class CardsComponent implements OnInit, OnDestroy {
         card.dataset['name'] = cardData.name;
         card.dataset['descriptions'] = cardData.descriptions.join('.,');
         card.addEventListener('mouseenter', () => {
-          card.style.boxShadow =
-            '1px 1px 20px rgb(255 255 255 / 100%)';
+          card.style.boxShadow = '1px 1px 20px rgb(255 255 255 / 100%)';
         });
 
         card.addEventListener('mouseleave', () => {
@@ -169,50 +171,53 @@ export class CardsComponent implements OnInit, OnDestroy {
     }
   }
 
-selectCard(event: Event): void {
-  const target = event.currentTarget as HTMLElement;
-  if (this.selectedCards.length >= 3 || target.classList.contains('selected')) {
-    return;
-  }
+  selectCard(event: Event): void {
+    const target = event.currentTarget as HTMLElement;
+    if (
+      this.selectedCards.length >= 3 ||
+      target.classList.contains('selected')
+    ) {
+      return;
+    }
 
-  const currentZIndex = 1500 + this.selectedCards.length;
-  target.style.zIndex = currentZIndex.toString();
+    const currentZIndex = 1500 + this.selectedCards.length;
+    target.style.zIndex = currentZIndex.toString();
 
-  target.classList.add('selected');
-  target.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    target.classList.add('selected');
+    target.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
 
-  const isMobile = window.innerWidth <= 768;
-  const centerX = window.innerWidth / 1.6;
-  const centerY = window.innerHeight / 4.25 + (isMobile ? 155 : 140);
-  
-  // Espaciado más moderado - entre el original y el muy ancho
-  const cardSpacing = isMobile ? 60 : 140; // Reducido de 200 a 140 para desktop
-  
-  // Calcular nueva posición basada en cantidad de seleccionadas
-  const offsetX = (this.selectedCards.length - 1) * cardSpacing - cardSpacing;
+    const isMobile = window.innerWidth <= 768;
+    const centerX = window.innerWidth / 1.6;
+    const centerY = window.innerHeight / 4.25 + (isMobile ? 155 : 140);
 
-  target.style.left = `${centerX - (isMobile ? 40 : 165) + offsetX}px`;
-  target.style.top = `${centerY - (isMobile ? 40 : 125)}px`;
-  target.style.transform = `scale(${isMobile ? 1.3 : 1.4}) rotateY(180deg)`;
+    // Espaciado más moderado - entre el original y el muy ancho
+    const cardSpacing = isMobile ? 60 : 140; // Reducido de 200 a 140 para desktop
 
-  this.selectedCards.push({
-    src: target.dataset['src'] || '',
-    name: target.dataset['name'] || '',
-    descriptions: target.dataset['descriptions']?.split('.,') || [],
-  });
+    // Calcular nueva posición basada en cantidad de seleccionadas
+    const offsetX = (this.selectedCards.length - 1) * cardSpacing - cardSpacing;
 
-  setTimeout(() => {
-    target.style.backgroundImage = `url('${target.dataset['src']}')`;
-    target.style.pointerEvents = 'none';
-  }, 850);
+    target.style.left = `${centerX - (isMobile ? 40 : 165) + offsetX}px`;
+    target.style.top = `${centerY - (isMobile ? 40 : 125)}px`;
+    target.style.transform = `scale(${isMobile ? 1.3 : 1.4}) rotateY(180deg)`;
 
-  if (this.selectedCards.length === 3) {
-    this.cardService.setSelectedCards(this.selectedCards);
+    this.selectedCards.push({
+      src: target.dataset['src'] || '',
+      name: target.dataset['name'] || '',
+      descriptions: target.dataset['descriptions']?.split('.,') || [],
+    });
+
     setTimeout(() => {
-      this.promptForPayment();
-    }, 3000);
+      target.style.backgroundImage = `url('${target.dataset['src']}')`;
+      target.style.pointerEvents = 'none';
+    }, 850);
+
+    if (this.selectedCards.length === 3) {
+      this.cardService.setSelectedCards(this.selectedCards);
+      setTimeout(() => {
+        this.showDataModal = true;
+      }, 3000);
+    }
   }
-}
 
   async promptForPayment(): Promise<void> {
     this.showPaymentModal = true;
@@ -273,73 +278,73 @@ selectCard(event: Event): void {
     }
   }
 
-async handlePaymentSubmit(): Promise<void> {
-  if (
-    !this.stripe ||
-    !this.elements ||
-    !this.clientSecret ||
-    !this.paymentElement
-  ) {
-    this.paymentError =
-      'El sistema de pago no está inicializado correctamente.';
-    this.isProcessingPayment = false;
-    return;
-  }
-
-  this.isProcessingPayment = true;
-  this.paymentError = null;
-
-  // Usa confirmParams con return_url para métodos de pago que requieren redirección
-  const { error, paymentIntent } = await this.stripe.confirmPayment({
-    elements: this.elements,
-    confirmParams: {
-      // Asegúrate de usar una URL absoluta y actualiza esta URL según corresponda a tu entorno
-      return_url: window.location.origin + '/descripcion-cartas',
-    },
-    redirect: 'if_required',
-  });
-
-  // Si hay un error durante la confirmación
-  if (error) {
-    this.paymentError =
-      error.message || 'Ocurrió un error inesperado durante el pago.';
-    this.isProcessingPayment = false;
-  } else if (paymentIntent) {
-    // Si obtenemos un paymentIntent, procesamos su estado
-    switch (paymentIntent.status) {
-      case 'succeeded':
-        console.log('¡Pago exitoso!');
-        this.showPaymentModal = false;
-        this.paymentElement?.destroy();
-        this.fadeOutAndNavigate();
-        break;
-      case 'processing':
-        this.paymentError =
-          'El pago se está procesando. Te notificaremos cuando se complete.';
-        // Mantener isProcessingPayment como true o manejar según preferencia de UX
-        break;
-      case 'requires_payment_method':
-        this.paymentError =
-          'Pago fallido. Por favor, intenta con otro método de pago.';
-        this.isProcessingPayment = false;
-        break;
-      case 'requires_action':
-        // Para métodos que requieren acción adicional, el usuario podría ser redirigido
-        this.paymentError =
-          'Se requiere una acción adicional para completar el pago.';
-        this.isProcessingPayment = false;
-        break;
-      default:
-        this.paymentError = `Estado del pago: ${paymentIntent.status}. Inténtalo de nuevo.`;
-        this.isProcessingPayment = false;
-        break;
+  async handlePaymentSubmit(): Promise<void> {
+    if (
+      !this.stripe ||
+      !this.elements ||
+      !this.clientSecret ||
+      !this.paymentElement
+    ) {
+      this.paymentError =
+        'El sistema de pago no está inicializado correctamente.';
+      this.isProcessingPayment = false;
+      return;
     }
-  } else {
-    // Si no hay error ni paymentIntent (caso raro)
-    this.paymentError = 'No se pudo determinar el estado del pago.';
-    this.isProcessingPayment = false;
+
+    this.isProcessingPayment = true;
+    this.paymentError = null;
+
+    // Usa confirmParams con return_url para métodos de pago que requieren redirección
+    const { error, paymentIntent } = await this.stripe.confirmPayment({
+      elements: this.elements,
+      confirmParams: {
+        // Asegúrate de usar una URL absoluta y actualiza esta URL según corresponda a tu entorno
+        return_url: window.location.origin + '/descripcion-cartas',
+      },
+      redirect: 'if_required',
+    });
+
+    // Si hay un error durante la confirmación
+    if (error) {
+      this.paymentError =
+        error.message || 'Ocurrió un error inesperado durante el pago.';
+      this.isProcessingPayment = false;
+    } else if (paymentIntent) {
+      // Si obtenemos un paymentIntent, procesamos su estado
+      switch (paymentIntent.status) {
+        case 'succeeded':
+          console.log('¡Pago exitoso!');
+          this.showPaymentModal = false;
+          this.paymentElement?.destroy();
+          this.fadeOutAndNavigate();
+          break;
+        case 'processing':
+          this.paymentError =
+            'El pago se está procesando. Te notificaremos cuando se complete.';
+          // Mantener isProcessingPayment como true o manejar según preferencia de UX
+          break;
+        case 'requires_payment_method':
+          this.paymentError =
+            'Pago fallido. Por favor, intenta con otro método de pago.';
+          this.isProcessingPayment = false;
+          break;
+        case 'requires_action':
+          // Para métodos que requieren acción adicional, el usuario podría ser redirigido
+          this.paymentError =
+            'Se requiere una acción adicional para completar el pago.';
+          this.isProcessingPayment = false;
+          break;
+        default:
+          this.paymentError = `Estado del pago: ${paymentIntent.status}. Inténtalo de nuevo.`;
+          this.isProcessingPayment = false;
+          break;
+      }
+    } else {
+      // Si no hay error ni paymentIntent (caso raro)
+      this.paymentError = 'No se pudo determinar el estado del pago.';
+      this.isProcessingPayment = false;
+    }
   }
-}
 
   cancelPayment(): void {
     this.showPaymentModal = false;
@@ -397,5 +402,17 @@ async handlePaymentSubmit(): Promise<void> {
         this.router.navigate(['/descripcion-cartas']);
       }, 500);
     }
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

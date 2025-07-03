@@ -106,7 +106,7 @@
       </div>
 
       <!-- Loading indicator -->
-      
+
       <div *ngIf="isLoading" class="loading-message">
         <div class="loading-avatar">
           <span class="avatar-icon">
@@ -192,6 +192,12 @@
       </div>
     </div>
   </div>
+  <app-recolecta-datos
+    *ngIf="showDataModal"
+    (onDataSubmitted)="onUserDataSubmitted($event)"
+    (onModalClosed)="onDataModalClosed()"
+  >
+  </app-recolecta-datos>
 </div>
 
 <!-- Modal de Pago -->

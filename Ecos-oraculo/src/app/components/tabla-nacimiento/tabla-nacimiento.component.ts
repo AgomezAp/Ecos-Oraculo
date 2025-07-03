@@ -27,6 +27,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 interface BirthChartMessage {
   content: string;
   isUser: boolean;
@@ -71,6 +72,7 @@ interface ChartData {
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './tabla-nacimiento.component.html',
   styleUrl: './tabla-nacimiento.component.css',
@@ -104,6 +106,9 @@ export class TablaNacimientoComponent
     title: 'Guardiana de las Configuraciones Celestiales',
     specialty: 'Especialista en cartas natales y astrología transpersonal',
   };
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
 
   // Sistema de pagos
   showPaymentModal: boolean = false;
@@ -243,7 +248,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     // Verificar si necesita pago
     if (!this.hasUserPaid && this.firstQuestionAsked) {
       this.saveStateBeforePayment();
-      this.promptForPayment();
+      this.showDataModal = true;
       return;
     }
 
@@ -622,5 +627,17 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       timestamp: new Date(),
       isUser: false,
     });
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

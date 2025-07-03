@@ -489,4 +489,10 @@
       </div>
     </div>
   </div>
+  <app-recolecta-datos
+    *ngIf="showDataModal"
+    (onDataSubmitted)="onUserDataSubmitted($event)"
+    (onModalClosed)="onDataModalClosed()"
+  >
+  </app-recolecta-datos>
 </div>

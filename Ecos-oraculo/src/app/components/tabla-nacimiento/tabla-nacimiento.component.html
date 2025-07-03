@@ -20,11 +20,16 @@
             alt="Maestra Avatar"
           />
         </div>
-        <div class="astrologer-details">
-          <h3>Maestra Emma</h3>
-          <p class="interpreter-title">
-            Guardiana de las Configuraciones Celestiales
-          </p>
+        <div class="interpreter-details">
+          <!-- Primera línea: nombre + icono + título juntos -->
+          <div class="name-title-row">
+            <h3>Maestra Emma</h3>
+            <span class="separator-icon">»</span>
+            <p class="interpreter-title">
+              Guardiana de las Configuraciones Celestiales
+            </p>
+          </div>
+          <!-- Segunda línea: especialidad debajo EN MAYÚSCULAS -->
           <p class="interpreter-specialty">
             Especialista en cartas natales y astrología transpersonal
           </p>
@@ -167,6 +172,12 @@
       </div>
     </div>
   </div>
+  <app-recolecta-datos
+    *ngIf="showDataModal"
+    (onDataSubmitted)="onUserDataSubmitted($event)"
+    (onModalClosed)="onDataModalClosed()"
+  >
+  </app-recolecta-datos>
 </div>
 
 <!-- ===== MODAL DE PAGO ===== -->

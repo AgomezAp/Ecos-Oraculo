@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,8 +18,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MapaVocacionalService } from '../../services/mapa-vocacional.service';
-import { loadStripe, Stripe, StripeElements, StripePaymentElement } from '@stripe/stripe-js';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  StripePaymentElement,
+} from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 interface VocationalMessage {
   sender: string;
   content: string;
@@ -81,20 +94,25 @@ interface AnalysisResult {
     MatRadioModule,
     MatStepperModule,
     MatProgressBarModule,
-    
+    RecolectaDatosComponent,
   ],
   templateUrl: './mapa-vocacional.component.html',
   styleUrl: './mapa-vocacional.component.css',
 })
-export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class MapaVocacionalComponent
+  implements OnInit, OnDestroy, AfterViewChecked
+{
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
   // Info del consejero
   counselorInfo = {
     name: 'Dra. Valeria',
     title: 'Consejero Vocacional Especialista',
-    specialty: 'Orientación profesional y mapas vocacionales personalizados'
+    specialty: 'Orientación profesional y mapas vocacionales personalizados',
   };
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
 
   // Estado de pestañas
   currentTab: 'chat' | 'assessment' | 'results' = 'chat';
@@ -121,7 +139,8 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
   blockedMessageId: string | null = null;
 
   // AGREGADO - Configuración de Stripe
-  private stripePublishableKey = 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+  private stripePublishableKey =
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = 'http://localhost:3010';
 
   // Datos personales
@@ -148,15 +167,21 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
       console.error('Error loading Stripe.js:', error);
-      this.paymentError = 'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
+      this.paymentError =
+        'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
 
     // AGREGADO - Verificar estado de pago
-    this.hasUserPaidForVocational = sessionStorage.getItem('hasUserPaidForVocational') === 'true';
-    
+    this.hasUserPaidForVocational =
+      sessionStorage.getItem('hasUserPaidForVocational') === 'true';
+
     const savedMessages = sessionStorage.getItem('vocationalMessages');
-    const savedFirstQuestion = sessionStorage.getItem('vocationalFirstQuestionAsked');
-    const savedBlockedMessageId = sessionStorage.getItem('vocationalBlockedMessageId');
+    const savedFirstQuestion = sessionStorage.getItem(
+      'vocationalFirstQuestionAsked'
+    );
+    const savedBlockedMessageId = sessionStorage.getItem(
+      'vocationalBlockedMessageId'
+    );
 
     if (savedMessages) {
       try {
@@ -185,7 +210,10 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
 
   // AGREGADO - Métodos para control de scroll
   ngAfterViewChecked(): void {
-    if (this.shouldAutoScroll && this.chatMessages.length > this.lastMessageCount) {
+    if (
+      this.shouldAutoScroll &&
+      this.chatMessages.length > this.lastMessageCount
+    ) {
       this.scrollToBottom();
       this.lastMessageCount = this.chatMessages.length;
     }
@@ -194,7 +222,9 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
   onScroll(event: any): void {
     const element = event.target;
     const threshold = 50;
-    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+    const isNearBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight <
+      threshold;
     this.shouldAutoScroll = isNearBottom;
   }
 
@@ -215,17 +245,24 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
   private checkPaymentStatus(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentIntent = urlParams.get('payment_intent');
-    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+    const paymentIntentClientSecret = urlParams.get(
+      'payment_intent_client_secret'
+    );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-      this.stripe.retrievePaymentIntent(paymentIntentClientSecret)
+      this.stripe
+        .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
             this.hasUserPaidForVocational = true;
             sessionStorage.setItem('hasUserPaidForVocational', 'true');
             this.blockedMessageId = null;
             sessionStorage.removeItem('vocationalBlockedMessageId');
-            window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname
+            );
           }
         });
     }
@@ -237,7 +274,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       sender: this.counselorInfo.name,
       content: `¡Saludos! Soy ${this.counselorInfo.name}, tu consejero vocacional especialista. Estoy aquí para ayudarte a descubrir tu verdadera vocación y diseñar un mapa profesional personalizado. `,
       timestamp: new Date(),
-      isUser: false
+      isUser: false,
     });
   }
 
@@ -255,7 +292,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
     // MODIFICADO - Verificar si es la segunda pregunta y no ha pagado
     if (!this.hasUserPaidForVocational && this.firstQuestionAsked) {
       this.saveStateBeforePayment();
-      this.promptForPayment();
+      this.showDataModal = true;
       return;
     }
 
@@ -263,71 +300,80 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       sender: 'Tú',
       content: userMessage,
       timestamp: new Date(),
-      isUser: true
+      isUser: true,
     });
 
     this.currentMessage = '';
     this.isLoading = true;
 
     // Preparar historial de conversación
-    const conversationHistory = this.chatMessages.slice(-10).map(msg => ({
-      role: msg.isUser ? 'user' as const : 'counselor' as const,
-      message: msg.content
+    const conversationHistory = this.chatMessages.slice(-10).map((msg) => ({
+      role: msg.isUser ? ('user' as const) : ('counselor' as const),
+      message: msg.content,
     }));
 
     // Enviar al servicio
-    this.vocationalService.sendMessage(
-      userMessage,
-      this.personalInfo,
-      this.assessmentAnswers,
-      conversationHistory
-    ).subscribe({
-      next: (response) => {
-        const messageId = Date.now().toString(); // AGREGADO
+    this.vocationalService
+      .sendMessage(
+        userMessage,
+        this.personalInfo,
+        this.assessmentAnswers,
+        conversationHistory
+      )
+      .subscribe({
+        next: (response) => {
+          const messageId = Date.now().toString(); // AGREGADO
 
-        this.addMessage({
-          sender: this.counselorInfo.name,
-          content: response,
-          timestamp: new Date(),
-          isUser: false,
-          id: messageId // AGREGADO
-        });
+          this.addMessage({
+            sender: this.counselorInfo.name,
+            content: response,
+            timestamp: new Date(),
+            isUser: false,
+            id: messageId, // AGREGADO
+          });
 
-        // AGREGADO - Controlar bloqueo de mensajes
-        if (this.firstQuestionAsked && !this.hasUserPaidForVocational) {
-          this.blockedMessageId = messageId;
-          sessionStorage.setItem('vocationalBlockedMessageId', messageId);
-          setTimeout(() => {
-            this.saveStateBeforePayment();
-            this.promptForPayment();
-          }, 2000);
-        } else if (!this.firstQuestionAsked) {
-          this.firstQuestionAsked = true;
-          sessionStorage.setItem('vocationalFirstQuestionAsked', 'true');
-        }
+          // AGREGADO - Controlar bloqueo de mensajes
+          if (this.firstQuestionAsked && !this.hasUserPaidForVocational) {
+            this.blockedMessageId = messageId;
+            sessionStorage.setItem('vocationalBlockedMessageId', messageId);
+            setTimeout(() => {
+              this.saveStateBeforePayment();
+              this.promptForPayment();
+            }, 2000);
+          } else if (!this.firstQuestionAsked) {
+            this.firstQuestionAsked = true;
+            sessionStorage.setItem('vocationalFirstQuestionAsked', 'true');
+          }
 
-        this.saveMessagesToSession(); // AGREGADO
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error:', error);
-        this.addMessage({
-          sender: this.counselorInfo.name,
-          content: 'Disculpa, estoy teniendo dificultades técnicas. ¿Podrías intentar reformular tu pregunta?',
-          timestamp: new Date(),
-          isUser: false
-        });
-        this.isLoading = false;
-      }
-    });
+          this.saveMessagesToSession(); // AGREGADO
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error:', error);
+          this.addMessage({
+            sender: this.counselorInfo.name,
+            content:
+              'Disculpa, estoy teniendo dificultades técnicas. ¿Podrías intentar reformular tu pregunta?',
+            timestamp: new Date(),
+            isUser: false,
+          });
+          this.isLoading = false;
+        },
+      });
   }
 
   // AGREGADO - Métodos para pagos
   private saveStateBeforePayment(): void {
     this.saveMessagesToSession();
-    sessionStorage.setItem('vocationalFirstQuestionAsked', this.firstQuestionAsked.toString());
+    sessionStorage.setItem(
+      'vocationalFirstQuestionAsked',
+      this.firstQuestionAsked.toString()
+    );
     if (this.blockedMessageId) {
-      sessionStorage.setItem('vocationalBlockedMessageId', this.blockedMessageId);
+      sessionStorage.setItem(
+        'vocationalBlockedMessageId',
+        this.blockedMessageId
+      );
     }
   }
 
@@ -335,16 +381,24 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
     try {
       const messagesToSave = this.chatMessages.map((msg) => ({
         ...msg,
-        timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
+        timestamp:
+          msg.timestamp instanceof Date
+            ? msg.timestamp.toISOString()
+            : msg.timestamp,
       }));
-      sessionStorage.setItem('vocationalMessages', JSON.stringify(messagesToSave));
+      sessionStorage.setItem(
+        'vocationalMessages',
+        JSON.stringify(messagesToSave)
+      );
     } catch (error) {
       console.error('Error guardando mensajes:', error);
     }
   }
 
   isMessageBlocked(message: ChatMessage): boolean {
-    return message.id === this.blockedMessageId && !this.hasUserPaidForVocational;
+    return (
+      message.id === this.blockedMessageId && !this.hasUserPaidForVocational
+    );
   }
 
   async promptForPayment(): Promise<void> {
@@ -363,13 +417,18 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
 
     try {
       const items = [{ id: 'vocational_counseling_unlimited', amount: 500 }];
-      
+
       const response = await this.http
-        .post<{ clientSecret: string }>(`${this.backendUrl}/create-payment-intent`, { items })
+        .post<{ clientSecret: string }>(
+          `${this.backendUrl}/create-payment-intent`,
+          { items }
+        )
         .toPromise();
 
       if (!response || !response.clientSecret) {
-        throw new Error('Error al obtener la información de pago del servidor.');
+        throw new Error(
+          'Error al obtener la información de pago del servidor.'
+        );
       }
       this.clientSecret = response.clientSecret;
 
@@ -382,7 +441,9 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
         this.isProcessingPayment = false;
 
         setTimeout(() => {
-          const paymentElementContainer = document.getElementById('payment-element-container');
+          const paymentElementContainer = document.getElementById(
+            'payment-element-container'
+          );
           if (paymentElementContainer && this.paymentElement) {
             this.paymentElement.mount(paymentElementContainer);
           } else {
@@ -391,14 +452,22 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
         }, 100);
       }
     } catch (error: any) {
-      this.paymentError = error.message || 'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
+      this.paymentError =
+        error.message ||
+        'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
     }
   }
 
   async handlePaymentSubmit(): Promise<void> {
-    if (!this.stripe || !this.elements || !this.clientSecret || !this.paymentElement) {
-      this.paymentError = 'El sistema de pago no está inicializado correctamente.';
+    if (
+      !this.stripe ||
+      !this.elements ||
+      !this.clientSecret ||
+      !this.paymentElement
+    ) {
+      this.paymentError =
+        'El sistema de pago no está inicializado correctamente.';
       return;
     }
 
@@ -414,7 +483,8 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
     });
 
     if (error) {
-      this.paymentError = error.message || 'Ocurrió un error inesperado durante el pago.';
+      this.paymentError =
+        error.message || 'Ocurrió un error inesperado durante el pago.';
       this.isProcessingPayment = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       this.hasUserPaidForVocational = true;
@@ -423,12 +493,13 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       this.paymentElement?.destroy();
       this.blockedMessageId = null;
       sessionStorage.removeItem('vocationalBlockedMessageId');
-      
+
       this.addMessage({
         sender: this.counselorInfo.name,
-        content: '✨ ¡Pago confirmado! Ahora puedes acceder a toda mi experiencia en orientación vocacional. Continuemos explorando tu camino profesional ideal.',
+        content:
+          '✨ ¡Pago confirmado! Ahora puedes acceder a toda mi experiencia en orientación vocacional. Continuemos explorando tu camino profesional ideal.',
         timestamp: new Date(),
-        isUser: false
+        isUser: false,
       });
     }
   }
@@ -500,13 +571,13 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
 
   savePersonalInfo(): void {
     this.showPersonalForm = false;
-    
+
     if (Object.keys(this.personalInfo).length > 0) {
       this.addMessage({
         sender: this.counselorInfo.name,
         content: `Perfecto, he registrado tu información personal. Esto me ayudará a brindarte una orientación más precisa y personalizada. ¿Hay algo específico sobre tu futuro profesional que te preocupe o te emocione?`,
         timestamp: new Date(),
-        isUser: false
+        isUser: false,
       });
     }
   }
@@ -520,7 +591,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       },
       error: (error) => {
         console.error('Error loading questions:', error);
-      }
+      },
     });
   }
 
@@ -538,7 +609,10 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       this.assessmentAnswers[this.currentQuestionIndex] = {
         question: this.currentQuestion.question,
         answer: this.selectedOption,
-        category: this.currentQuestion.options.find((o: any) => o.value === this.selectedOption)?.category || ''
+        category:
+          this.currentQuestion.options.find(
+            (o: any) => o.value === this.selectedOption
+          )?.category || '',
       };
 
       this.currentQuestionIndex++;
@@ -558,7 +632,9 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
 
   updateProgress(): void {
     if (this.assessmentQuestions.length > 0) {
-      this.assessmentProgress = ((this.currentQuestionIndex + 1) / this.assessmentQuestions.length) * 100;
+      this.assessmentProgress =
+        ((this.currentQuestionIndex + 1) / this.assessmentQuestions.length) *
+        100;
     }
   }
 
@@ -568,7 +644,10 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       this.assessmentAnswers[this.currentQuestionIndex] = {
         question: this.currentQuestion.question,
         answer: this.selectedOption,
-        category: this.currentQuestion.options.find((o: any) => o.value === this.selectedOption)?.category || ''
+        category:
+          this.currentQuestion.options.find(
+            (o: any) => o.value === this.selectedOption
+          )?.category || '',
       };
 
       // Analizar resultados
@@ -585,7 +664,7 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
       },
       error: (error) => {
         console.error('Error analyzing assessment:', error);
-      }
+      },
     });
   }
 
@@ -618,5 +697,17 @@ export class MapaVocacionalComponent implements OnInit, OnDestroy, AfterViewChec
     } catch (err) {
       console.error('Error scrolling to bottom:', err);
     }
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

@@ -102,7 +102,7 @@
 
 /* Contenedor principal con z-index alto */
 .oracle-main {
-  font-family: "Cinzel", serif;
+  font-family: "Arsenal", sans-serif !important;
   background-color: #00000026;
 
   border-radius: 25px;
@@ -1120,17 +1120,17 @@
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background: var(--animal-light);
+  background:  #095a59;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: var(--animal-border);
+  background: #3A8394;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 69, 19, 0.5);
+  background: #3A8394;
 }
 
 /* ===== RESPONSIVE ===== */

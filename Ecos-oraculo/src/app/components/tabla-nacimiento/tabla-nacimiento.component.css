@@ -1,4 +1,3 @@
-/* ===== CONFIGURACIÓN DE FUENTES BASE ===== */
 :root {
   --font-astrologer: "Berkshire Swash", cursive;
   --font-user: "El Messiri", sans-serif;
@@ -19,6 +18,26 @@
   --transition: all 0.3s ease;
 }
 
+/* ✅ SOLUCIÓN GLOBAL PARA ELIMINAR SCROLL HORIZONTAL */
+html,
+body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+* {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -56,7 +75,6 @@
   z-index: -2;
   pointer-events: none;
 }
-
 /* Overlay opcional para mejorar legibilidad */
 .video-overlay {
   position: fixed;
@@ -71,36 +89,36 @@
 
 /* Contenedor de fondo con imagen - actualizado para funcionar con video */
 .background-container {
-  /* Eliminar propiedades de fondo estático */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -3; /* Mover atrás del video */
+  z-index: -3;
 }
 
 /* Contenedor principal con z-index actualizado */
 .main-content {
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding: 20px;
-  overflow: hidden;
-  z-index: 1; /* Asegurar que esté sobre el video */
+  overflow-x: hidden;
+  z-index: 1;
+  box-sizing: border-box;
 }
 
 .birth-chart-modal {
   font-family: "Cinzel", serif;
   background-color: #00000026;
-
   border-radius: 25px;
-  max-width: 1200px;
-  width: 95%;
+  max-width: min(1200px, calc(100vw - 40px));
+  width: 75%;
   height: calc(100vh - 40px);
   margin: 0 auto;
   position: relative;
@@ -112,9 +130,9 @@
   flex-direction: column;
   overflow: hidden;
   padding: 15px;
-  z-index: 2; /* Asegurar que esté sobre el video */
+  z-index: 2;
+  box-sizing: border-box;
 }
-
 /* Header con z-index alto y mejor contraste */
 .birth-chart-header {
   display: flex;
@@ -129,6 +147,8 @@
   margin-bottom: 12px;
   z-index: 2;
   min-height: 65px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .astrologer-info {
@@ -136,6 +156,8 @@
   align-items: center;
   gap: 15px;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .astrologer-avatar {
@@ -149,6 +171,7 @@
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow: var(--shadow-soft);
+  flex-shrink: 0;
 }
 
 .astrologer-icon {
@@ -166,12 +189,15 @@
     filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1));
   }
 }
+
 .astrologer-details {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .astrologer-details h3 {
@@ -183,12 +209,14 @@
   line-height: 1.2;
   flex-shrink: 0;
 }
+
 .separator-icon {
   color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   font-weight: bold;
   line-height: 1.2;
   margin: 0 2px;
+  flex-shrink: 0;
 }
 
 .name-title-row {
@@ -196,7 +224,9 @@
   align-items: baseline;
   gap: 8px;
   flex-wrap: nowrap;
+  min-width: 0;
 }
+
 .close-button {
   color: white;
   background: rgba(255, 255, 255, 0.1);
@@ -211,6 +241,7 @@
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
+  flex-shrink: 0;
 }
 
 .close-button:hover {
@@ -219,14 +250,16 @@
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Sección de datos personales con z-index alto */
+/* ✅ SECCIONES CON ANCHO CONTROLADO */
 .personal-data-section {
   background: rgba(139, 92, 246, 0.1);
   border-bottom: 1px solid rgba(139, 92, 246, 0.2);
   padding: 12px 20px;
   flex-shrink: 0;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 3;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .personal-data-section h4 {
@@ -236,22 +269,26 @@
   font-weight: 600;
   text-align: center;
   font-family: var(--font-astrologer);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .data-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .form-row {
   display: flex;
   gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .half-width {
   flex: 1;
+  min-width: 0;
 }
 
 .full-width {
@@ -263,6 +300,7 @@
   gap: 8px;
   margin-top: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .form-actions button {
@@ -285,8 +323,10 @@
   border-bottom: 1px solid rgba(139, 92, 246, 0.1);
   padding: 12px 20px;
   flex-shrink: 0;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 3;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-preview h4 {
@@ -296,7 +336,7 @@
   font-weight: 600;
   text-align: center;
   font-family: var(--font-astrologer);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Mejorar contraste sobre video */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .chart-grid {
@@ -305,8 +345,8 @@
   gap: 10px;
   max-width: 350px;
   margin: 0 auto;
+  width: 100%;
 }
-
 .chart-card {
   background: white;
   border-radius: 10px;
@@ -315,8 +355,8 @@
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-purple);
   transition: var(--transition);
+  min-width: 0;
 }
-
 .chart-card:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-medium);
@@ -329,7 +369,6 @@
   color: var(--primary-purple);
   margin-bottom: 4px;
 }
-
 .chart-card .label {
   display: block;
   font-size: 0.75rem;
@@ -343,6 +382,7 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 15px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -352,25 +392,26 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  z-index: 3; /* Asegurar que esté sobre el video */
+  z-index: 3;
+  width: 100%;
+  box-sizing: border-box;
 }
-
 .chat-messages::-webkit-scrollbar {
   width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-track {
-  background: rgba(139, 92, 246, 0.1);
+  background: #17214c;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: var(--primary-purple);
+  background: #594c85;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary-purple);
+  background: #594c85;
 }
 
 /* Mensajes con estructura exacta de sueños */
@@ -380,6 +421,8 @@
   animation: fadeInUp 0.4s ease-out;
   position: relative;
   margin: 0 8px;
+  max-width: calc(100% - 16px);
+  box-sizing: border-box;
 }
 
 @keyframes fadeInUp {
@@ -394,9 +437,18 @@
 }
 
 .message.user-message {
-  justify-content: flex-start;
-  margin-left: 90%;
+  justify-content: flex-end;
+  margin-left: 20%;
   margin-right: 8px;
+  max-width: calc(80% - 8px);
+}
+
+.message.astrologer-message {
+  flex-direction: row;
+  justify-content: flex-start;
+  margin-left: 8px;
+  margin-right: 20%;
+  max-width: calc(80% - 8px);
 }
 
 .message-avatar {
@@ -410,12 +462,8 @@
   flex-shrink: 0;
   position: relative;
 }
-.message.astrologer-message {
-  flex-direction: row;
-  justify-content: flex-start;
-  margin-left: 8px;
-  margin-right: 20%; /* Dejar espacio a la derecha */
-}
+
+
 .message.astrologer-message .message-avatar {
   background: #594c85;
 }
@@ -425,13 +473,17 @@
   border: 1px solid #594c85;
 }
 
+
 .avatar-icon {
   filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
 }
 
+
 .message-content {
-  max-width: 80%;
+  max-width: calc(100% - 45px);
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sender-name {
@@ -455,13 +507,12 @@
   color: rgb(255, 255, 255);
 }
 
-/* Hora para mensajes del usuario (gris oscuro) */
 .message.user-message .message-time {
   color: rgb(0, 0, 0);
 }
 
 .message-text {
-  padding: 12px 16px 8px 16px; /* Reducir padding inferior */
+  padding: 12px 16px 8px 16px;
   border-radius: 18px;
   color: white;
   font-family: "Arsenal", sans-serif !important;
@@ -471,6 +522,9 @@
   line-height: 1.4 !important;
   letter-spacing: 0.3px;
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .message.astrologer-message .message-text {
@@ -478,7 +532,6 @@
   border: 1px solid #594c85;
   color: white;
 }
-
 .message.astrologer-message .message-text p {
   color: #334155 !important;
   font-family: var(--font-astrologer) !important;
@@ -487,6 +540,7 @@
   line-height: 1.4 !important;
   margin: 0;
   text-shadow: none;
+  word-break: break-word;
 }
 
 .message.user-message .message-text {
@@ -496,6 +550,7 @@
   border: 1px solid var(--border-purple);
 }
 
+
 .message.user-message .message-text p {
   color: white !important;
   font-family: var(--font-user) !important;
@@ -503,6 +558,7 @@
   font-weight: 500 !important;
   line-height: 1.4 !important;
   margin: 0;
+  word-break: break-word;
 }
 
 /* Mensajes bloqueados - estructura exacta de sueños */
@@ -696,6 +752,17 @@
   font-size: 14px !important;
   resize: none;
   outline: none;
+
+  /* Mantener scroll pero ocultar barra */
+  overflow-y: auto;
+  scrollbar-width: none; /* Para Firefox */
+  -ms-overflow-style: none; /* Para Internet Explorer/Edge */
+}
+
+/* Ocultar scrollbar en navegadores webkit manteniendo funcionalidad */
+.message-input::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }
 
 .message-input:disabled {
@@ -1197,191 +1264,6 @@
   }
 }
 
-/* Responsive con estructura exacta de sueños */
-@media (max-width: 768px) {
-  .main-content {
-    padding: 15px;
-  }
-
-  .birth-chart-modal {
-    height: calc(100vh - 30px);
-    border-radius: 20px;
-    max-width: 98%;
-    padding: 12px;
-  }
-
-  .birth-chart-header {
-    padding: 6px 15px;
-    margin-bottom: 10px;
-  }
-
-  .astrologer-info {
-    gap: 10px;
-  }
-
-  .astrologer-avatar {
-    width: 40px;
-    height: 40px;
-  }
-
-  .astrologer-icon {
-    font-size: 18px;
-  }
-
-  .astrologer-details h3 {
-    font-size: 1rem;
-  }
-
-  .astrologer-details p {
-    font-size: 0.8rem;
-  }
-
-  .personal-data-section {
-    padding: 10px 15px;
-  }
-
-  .chart-preview {
-    padding: 10px 15px;
-  }
-
-  .chart-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .chart-card {
-    padding: 8px;
-  }
-
-  .chart-card .sign {
-    font-size: 1rem;
-  }
-
-  .chat-messages {
-    padding: 12px;
-  }
-
-  .message {
-    margin: 0 6px;
-  }
-
-  .message-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-
-  .message-text {
-    padding: 10px 14px;
-    font-size: 0.9rem;
-  }
-
-  .message-payment-overlay {
-    left: 35px;
-  }
-
-  .payment-prompt {
-    padding: 12px;
-    max-width: 180px;
-  }
-
-  .chat-input-area {
-    padding: 12px 15px;
-  }
-
-  .action-buttons {
-    gap: 8px;
-  }
-
-  .send-button,
-  .data-button,
-  .clear-button {
-    width: 35px;
-    height: 35px;
-  }
-
-  .payment-modal {
-    max-width: 95%;
-    margin: 20px;
-  }
-
-  .payment-header,
-  .payment-content {
-    padding: 15px;
-  }
-
-  .price-amount {
-    font-size: 2em;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    padding: 10px;
-  }
-
-  .birth-chart-modal {
-    height: calc(100vh - 20px);
-    padding: 10px;
-  }
-
-  .birth-chart-header {
-    padding: 6px 12px;
-    margin-bottom: 8px;
-  }
-
-  .astrologer-details h3 {
-    font-size: 0.95rem;
-  }
-
-  .personal-data-section {
-    padding: 8px 12px;
-  }
-
-  .chart-preview {
-    padding: 8px 12px;
-  }
-
-  .chart-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .message {
-    margin: 0 4px;
-    gap: 8px;
-  }
-
-  .message-avatar {
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
-  }
-
-  .message-text {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-
-  .payment-prompt {
-    padding: 10px;
-    max-width: 160px;
-  }
-
-  .payment-modal {
-    max-width: 98%;
-    margin: 10px;
-  }
-
-  .payment-header,
-  .payment-content {
-    padding: 12px;
-  }
-
-  .price-amount {
-    font-size: 1.8em;
-  }
-}
-
 /* Focus visible con colores púrpuras */
 .send-button:focus-visible,
 .data-button:focus-visible,
@@ -1393,13 +1275,7 @@
   outline-offset: 2px;
 }
 
-/* Estados especiales */
-.birth-chart-modal.fullscreen {
-  width: 100%;
-  height: 100vh;
-  max-width: none;
-  border-radius: 0;
-}
+
 
 /* Accesibilidad */
 @media (prefers-reduced-motion: reduce) {
@@ -1433,9 +1309,7 @@
   border-radius: 50%;
   object-fit: cover;
 }
-.interpreter-avatar-small {
-  border: 1px solid #8a5cf600;
-}
+
 .mystical-orb-image {
   width: 50px;
   height: 50px;
@@ -1443,21 +1317,48 @@
   object-fit: cover;
   border: 1px solid #17214c;
 }
+.interpreter-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.name-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.interpreter-details h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 100;
+  font-family: "Berkshire Swash", cursive;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.separator-icon {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0 2px;
+}
+
 .interpreter-title {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.95);
   font-family: "Arsenal", sans-serif;
   font-weight: bold;
   letter-spacing: 0.5px;
   line-height: 1.2;
   white-space: nowrap;
-}
-.interpreter-details h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 100;
-  font-family: "Arsenal", sans-serif;
 }
 
 .interpreter-specialty {
@@ -1467,6 +1368,7 @@
   font-family: "Arsenal", sans-serif;
   font-style: italic;
   line-height: 1.2;
+  text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 .user-avatar-image {
@@ -1478,224 +1380,350 @@
 .user-avatar-image {
   border: 2px solid #3b83f600;
 }
-/* ===== MEDIA QUERIES PARA MÓVILES - CONSERVANDO TODA LA INFORMACIÓN ===== */
+/* ===== RESPONSIVE MEJORADO SIN SCROLL HORIZONTAL ===== */
 @media (max-width: 768px) {
-  /* Contenedor principal */
   .main-content {
-    padding: 10px;
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
+    padding: 8px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 
   .birth-chart-modal {
-    height: calc(100vh - 20px);
-    width: 100%;
-    max-width: calc(100vw - 20px);
+    height: calc(100vh - 16px) !important;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
     border-radius: 15px;
-    padding: 8px;
-    margin: 0;
-    box-sizing: border-box;
+    padding: 8px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  /* HEADER - Manteniendo toda la información visible */
   .birth-chart-header {
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    border-radius: 15px;
-    min-height: 60px;
-    gap: 10px;
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 6px 8px !important;
+    margin-bottom: 6px;
+    min-height: 50px;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .astrologer-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
+    gap: 6px;
     min-width: 0;
+    overflow: hidden;
   }
 
-  /* Avatar ajustado pero visible */
   .astrologer-avatar,
   .mystical-orb-image {
-    width: 38px;
-    height: 38px;
+    width: 32px !important;
+    height: 32px !important;
     flex-shrink: 0;
   }
 
   .astrologer-icon {
-    font-size: 17px;
+    font-size: 14px;
   }
 
-  /* Información del astrólogo - asegurar que todo se vea */
   .astrologer-details {
-    flex: 1;
-    gap: 1px;
     min-width: 0;
     overflow: hidden;
   }
 
-  /* Fila del nombre y título - SIN wrap para mantener en una línea */
   .name-title-row {
-    gap: 4px;
+    gap: 3px;
     flex-wrap: nowrap;
-    align-items: baseline;
-    display: flex;
     min-width: 0;
-    width: 100%;
   }
 
-  /* Nombre - reducido pero legible */
   .astrologer-details h3 {
-    font-size: 0.95rem !important;
-    line-height: 1.1;
-    margin: 0;
+    font-size: 0.8rem !important;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
-  /* Separador visible */
   .separator-icon {
-    font-size: 0.8rem !important;
+    font-size: 0.6rem !important;
     margin: 0 1px;
     flex-shrink: 0;
   }
 
-  /* Título - MÁS PEQUEÑO para que quepa "GUARDIANA DE LAS CONFIGURACIONES CELESTIALES" */
   .interpreter-title {
-    font-size: 0.65rem !important; /* Reducido significativamente */
-    line-height: 1.1;
-    margin: 0;
+    font-size: 0.55rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
     flex: 1;
-    font-weight: bold;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
   }
 
-  /* Especialidad - más pequeña pero visible */
   .interpreter-specialty {
-    font-size: 0.6rem !important; /* Muy pequeño pero legible */
-    line-height: 1.1;
-    margin: 0;
-    letter-spacing: 0.1px;
+    font-size: 0.5rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block !important;
     width: 100%;
   }
 
-  /* Botón de cerrar ajustado */
-  .close-button,
-  .close-chat-btn {
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
+  .close-button {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 12px;
     flex-shrink: 0;
-    font-size: 14px;
   }
 
-  .close-icon {
-    width: 9px;
-    height: 9px;
-  }
-
-  /* Sección de datos personales */
   .personal-data-section {
-    padding: 10px 15px;
-    margin-bottom: 8px;
+    padding: 6px 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .personal-data-section h4 {
-    font-size: 0.9em;
-    margin-bottom: 8px;
-  }
-
-  .form-row {
-    gap: 8px;
-  }
-
-  .form-actions {
-    gap: 6px;
-    margin-top: 6px;
-  }
-
-  .form-actions button {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-
-  /* Preview de carta */
   .chart-preview {
-    padding: 10px 15px;
-    margin-bottom: 8px;
-  }
-
-  .chart-preview h4 {
-    font-size: 0.9em;
-    margin-bottom: 8px;
+    padding: 6px 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .chart-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    max-width: 280px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 4px;
+    max-width: 100% !important;
+    width: 100% !important;
   }
 
-  .chart-card {
-    padding: 8px;
-  }
-
-  .chart-card .sign {
-    font-size: 1rem;
-    margin-bottom: 3px;
-  }
-
-  .chart-card .label {
-    font-size: 0.7rem;
-  }
-
-  /* Área de chat */
   .chat-messages {
-    padding: 10px;
-    gap: 10px;
-    margin-bottom: 8px;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 6px !important;
+    gap: 6px;
+    margin-bottom: 6px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
-  /* Mensajes */
   .message {
-    margin: 0 4px;
-    gap: 6px;
-    width: calc(100% - 8px);
-    box-sizing: border-box;
+    margin: 0 2px !important;
+    gap: 4px;
+    max-width: calc(100% - 4px) !important;
+    box-sizing: border-box !important;
   }
 
   .message.user-message {
-    margin-left: 85%;
-    margin-right: 4px;
+    margin-left: 15% !important;
+    margin-right: 2px !important;
+    max-width: calc(85% - 2px) !important;
   }
 
   .message.astrologer-message {
-    margin-left: 4px;
-    margin-right: 15%;
+    margin-left: 2px !important;
+    margin-right: 15% !important;
+    max-width: calc(85% - 2px) !important;
+  }
+
+  .message-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .interpreter-avatar-small,
+  .user-avatar-image {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .message-content {
+    max-width: calc(100% - 32px) !important;
+    min-width: 0;
+  }
+
+  .message-text {
+    padding: 6px 8px 4px 8px !important;
+    border-radius: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100% !important;
+  }
+
+  .message.astrologer-message .message-text p {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    word-break: break-word;
+  }
+
+  .message.user-message .message-text p {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    word-break: break-word;
+  }
+
+  .chat-input-area {
+    padding: 6px 8px !important;
+    border-radius: 12px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .input-container {
+    gap: 4px;
+    width: 100% !important;
+  }
+
+  .text-input-wrapper {
+    flex: 1;
+    min-width: 0 !important;
+  }
+
+  .message-input {
+    padding: 6px 8px !important;
+    border-radius: 14px;
+    font-size: 11px !important;
+    min-height: 12px;
+    max-height: 50px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .send-button,
+  .clear-button {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .action-buttons {
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .payment-modal {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    margin: 8px !important;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 8px;
+  }
+
+  .birth-chart-modal {
+    height: calc(100vh - 16px);
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .birth-chart-header {
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    min-height: 50px;
+  }
+
+  .astrologer-info {
+    gap: 6px;
+  }
+
+  .astrologer-avatar,
+  .mystical-orb-image {
+    width: 32px;
+    height: 32px;
+  }
+
+  .astrologer-icon {
+    font-size: 14px;
+  }
+
+  .astrologer-details h3 {
+    font-size: 0.8rem;
+  }
+
+  .separator-icon {
+    font-size: 0.6rem;
+    margin: 0 1px;
+  }
+
+  .interpreter-title {
+    font-size: 0.55rem;
+  }
+
+  .interpreter-specialty {
+    font-size: 0.5rem;
+  }
+
+  .close-button {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .personal-data-section {
+    padding: 6px 10px;
+  }
+
+  .personal-data-section h4 {
+    font-size: 0.8em;
+    margin-bottom: 4px;
+  }
+
+  .form-row {
+    gap: 4px;
+  }
+
+  .half-width {
+    min-width: calc(50% - 2px);
+  }
+
+  .form-actions button {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+
+  .chart-preview {
+    padding: 6px 10px;
+  }
+
+  .chart-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+
+  .chart-card {
+    padding: 4px;
+  }
+
+  .chart-card .sign {
+    font-size: 0.8rem;
+    margin-bottom: 1px;
+  }
+
+  .chart-card .label {
+    font-size: 0.6rem;
+  }
+
+  .chat-messages {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .message {
+    margin: 0 2px;
+    gap: 4px;
+    max-width: calc(100% - 4px);
+  }
+
+  .message.user-message,
+  .message.astrologer-message {
+    max-width: 85%;
   }
 
   .message-avatar {
     width: 28px;
     height: 28px;
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .interpreter-avatar-small,
@@ -1705,160 +1733,132 @@
   }
 
   .message-content {
-    max-width: 85%;
+    max-width: calc(100% - 32px);
   }
 
   .message-text {
-    padding: 8px 12px 6px 12px;
-    border-radius: 14px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    padding: 6px 10px 4px 10px;
+    border-radius: 10px;
   }
 
   .message.astrologer-message .message-text p {
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-    word-break: break-word;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
   }
 
   .message.user-message .message-text p {
-    font-size: 13px !important;
-    line-height: 1.3 !important;
-    word-break: break-word;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
   }
 
   .message-time {
-    font-size: 0.6rem;
-    margin-top: 4px;
+    font-size: 0.5rem;
+    margin-top: 2px;
   }
 
-  /* Mensajes bloqueados */
   .message-payment-overlay {
     left: 30px;
   }
 
   .payment-prompt {
-    padding: 12px;
-    max-width: 180px;
+    padding: 8px;
+    max-width: 140px;
   }
 
   .lock-icon {
-    font-size: 18px;
-    margin-bottom: 6px;
+    font-size: 14px;
+    margin-bottom: 2px;
   }
 
   .payment-prompt p {
-    font-size: 11px;
+    font-size: 9px;
   }
 
   .payment-prompt p:first-of-type {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .unlock-button {
-    padding: 6px 12px;
-    font-size: 11px;
-    margin-top: 6px;
-  }
-
-  /* Indicador de carga */
-  .loading-message {
-    gap: 6px;
+    padding: 4px 8px;
+    font-size: 9px;
+    margin-top: 2px;
   }
 
   .loading-avatar {
     width: 28px;
     height: 28px;
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .loading-content {
-    padding: 8px 12px;
-  }
-
-  .loading-dots span {
-    width: 4px;
-    height: 4px;
+    padding: 6px 10px;
   }
 
   .loading-text {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 
-  /* Área de entrada */
   .chat-input-area {
-    padding: 8px 12px;
-    border-radius: 16px;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 6px 10px;
+    border-radius: 12px;
   }
 
   .input-container {
-    gap: 8px;
-    width: 100%;
-  }
-
-  .text-input-wrapper {
-    flex: 1;
-    min-width: 0;
+    gap: 4px;
   }
 
   .message-input {
-    padding: 8px 14px;
-    border-radius: 18px;
-    font-size: 13px !important;
-    min-height: 16px;
-    max-height: 70px;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 11px !important;
+    min-height: 12px;
+    max-height: 50px;
   }
 
   .send-button,
   .clear-button {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
   }
 
   .action-buttons {
-    gap: 6px;
-    flex-shrink: 0;
+    gap: 3px;
   }
 
   .input-hint {
-    font-size: 0.7rem;
-    margin-top: 6px;
+    font-size: 0.6rem;
+    margin-top: 3px;
   }
 
-  /* Modal de pago */
   .payment-modal {
-    width: calc(100vw - 20px);
-    max-width: 95%;
-    margin: 10px;
-    border-radius: 18px;
+    width: calc(100vw - 16px);
+    max-width: 98%;
+    margin: 8px;
+    border-radius: 14px;
   }
 
   .payment-header,
   .payment-content {
-    padding: 12px 15px;
+    padding: 10px;
   }
 
   .payment-header h3 {
-    font-size: 1em;
+    font-size: 0.9em;
   }
 
   .close-payment-button {
-    width: 26px;
-    height: 26px;
-    font-size: 14px;
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
   }
 
   .price-amount {
-    font-size: 1.8em;
+    font-size: 1.4em;
   }
 
   .pay-button {
-    padding: 10px 25px;
-    font-size: 0.9em;
+    padding: 8px 16px;
+    font-size: 0.8em;
   }
 }
-

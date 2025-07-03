@@ -1059,12 +1059,12 @@
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background:  #754f9f;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: rgba(147, 112, 219, 0.3);
+  background:  #3B2850;
   border-radius: 3px;
 }
 
@@ -1077,11 +1077,11 @@
 }
 
 .message-input::-webkit-scrollbar-track {
-  background: transparent;
+  background: #754f9f;
 }
 
 .message-input::-webkit-scrollbar-thumb {
-  background: rgba(51, 51, 51, 0.3);
+  background:  #3B2850;
   border-radius: 2px;
 }
 

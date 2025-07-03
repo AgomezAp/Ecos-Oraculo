@@ -1215,12 +1215,12 @@
 }
 
 .chat-messages::-webkit-scrollbar-track {
-  background: rgba(255, 20, 147, 0.1);
+  background: #2a1c36;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(255, 20, 147, 0.3);
+  background: #773a58;
   border-radius: 3px;
 }
 

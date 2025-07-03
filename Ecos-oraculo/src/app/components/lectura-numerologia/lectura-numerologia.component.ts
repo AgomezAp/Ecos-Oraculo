@@ -1,4 +1,13 @@
-import { AfterViewChecked, Component, ElementRef, Inject, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  Optional,
+  ViewChild,
+} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -12,8 +21,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { loadStripe, Stripe, StripeElements, StripePaymentElement } from '@stripe/stripe-js';
+import {
+  loadStripe,
+  Stripe,
+  StripeElements,
+  StripePaymentElement,
+} from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 interface NumerologyMessage {
   sender: string;
   content: string;
@@ -40,11 +55,14 @@ interface ConversationMessage {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './lectura-numerologia.component.html',
   styleUrl: './lectura-numerologia.component.css',
 })
-export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class LecturaNumerologiaComponent
+  implements OnInit, OnDestroy, AfterViewChecked
+{
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   // Variables principales del chat
@@ -58,6 +76,9 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
 
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
 
   // Variables para control de pagos
   showPaymentModal: boolean = false;
@@ -74,7 +95,8 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   blockedMessageId: string | null = null;
 
   // Configuración de Stripe
-  private stripePublishableKey = 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+  private stripePublishableKey =
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = 'http://localhost:3010';
 
   // Datos personales
@@ -99,7 +121,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
     'Salve, buscador de la sabiduría numérica... Los números son el lenguaje del universo y revelan los secretos de tu destino. ¿Qué deseas conocer sobre tu vibración numerológica?',
     'Las energías numéricas me susurran que has venido buscando respuestas... Soy Maestra Sofía, guardiana de los números sagrados. ¿Qué misterio numérico te inquieta?',
     'Bienvenido al templo de los números sagrados. Los patrones matemáticos del cosmos han anunciado tu llegada. Permíteme revelarte los secretos de tu código numerológico.',
-    'Los números danzan ante mí revelando tu presencia... Cada número tiene un significado, cada cálculo revela un destino. ¿Qué números deseas que interprete para ti?'
+    'Los números danzan ante mí revelando tu presencia... Cada número tiene un significado, cada cálculo revela un destino. ¿Qué números deseas que interprete para ti?',
   ];
 
   constructor(
@@ -114,14 +136,20 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
       console.error('Error loading Stripe.js:', error);
-      this.paymentError = 'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
+      this.paymentError =
+        'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
 
-    this.hasUserPaidForNumerology = sessionStorage.getItem('hasUserPaidForNumerology') === 'true';
+    this.hasUserPaidForNumerology =
+      sessionStorage.getItem('hasUserPaidForNumerology') === 'true';
 
     const savedMessages = sessionStorage.getItem('numerologyMessages');
-    const savedFirstQuestion = sessionStorage.getItem('numerologyFirstQuestionAsked');
-    const savedBlockedMessageId = sessionStorage.getItem('numerologyBlockedMessageId');
+    const savedFirstQuestion = sessionStorage.getItem(
+      'numerologyFirstQuestionAsked'
+    );
+    const savedBlockedMessageId = sessionStorage.getItem(
+      'numerologyBlockedMessageId'
+    );
 
     if (savedMessages) {
       try {
@@ -133,7 +161,9 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
         this.hasStartedConversation = true;
-        console.log('✅ Mensajes de numerología restaurados desde sessionStorage');
+        console.log(
+          '✅ Mensajes de numerología restaurados desde sessionStorage'
+        );
       } catch (error) {
         console.error('Error al restaurar mensajes:', error);
         this.clearSessionData();
@@ -160,12 +190,15 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   private checkPaymentStatus(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentIntent = urlParams.get('payment_intent');
-    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+    const paymentIntentClientSecret = urlParams.get(
+      'payment_intent_client_secret'
+    );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
       console.log('🔍 Verificando estado del pago de numerología...');
 
-      this.stripe.retrievePaymentIntent(paymentIntentClientSecret)
+      this.stripe
+        .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent) {
             switch (paymentIntent.status) {
@@ -176,13 +209,21 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
                 this.blockedMessageId = null;
                 sessionStorage.removeItem('numerologyBlockedMessageId');
 
-                window.history.replaceState({}, document.title, window.location.pathname);
+                window.history.replaceState(
+                  {},
+                  document.title,
+                  window.location.pathname
+                );
 
                 const lastMessage = this.messages[this.messages.length - 1];
-                if (!lastMessage || !lastMessage.message.includes('¡Pago confirmado!')) {
+                if (
+                  !lastMessage ||
+                  !lastMessage.message.includes('¡Pago confirmado!')
+                ) {
                   const confirmationMsg: ConversationMessage = {
                     role: 'numerologist',
-                    message: '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados están a tu disposición. ¿Qué otro aspecto numerológico te gustaría explorar?',
+                    message:
+                      '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados están a tu disposición. ¿Qué otro aspecto numerológico te gustaría explorar?',
                     timestamp: new Date(),
                   };
                   this.messages.push(confirmationMsg);
@@ -201,7 +242,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
             }
           }
         })
-        .catch((error:any) => {
+        .catch((error: any) => {
           console.error('Error verificando el pago:', error);
         });
     }
@@ -217,7 +258,9 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   onScroll(event: any): void {
     const element = event.target;
     const threshold = 50;
-    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
+    const isNearBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight <
+      threshold;
     this.shouldAutoScroll = isNearBottom;
   }
 
@@ -241,7 +284,10 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
 
   startConversation(): void {
     if (this.messages.length === 0) {
-      const randomWelcome = this.welcomeMessages[Math.floor(Math.random() * this.welcomeMessages.length)];
+      const randomWelcome =
+        this.welcomeMessages[
+          Math.floor(Math.random() * this.welcomeMessages.length)
+        ];
 
       const welcomeMessage: ConversationMessage = {
         role: 'numerologist',
@@ -262,7 +308,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
     // Verificar si es la SEGUNDA pregunta y si no ha pagado
     if (!this.hasUserPaidForNumerology && this.firstQuestionAsked) {
       this.saveStateBeforePayment();
-      this.promptForPayment();
+      this.showDataModal = true;
       return;
     }
 
@@ -343,9 +389,15 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   private saveStateBeforePayment(): void {
     console.log('💾 Guardando estado de numerología antes del pago...');
     this.saveMessagesToSession();
-    sessionStorage.setItem('numerologyFirstQuestionAsked', this.firstQuestionAsked.toString());
+    sessionStorage.setItem(
+      'numerologyFirstQuestionAsked',
+      this.firstQuestionAsked.toString()
+    );
     if (this.blockedMessageId) {
-      sessionStorage.setItem('numerologyBlockedMessageId', this.blockedMessageId);
+      sessionStorage.setItem(
+        'numerologyBlockedMessageId',
+        this.blockedMessageId
+      );
     }
   }
 
@@ -353,9 +405,15 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
     try {
       const messagesToSave = this.messages.map((msg) => ({
         ...msg,
-        timestamp: msg.timestamp instanceof Date ? msg.timestamp.toISOString() : msg.timestamp,
+        timestamp:
+          msg.timestamp instanceof Date
+            ? msg.timestamp.toISOString()
+            : msg.timestamp,
       }));
-      sessionStorage.setItem('numerologyMessages', JSON.stringify(messagesToSave));
+      sessionStorage.setItem(
+        'numerologyMessages',
+        JSON.stringify(messagesToSave)
+      );
     } catch (error) {
       console.error('Error guardando mensajes:', error);
     }
@@ -369,7 +427,9 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
   }
 
   isMessageBlocked(message: ConversationMessage): boolean {
-    return message.id === this.blockedMessageId && !this.hasUserPaidForNumerology;
+    return (
+      message.id === this.blockedMessageId && !this.hasUserPaidForNumerology
+    );
   }
 
   async promptForPayment(): Promise<void> {
@@ -393,13 +453,18 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
       console.log('📤 Enviando request de payment intent para numerología...');
 
       const response = await this.http
-        .post<{ clientSecret: string }>(`${this.backendUrl}/create-payment-intent`, { items })
+        .post<{ clientSecret: string }>(
+          `${this.backendUrl}/create-payment-intent`,
+          { items }
+        )
         .toPromise();
 
       console.log('📥 Respuesta de payment intent:', response);
 
       if (!response || !response.clientSecret) {
-        throw new Error('Error al obtener la información de pago del servidor.');
+        throw new Error(
+          'Error al obtener la información de pago del servidor.'
+        );
       }
       this.clientSecret = response.clientSecret;
 
@@ -413,7 +478,9 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
         this.isProcessingPayment = false;
 
         setTimeout(() => {
-          const paymentElementContainer = document.getElementById('payment-element-container');
+          const paymentElementContainer = document.getElementById(
+            'payment-element-container'
+          );
           console.log('🎯 Contenedor encontrado:', paymentElementContainer);
 
           if (paymentElementContainer && this.paymentElement) {
@@ -425,18 +492,28 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
           }
         }, 100);
       } else {
-        throw new Error('Stripe.js o la clave secreta del cliente no están disponibles.');
+        throw new Error(
+          'Stripe.js o la clave secreta del cliente no están disponibles.'
+        );
       }
     } catch (error: any) {
       console.error('❌ Error al preparar el pago:', error);
-      this.paymentError = error.message || 'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
+      this.paymentError =
+        error.message ||
+        'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
     }
   }
 
   async handlePaymentSubmit(): Promise<void> {
-    if (!this.stripe || !this.elements || !this.clientSecret || !this.paymentElement) {
-      this.paymentError = 'El sistema de pago no está inicializado correctamente.';
+    if (
+      !this.stripe ||
+      !this.elements ||
+      !this.clientSecret ||
+      !this.paymentElement
+    ) {
+      this.paymentError =
+        'El sistema de pago no está inicializado correctamente.';
       this.isProcessingPayment = false;
       return;
     }
@@ -453,7 +530,8 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
     });
 
     if (error) {
-      this.paymentError = error.message || 'Ocurrió un error inesperado durante el pago.';
+      this.paymentError =
+        error.message || 'Ocurrió un error inesperado durante el pago.';
       this.isProcessingPayment = false;
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
@@ -469,7 +547,8 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
 
           const confirmationMsg: ConversationMessage = {
             role: 'numerologist',
-            message: '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados revelarán todos sus secretos. ¿Qué otro aspecto numerológico te gustaría explorar?',
+            message:
+              '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados revelarán todos sus secretos. ¿Qué otro aspecto numerológico te gustaría explorar?',
             timestamp: new Date(),
           };
           this.messages.push(confirmationMsg);
@@ -478,14 +557,17 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
           this.saveMessagesToSession();
           break;
         case 'processing':
-          this.paymentError = 'El pago se está procesando. Te notificaremos cuando se complete.';
+          this.paymentError =
+            'El pago se está procesando. Te notificaremos cuando se complete.';
           break;
         case 'requires_payment_method':
-          this.paymentError = 'Pago fallido. Por favor, intenta con otro método de pago.';
+          this.paymentError =
+            'Pago fallido. Por favor, intenta con otro método de pago.';
           this.isProcessingPayment = false;
           break;
         case 'requires_action':
-          this.paymentError = 'Se requiere una acción adicional para completar el pago.';
+          this.paymentError =
+            'Se requiere una acción adicional para completar el pago.';
           this.isProcessingPayment = false;
           break;
         default:
@@ -519,11 +601,14 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
 
   savePersonalData(): void {
     if (this.fullName) {
-      this.personalNumbers.destiny = this.numerologyService.calculateDestinyNumber(this.fullName);
+      this.personalNumbers.destiny =
+        this.numerologyService.calculateDestinyNumber(this.fullName);
     }
 
     if (this.birthDate) {
-      this.personalNumbers.lifePath = this.numerologyService.calculateLifePath(this.birthDate);
+      this.personalNumbers.lifePath = this.numerologyService.calculateLifePath(
+        this.birthDate
+      );
     }
 
     this.showDataForm = false;
@@ -532,14 +617,23 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
       let numbersMessage = 'He calculado tus números sagrados:\n\n';
 
       if (this.personalNumbers.lifePath) {
-        numbersMessage += `🔹 Camino de Vida: ${this.personalNumbers.lifePath} - ${this.numerologyService.getNumberMeaning(this.personalNumbers.lifePath)}\n\n`;
+        numbersMessage += `🔹 Camino de Vida: ${
+          this.personalNumbers.lifePath
+        } - ${this.numerologyService.getNumberMeaning(
+          this.personalNumbers.lifePath
+        )}\n\n`;
       }
 
       if (this.personalNumbers.destiny) {
-        numbersMessage += `🔹 Número del Destino: ${this.personalNumbers.destiny} - ${this.numerologyService.getNumberMeaning(this.personalNumbers.destiny)}\n\n`;
+        numbersMessage += `🔹 Número del Destino: ${
+          this.personalNumbers.destiny
+        } - ${this.numerologyService.getNumberMeaning(
+          this.personalNumbers.destiny
+        )}\n\n`;
       }
 
-      numbersMessage += '¿Te gustaría que profundice en la interpretación de alguno de estos números?';
+      numbersMessage +=
+        '¿Te gustaría que profundice en la interpretación de alguno de estos números?';
 
       const numbersMsg: ConversationMessage = {
         role: 'numerologist',
@@ -570,7 +664,7 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
       this.firstQuestionAsked = false;
       this.blockedMessageId = null;
     }
-    
+
     this.messages = [];
     this.hasStartedConversation = false;
     setTimeout(() => {
@@ -637,5 +731,17 @@ export class LecturaNumerologiaComponent implements OnInit, OnDestroy, AfterView
     if (this.dialogRef) {
       this.dialogRef.close();
     }
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

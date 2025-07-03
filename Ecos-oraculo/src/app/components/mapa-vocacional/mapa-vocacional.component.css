@@ -1474,21 +1474,21 @@
 .chat-messages::-webkit-scrollbar-track,
 .assessment-section::-webkit-scrollbar-track,
 .results-section::-webkit-scrollbar-track {
-  background: rgba(96, 165, 250, 0.1);
+  background:  #58344E;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb,
 .assessment-section::-webkit-scrollbar-thumb,
 .results-section::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.3);
+  background: #926671;
   border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover,
 .assessment-section::-webkit-scrollbar-thumb:hover,
 .results-section::-webkit-scrollbar-thumb:hover {
-  background: rgba(96, 165, 250, 0.5);
+  background: #926671;
 }
 
 /* Responsive con estructura exacta de sueños */

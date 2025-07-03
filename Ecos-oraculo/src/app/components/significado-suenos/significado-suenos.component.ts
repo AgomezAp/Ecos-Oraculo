@@ -25,6 +25,7 @@ import {
   StripePaymentElement,
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 @Component({
   selector: 'app-significado-suenos',
   imports: [
@@ -35,6 +36,7 @@ import { HttpClient } from '@angular/common/http';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './significado-suenos.component.html',
   styleUrl: './significado-suenos.component.css',
@@ -54,6 +56,10 @@ export class SignificadoSuenosComponent
 
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
+
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
 
   // Variables para control de pagos
   showPaymentModal: boolean = false;
@@ -260,7 +266,7 @@ export class SignificadoSuenosComponent
       // Verificar si es la SEGUNDA pregunta y si no ha pagado
       if (!this.hasUserPaidForDreams && this.firstQuestionAsked) {
         this.saveStateBeforePayment();
-        this.promptForPayment();
+        this.showDataModal = true;
         return;
       }
 
@@ -652,5 +658,18 @@ export class SignificadoSuenosComponent
       console.error('Error formateando timestamp:', error);
       return 'N/A';
     }
+  }
+
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

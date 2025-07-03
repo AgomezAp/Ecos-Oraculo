@@ -37,6 +37,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 
 @Component({
   selector: 'app-calculadora-amor',
@@ -51,6 +52,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatDatepickerModule,
     MatProgressSpinnerModule,
     MatNativeDateModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './calculadora-amor.component.html',
   styleUrl: './calculadora-amor.component.css',
@@ -71,6 +73,9 @@ export class CalculadoraAmorComponent
   isTyping: boolean = false;
   hasStartedConversation: boolean = false;
   showDataForm: boolean = false;
+
+  showDataModal: boolean = false;
+  userData: any = null;
 
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
@@ -412,7 +417,7 @@ export class CalculadoraAmorComponent
     // Verificar si es la SEGUNDA pregunta y si no ha pagado
     if (!this.hasUserPaidForLove && this.firstQuestionAsked) {
       this.saveStateBeforePayment();
-      this.promptForPayment();
+      this.showDataModal = true;
       return;
     }
 
@@ -992,5 +997,18 @@ export class CalculadoraAmorComponent
 
   closeModal(): void {
     console.log('Cerrando modal de calculadora de amor');
+  }
+
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.showDataModal = false;
+
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 300);
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }
