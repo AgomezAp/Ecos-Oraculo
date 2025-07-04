@@ -461,7 +461,14 @@ h2 {
     margin-top: 15px;
     margin-bottom: 20px;
   }
-
+  .back-home-btn {
+    position: absolute;
+    top: -6px;
+    left: 6px;
+    z-index: 100;
+    padding: 15px 30px;
+    width: 186px;
+  }
   .modal-actions {
     flex-direction: column;
     gap: 15px;
