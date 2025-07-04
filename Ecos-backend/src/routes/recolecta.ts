@@ -4,6 +4,6 @@ const router = Router();
 
 // Ruta para obtener información del guía espiritual
 router.post("/api/recolecta", recolectarDatos);
-router.get("/api/enviar", getAllDatos);
+router.get("/api/obtener", getAllDatos);
 
 export default router;
