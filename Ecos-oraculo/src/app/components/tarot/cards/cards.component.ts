@@ -415,4 +415,8 @@ export class CardsComponent implements OnInit, OnDestroy {
   onDataModalClosed(): void {
     this.showDataModal = false;
   }
+  volverAlInicio() {
+    // Si usas Angular Router:
+    this.router.navigate(['/']);
+  }
 }

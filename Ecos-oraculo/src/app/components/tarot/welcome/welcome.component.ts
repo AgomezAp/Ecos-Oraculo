@@ -16,7 +16,7 @@ import { ParticlesComponent } from '../../../shared/particles/particles.componen
   imports: [],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.css',
-   animations: [
+  animations: [
     trigger('fadeIn', [
       state('void', style({ opacity: 0 })),
       transition(':enter', [animate('1s ease-in', style({ opacity: 1 }))]),
@@ -24,10 +24,10 @@ import { ParticlesComponent } from '../../../shared/particles/particles.componen
   ],
 })
 export class WelcomeComponent {
-cardData = cardData;
+  cardData = cardData;
   constructor(private router: Router, private cardService: CardService) {}
-   /* Empieza las cartas teniendo en cuenta el tema seleccionado
-    * @param {string} theme - El tema seleccionado
+  /* Empieza las cartas teniendo en cuenta el tema seleccionado
+   * @param {string} theme - El tema seleccionado
    */
   startTarot(theme: string): void {
     localStorage.setItem('tema', theme);
@@ -37,15 +37,19 @@ cardData = cardData;
       .filter((card: any) => card.descriptions[theme]?.length > 0)
       .map((card: any) => ({
         ...card,
-        descriptions: card.descriptions[theme]
+        descriptions: card.descriptions[theme],
       }));
-  
+
     if (selectedCardData.length === 0) {
       console.error('No se encontraron cartas para el tema:', theme);
       return;
     }
-  
+
     this.cardService.setSelectedCards(selectedCardData);
-    this.router.navigate(['/cartas',theme]);
+    this.router.navigate(['/cartas', theme]);
+  }
+  volverAlInicio() {
+    // Si usas Angular Router:
+    this.router.navigate(['/']);
   }
 }

@@ -25,7 +25,33 @@ body {
   overflow-y: auto;
   z-index: 1;
 }
-
+.back-home-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 100;
+  padding: 15px 30px;
+  font-size: 12px;
+  color: white;
+  background: #7d6ac3;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 10px 0;
+  width: 200px;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.back-home-btn:hover {
+  background: #29176d;
+  transform: translateY(-3px);
+}
 /* Video de fondo */
 .background-video {
   position: absolute;
