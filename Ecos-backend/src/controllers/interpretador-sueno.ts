@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from '@google/genai';
+
 import {
   ApiError,
   ChatRequest,
   ChatResponse,
   SaintData,
 } from "../interfaces/helpers";
+
 interface DreamInterpreterData {
   name: string;
   specialty: string;
@@ -16,14 +18,13 @@ interface DreamChatRequest {
   interpreterData: DreamInterpreterData;
   userMessage: string;
   conversationHistory?: Array<{
-    role: 'user' | 'interpreter';
+    role: "user" | "interpreter";
     message: string;
   }>;
 }
 
-
 export class ChatController {
-  private genAI: GoogleGenerativeAI;
+  private genAI: GoogleGenAI;
 
   constructor() {
     if (!process.env.GEMINI_API_KEY) {
@@ -31,49 +32,54 @@ export class ChatController {
         "GEMINI_API_KEY no está configurada en las variables de entorno"
       );
     }
-    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    // Inicializar con la nueva biblioteca
+    this.genAI = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      // Si quieres usar Vertex AI, descomenta estas líneas:
+      // vertexai: true,
+      // project: 'tu-project-id',
+      // location: 'global'
+    });
   }
 
-  public chatWithDreamInterpreter = async (req: Request, res: Response): Promise<void> => {
+  public chatWithDreamInterpreter = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const { interpreterData, userMessage, conversationHistory }: DreamChatRequest = req.body;
+      const {
+        interpreterData,
+        userMessage,
+        conversationHistory,
+      }: DreamChatRequest = req.body;
 
       // Validar entrada
       this.validateDreamChatRequest(interpreterData, userMessage);
 
-      // Obtener el modelo Gemini
-      const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        generationConfig: {
-          temperature: 0.9, // Más creatividad para interpretaciones místicas
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 300,
-        },
-      });
-
       // Crear el prompt contextualizado
-      const contextPrompt = this.createDreamInterpreterContext(interpreterData, conversationHistory);
+      const contextPrompt = this.createDreamInterpreterContext(
+        interpreterData,
+        conversationHistory
+      );
       const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del intérprete (completa tu respuesta):`;
 
       console.log(`Generando interpretación de sueños...`);
 
-      // Generar contenido con Gemini
-      const result = await model.generateContent(fullPrompt);
-      const response = result.response;
-      let text = response.text();
+      // Generar contenido con reintentos
+      const response = await this.generateContentWithRetry(fullPrompt);
 
-      if (!text || text.trim() === "") {
+      if (!response || response.trim() === "") {
         throw new Error("Respuesta vacía de Gemini");
       }
 
       // Verificar si la respuesta parece estar cortada
-      text = this.ensureCompleteResponse(text);
+      const finalResponse = this.ensureCompleteResponse(response);
 
       // Respuesta exitosa
       const chatResponse: ChatResponse = {
         success: true,
-        response: text.trim(),
+        response: finalResponse.trim(),
         timestamp: new Date().toISOString(),
       };
 
@@ -84,11 +90,89 @@ export class ChatController {
     }
   };
 
+  // Método para generar contenido con reintentos
+  private async generateContentWithRetry(prompt: string, maxRetries: number = 3): Promise<string> {
+    const model = 'gemini-1.5-flash';
+
+    const generationConfig = {
+      maxOutputTokens: 300,
+      temperature: 1,
+      topP: 1,
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        }
+      ],
+    };
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const req = {
+          model: model,
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: prompt }]
+            }
+          ],
+          config: generationConfig,
+        };
+
+        const response = await this.genAI.models.generateContent(req);
+        
+        // Extraer el texto de la respuesta
+        if (response.candidates && response.candidates.length > 0) {
+          const candidate = response.candidates[0];
+          if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+            return candidate.content.parts[0].text || '';
+          }
+        }
+        
+        throw new Error('No se pudo extraer el texto de la respuesta');
+        
+      } catch (error: any) {
+        console.log(`Intento ${attempt} fallido:`, error.message);
+        
+        // Si es error 503 (overloaded) y no es el último intento, esperar y reintentar
+        if (error.status === 503 && attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // Delay exponencial: 2s, 4s, 8s
+          console.log(`Esperando ${delay}ms antes del siguiente intento...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        // Si es el último intento o no es un error 503, lanzar el error
+        throw error;
+      }
+    }
+    
+    throw new Error('Se agotaron todos los intentos de generación');
+  }
+
   // Método para crear el contexto del intérprete de sueños
-  private createDreamInterpreterContext(interpreter: DreamInterpreterData, history?: Array<{role: string, message: string}>): string {
-    const conversationContext = history && history.length > 0 
-      ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-      : '';
+  private createDreamInterpreterContext(
+    interpreter: DreamInterpreterData,
+    history?: Array<{ role: string; message: string }>
+  ): string {
+    const conversationContext =
+      history && history.length > 0
+        ? `\n\nCONVERSACIÓN PREVIA:\n${history
+            .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+            .join("\n")}\n`
+        : "";
 
     return `Eres Maestra Oneiros, una bruja mística y vidente ancestral especializada en la interpretación de sueños. Tienes siglos de experiencia desentrañando los misterios del mundo onírico y conectando los sueños con la realidad espiritual.
 
@@ -149,23 +233,26 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
   // Método para asegurar que la respuesta esté completa
   private ensureCompleteResponse(text: string): string {
     const lastChar = text.trim().slice(-1);
-    const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-    
-    if (endsIncomplete && !text.trim().endsWith('...')) {
+    const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+
+    if (endsIncomplete && !text.trim().endsWith("...")) {
       const sentences = text.split(/[.!?]/);
       if (sentences.length > 1) {
         const completeSentences = sentences.slice(0, -1);
-        return completeSentences.join('.') + '.';
+        return completeSentences.join(".") + ".";
       } else {
-        return text.trim() + '...';
+        return text.trim() + "...";
       }
     }
-    
+
     return text;
   }
 
   // Validación de la solicitud para intérprete de sueños
-  private validateDreamChatRequest(interpreterData: DreamInterpreterData, userMessage: string): void {
+  private validateDreamChatRequest(
+    interpreterData: DreamInterpreterData,
+    userMessage: string
+  ): void {
     if (!interpreterData) {
       const error: ApiError = new Error("Datos del intérprete requeridos");
       error.statusCode = 400;
@@ -173,7 +260,11 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
       throw error;
     }
 
-    if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+    if (
+      !userMessage ||
+      typeof userMessage !== "string" ||
+      userMessage.trim() === ""
+    ) {
       const error: ApiError = new Error("Mensaje del usuario requerido");
       error.statusCode = 400;
       error.code = "MISSING_USER_MESSAGE";
@@ -189,7 +280,8 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
       throw error;
     }
   }
-    private handleError(error: any, res: Response): void {
+
+  private handleError(error: any, res: Response): void {
     console.error("Error en ChatController:", error);
 
     let statusCode = 500;
@@ -200,6 +292,10 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
       statusCode = error.statusCode;
       errorMessage = error.message;
       errorCode = error.code || "VALIDATION_ERROR";
+    } else if (error.status === 503) {
+      statusCode = 503;
+      errorMessage = "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+      errorCode = "SERVICE_OVERLOADED";
     } else if (
       error.message?.includes("quota") ||
       error.message?.includes("limit")
@@ -227,7 +323,11 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
 
     res.status(statusCode).json(errorResponse);
   }
-public getDreamInterpreterInfo = async (req: Request, res: Response): Promise<void> => {
+
+  public getDreamInterpreterInfo = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       res.json({
         success: true,
@@ -235,7 +335,18 @@ public getDreamInterpreterInfo = async (req: Request, res: Response): Promise<vo
           name: "Maestra Alma",
           title: "Guardián de los Sueños",
           specialty: "Interpretación de sueños y simbolismo onírico",
-          description: "Vidente ancestral especializado en desentrañar los misterios del mundo onírico"
+          description:
+            "Vidente ancestral especializado en desentrañar los misterios del mundo onírico",
+          experience:
+            "Siglos de experiencia interpretando los mensajes del subconsciente y el plano astral",
+          abilities: [
+            "Interpretación de símbolos oníricos",
+            "Conexión con el plano astral",
+            "Análisis de mensajes del subconsciente",
+            "Guía espiritual través de los sueños",
+          ],
+          approach:
+            "Combina sabiduría ancestral con intuición práctica para revelar los secretos ocultos en tus sueños",
         },
         timestamp: new Date().toISOString(),
       });

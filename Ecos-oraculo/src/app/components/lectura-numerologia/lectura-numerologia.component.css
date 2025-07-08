@@ -492,13 +492,11 @@
 
 .user-message p {
   color: #333;
-  font-family: "El Messiri", sans-serif !important;
-  font-size: 15px !important;
-  font-weight: 500 !important;
-  line-height: 1.4 !important;
-  margin: 0 0 10px 0;
-  word-wrap: break-word;
-  letter-spacing: 0.2px;
+  font-family: Arsenal, sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0;
 }
 
 .user-message .message-time {
@@ -906,7 +904,7 @@
 }
 
 .payment-content::-webkit-scrollbar-track {
-  background: #274A4A;
+  background: #274a4a;
   border-radius: 3px;
 }
 
@@ -1040,12 +1038,12 @@
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background:  #274A4A;
+  background: #274a4a;
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background:  #638382;
+  background: #638382;
   border-radius: 3px;
 }
 

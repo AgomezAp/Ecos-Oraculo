@@ -25,7 +25,8 @@ import {
 } from '@stripe/stripe-js';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
-
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 interface ZodiacMessage {
   content: string;
   isUser: boolean;
@@ -33,13 +34,39 @@ interface ZodiacMessage {
   sender: string;
 }
 
+// ✅ Definir AstrologerData según tu servicio
 interface AstrologerData {
   name: string;
   title: string;
   specialty: string;
   experience: string;
 }
+interface ZodiacRequest {
+  zodiacData: AstrologerData;
+  userMessage: string;
+  conversationHistory?: Array<{
+    role: 'user' | 'astrologer';
+    message: string;
+  }>;
+}
 
+interface ZodiacResponse {
+  success: boolean;
+  response?: string;
+  error?: string;
+  timestamp: string;
+}
+
+interface AstrologerInfo {
+  success: boolean;
+  astrologer: {
+    name: string;
+    title: string;
+    specialty: string;
+    description: string;
+  };
+  timestamp: string;
+}
 @Component({
   selector: 'app-informacion-zodiaco',
   imports: [
@@ -72,7 +99,7 @@ export class InformacionZodiacoComponent
 
   showDataModal: boolean = false;
   userData: any = null;
-  
+
   // Variables para control de pagos
   showPaymentModal: boolean = false;
   stripe: Stripe | null = null;
@@ -299,43 +326,94 @@ export class InformacionZodiacoComponent
       this.currentMessage = '';
       this.isLoading = true;
 
-      // Simular respuesta del servicio de astrología
-      // AQUÍ DEBES INTEGRAR TU SERVICIO DE ASTROLOGÍA
-      setTimeout(() => {
-        this.isLoading = false;
+      // Usar el servicio real de astrología
+      this.generateAstrologyResponse(userMessage).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
 
-        const messageId = Date.now().toString();
-        const astrologerMsg = {
-          isUser: false,
-          content: this.generateAstrologyResponse(userMessage),
-          timestamp: new Date(),
-          id: messageId,
-        };
-        this.messages.push(astrologerMsg);
+          const messageId = Date.now().toString();
+          const astrologerMsg = {
+            isUser: false,
+            content: response,
+            timestamp: new Date(),
+            id: messageId,
+          };
+          this.messages.push(astrologerMsg);
 
-        this.shouldAutoScroll = true;
+          this.shouldAutoScroll = true;
 
-        if (this.firstQuestionAsked && !this.hasUserPaidForAstrology) {
-          this.blockedMessageId = messageId;
-          sessionStorage.setItem('blockedAstrologyMessageId', messageId);
+          if (this.firstQuestionAsked && !this.hasUserPaidForAstrology) {
+            this.blockedMessageId = messageId;
+            sessionStorage.setItem('blockedAstrologyMessageId', messageId);
 
-          setTimeout(() => {
-            this.saveStateBeforePayment();
-            this.promptForPayment();
-          }, 2000);
-        } else if (!this.firstQuestionAsked) {
-          this.firstQuestionAsked = true;
-          sessionStorage.setItem('firstAstrologyQuestionAsked', 'true');
-        }
+            setTimeout(() => {
+              this.saveStateBeforePayment();
+              this.promptForPayment();
+            }, 2000);
+          } else if (!this.firstQuestionAsked) {
+            this.firstQuestionAsked = true;
+            sessionStorage.setItem('firstAstrologyQuestionAsked', 'true');
+          }
 
-        this.saveMessagesToSession();
-      }, 2000);
+          this.saveMessagesToSession();
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          console.error('Error al obtener respuesta astrológica:', error);
+
+          const errorMsg = {
+            isUser: false,
+            content:
+              '🌟 Disculpa, las energías cósmicas están temporalmente perturbadas. Por favor, intenta nuevamente en unos momentos.',
+            timestamp: new Date(),
+          };
+          this.messages.push(errorMsg);
+          this.saveMessagesToSession();
+        },
+      });
     }
   }
+  private generateAstrologyResponse(userMessage: string): Observable<string> {
+    // Crear el historial de conversación para el contexto
+    const conversationHistory = this.messages
+      .filter((msg) => msg.content && msg.content.trim() !== '')
+      .map((msg) => ({
+        role: msg.isUser ? ('user' as const) : ('astrologer' as const),
+        message: msg.content,
+      }));
 
-  private generateAstrologyResponse(userMessage: string): string {
-    // Respuesta temporal - REEMPLAZA ESTO CON TU SERVICIO REAL
-    return `🌟 Las estrellas revelan información fascinante sobre tu consulta: "${userMessage}". Los planetas se alinean para mostrar que hay energías cósmicas especiales rodeando esta situación. Tu signo zodiacal influye profundamente en este aspecto de tu vida...`;
+    // Datos del astrólogo
+    const astrologerData: AstrologerData = {
+      name: this.astrologerInfo.name,
+      title: this.astrologerInfo.title,
+      specialty: this.astrologerInfo.specialty,
+      experience:
+        'Siglos de experiencia interpretando los designios celestiales y la influencia de los astros',
+    };
+
+    // ✅ Crear la solicitud con 'zodiacData' en lugar de 'astrologerData'
+    const request: ZodiacRequest = {
+      zodiacData: astrologerData, // ✅ Cambiar aquí
+      userMessage,
+      conversationHistory,
+    };
+
+    // Llamar al servicio y transformar la respuesta
+    return this.zodiacoService.chatWithAstrologer(request).pipe(
+      map((response: ZodiacResponse) => {
+        if (response.success && response.response) {
+          return response.response;
+        } else {
+          throw new Error(response.error || 'Error desconocido del servicio');
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Error en el servicio de astrología:', error);
+        return of(
+          '🌟 Las estrellas están temporalmente nubladas. Los astros me susurran que debo recargar mis energías cósmicas. Por favor, intenta nuevamente en unos momentos.'
+        );
+      })
+    );
   }
 
   private saveStateBeforePayment(): void {
