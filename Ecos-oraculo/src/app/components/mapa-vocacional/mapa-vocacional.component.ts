@@ -141,7 +141,7 @@ export class MapaVocacionalComponent
   // AGREGADO - Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com/';
+  private backendUrl = 'https://api.ecosdeloraculo.com';
 
   // Datos personales
   showPersonalForm: boolean = false;
