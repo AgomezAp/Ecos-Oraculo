@@ -31,7 +31,8 @@ export class RecolectaDatosComponent {
     importe: 5.0,
     email: '',
   };
-
+  aceptaTerminos = false;
+  showTerminosError = false;
   // ✅ Control de formulario
   dataFormErrors: { [key: string]: string } = {};
   isValidatingData: boolean = false;
@@ -193,7 +194,11 @@ export class RecolectaDatosComponent {
         email: this.userData.email,
       };
 
-      console.log('Enviando datos al servidor:', datosToSend);
+      this.showTerminosError = false;
+      if (!this.aceptaTerminos) {
+        this.showTerminosError = true;
+        return;
+      }
 
       // ✅ Llamar al servicio createProduct
       this.recolecta.createProduct(datosToSend).subscribe({

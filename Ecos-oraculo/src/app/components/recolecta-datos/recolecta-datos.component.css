@@ -304,7 +304,7 @@
 @media (max-width: 768px) {
   .data-modal {
     max-width: 95%;
-    max-height: 95vh;
+    max-height: 92vh;
   }
 
   .data-header {
@@ -342,7 +342,7 @@
 @media (max-width: 480px) {
   .data-modal {
     max-width: 100%;
-    max-height: 100vh;
+    max-height: 95vh;
     border-radius: 0;
   }
 

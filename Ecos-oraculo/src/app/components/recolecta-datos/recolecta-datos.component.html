@@ -2,9 +2,7 @@
   <div class="data-modal">
     <div class="data-header">
       <h3>📝 Completa tus datos para continuar</h3>
-      <button (click)="cancelDataModal()" class="close-data-button">
-        ✕
-      </button>
+      <button (click)="cancelDataModal()" class="close-data-button">✕</button>
     </div>
 
     <div class="data-content">
@@ -27,9 +25,11 @@
                 placeholder="12345678X"
                 [class.error]="hasError('NIF')"
               />
-              <span *ngIf="hasError('NIF')" class="error-message">{{ dataFormErrors['NIF'] }}</span>
+              <span *ngIf="hasError('NIF')" class="error-message">{{
+                dataFormErrors["NIF"]
+              }}</span>
             </div>
-            
+
             <div class="form-group">
               <label for="pasaporte">Número de Pasaporte:</label>
               <input
@@ -40,7 +40,9 @@
                 placeholder="Opcional si tienes NIF"
                 [class.error]="hasError('numero_pasapote')"
               />
-              <span *ngIf="hasError('numero_pasapote')" class="error-message">{{ dataFormErrors['numero_pasapote'] }}</span>
+              <span *ngIf="hasError('numero_pasapote')" class="error-message">{{
+                dataFormErrors["numero_pasapote"]
+              }}</span>
             </div>
           </div>
         </div>
@@ -60,9 +62,11 @@
                 required
                 [class.error]="hasError('nombre')"
               />
-              <span *ngIf="hasError('nombre')" class="error-message">{{ dataFormErrors['nombre'] }}</span>
+              <span *ngIf="hasError('nombre')" class="error-message">{{
+                dataFormErrors["nombre"]
+              }}</span>
             </div>
-            
+
             <div class="form-group">
               <label for="apellido">Apellido *:</label>
               <input
@@ -74,7 +78,9 @@
                 required
                 [class.error]="hasError('apellido')"
               />
-              <span *ngIf="hasError('apellido')" class="error-message">{{ dataFormErrors['apellido'] }}</span>
+              <span *ngIf="hasError('apellido')" class="error-message">{{
+                dataFormErrors["apellido"]
+              }}</span>
             </div>
           </div>
 
@@ -89,7 +95,9 @@
               required
               [class.error]="hasError('email')"
             />
-            <span *ngIf="hasError('email')" class="error-message">{{ dataFormErrors['email'] }}</span>
+            <span *ngIf="hasError('email')" class="error-message">{{
+              dataFormErrors["email"]
+            }}</span>
           </div>
 
           <div class="form-group">
@@ -102,9 +110,13 @@
               [class.error]="hasError('pais')"
             >
               <option value="">Selecciona tu país</option>
-              <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+              <option *ngFor="let country of countries" [value]="country">
+                {{ country }}
+              </option>
             </select>
-            <span *ngIf="hasError('pais')" class="error-message">{{ dataFormErrors['pais'] }}</span>
+            <span *ngIf="hasError('pais')" class="error-message">{{
+              dataFormErrors["pais"]
+            }}</span>
           </div>
         </div>
 
@@ -122,7 +134,9 @@
               required
               [class.error]="hasError('direccion')"
             />
-            <span *ngIf="hasError('direccion')" class="error-message">{{ dataFormErrors['direccion'] }}</span>
+            <span *ngIf="hasError('direccion')" class="error-message">{{
+              dataFormErrors["direccion"]
+            }}</span>
           </div>
 
           <div class="form-row">
@@ -136,9 +150,11 @@
                 placeholder="Nombre de la calle"
                 [class.error]="hasError('calle')"
               />
-              <span *ngIf="hasError('calle')" class="error-message">{{ dataFormErrors['calle'] }}</span>
+              <span *ngIf="hasError('calle')" class="error-message">{{
+                dataFormErrors["calle"]
+              }}</span>
             </div>
-            
+
             <div class="form-group">
               <label for="codigo_postal">Código Postal *:</label>
               <input
@@ -150,7 +166,9 @@
                 required
                 [class.error]="hasError('codigo_postal')"
               />
-              <span *ngIf="hasError('codigo_postal')" class="error-message">{{ dataFormErrors['codigo_postal'] }}</span>
+              <span *ngIf="hasError('codigo_postal')" class="error-message">{{
+                dataFormErrors["codigo_postal"]
+              }}</span>
             </div>
           </div>
 
@@ -166,9 +184,11 @@
                 required
                 [class.error]="hasError('ciudad')"
               />
-              <span *ngIf="hasError('ciudad')" class="error-message">{{ dataFormErrors['ciudad'] }}</span>
+              <span *ngIf="hasError('ciudad')" class="error-message">{{
+                dataFormErrors["ciudad"]
+              }}</span>
             </div>
-            
+
             <div class="form-group">
               <label for="provincia">Provincia:</label>
               <input
@@ -179,7 +199,9 @@
                 placeholder="Tu provincia"
                 [class.error]="hasError('provincia')"
               />
-              <span *ngIf="hasError('provincia')" class="error-message">{{ dataFormErrors['provincia'] }}</span>
+              <span *ngIf="hasError('provincia')" class="error-message">{{
+                dataFormErrors["provincia"]
+              }}</span>
             </div>
           </div>
 
@@ -192,9 +214,18 @@
               [class.error]="hasError('comunidad_autonoma')"
             >
               <option value="">Selecciona tu comunidad</option>
-              <option *ngFor="let comunidad of comunidadesAutonomas" [value]="comunidad">{{ comunidad }}</option>
+              <option
+                *ngFor="let comunidad of comunidadesAutonomas"
+                [value]="comunidad"
+              >
+                {{ comunidad }}
+              </option>
             </select>
-            <span *ngIf="hasError('comunidad_autonoma')" class="error-message">{{ dataFormErrors['comunidad_autonoma'] }}</span>
+            <span
+              *ngIf="hasError('comunidad_autonoma')"
+              class="error-message"
+              >{{ dataFormErrors["comunidad_autonoma"] }}</span
+            >
           </div>
         </div>
 
@@ -217,15 +248,40 @@
           </div>
         </div>
 
-        <div *ngIf="dataFormErrors['general']" class="error-message general-error">
-          {{ dataFormErrors['general'] }}
+        <div
+          *ngIf="dataFormErrors['general']"
+          class="error-message general-error"
+        >
+          {{ dataFormErrors["general"] }}
         </div>
 
         <div *ngIf="isValidatingData" class="data-loading">
           <div class="loading-spinner"></div>
           <p>Validando datos...</p>
         </div>
-
+        <div class="form-group" style="margin: 16px 0">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="aceptaTerminos"
+              name="aceptaTerminos"
+              required
+            />
+            Acepto los
+            <a
+              routerLink="/terminos-condiciones"
+              target="_blank"
+              href="terminos-y-condiciones"
+              (click)="$event.stopPropagation()"
+              >
+                Términos y Condiciones
+             </a>
+            *
+          </label>
+          <span *ngIf="showTerminosError" class="error-message"
+            >Debes aceptar los Términos y Condiciones</span
+          >
+        </div>
         <div class="data-actions">
           <button
             type="button"

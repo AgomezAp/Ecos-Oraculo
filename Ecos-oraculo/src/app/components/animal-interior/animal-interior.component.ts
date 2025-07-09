@@ -26,6 +26,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../environments/environmets.prod';
 interface Message {
   role: 'user' | 'guide';
   content: string;
@@ -91,7 +92,7 @@ export class AnimalInteriorComponent
 
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl = environment.apiUrl;
 
   constructor(
     private animalService: AnimalInteriorService,
