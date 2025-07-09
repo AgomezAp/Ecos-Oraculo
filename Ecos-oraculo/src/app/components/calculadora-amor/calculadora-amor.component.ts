@@ -564,7 +564,7 @@ export class CalculadoraAmorComponent
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

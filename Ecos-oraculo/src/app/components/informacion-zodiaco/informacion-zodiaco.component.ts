@@ -197,7 +197,6 @@ export class InformacionZodiacoComponent
     );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-      console.log('🔍 Verificando estado del pago astral...');
 
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
@@ -225,7 +224,7 @@ export class InformacionZodiacoComponent
                   const confirmationMsg = {
                     isUser: false,
                     content:
-                      '✨ ¡Pago confirmado! Ahora puedes consultar los astros ilimitadamente. Los misterios del zodíaco están a tu disposición. ¿Qué otro aspecto astral te gustaría explorar?',
+                      '✨ ¡Pago confirmado! Ahora puedes consultar los astros ilimitadamente. Los misterios del zodíaco están a tu disposición.',
                     timestamp: new Date(),
                   };
                   this.messages.push(confirmationMsg);
@@ -484,7 +483,7 @@ export class InformacionZodiacoComponent
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

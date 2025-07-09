@@ -645,6 +645,7 @@ body {
 
 /* Indicador de carga - estructura exacta de sueños */
 .loading-message {
+  max-width: 100%;
   display: flex;
   gap: 10px;
   animation: fadeInUp 0.4s ease-out;
@@ -875,8 +876,7 @@ body {
   );
   border-radius: 25px;
   padding: 0;
-  max-width: 480px;
-  width: 92%;
+  width: 50%;
   color: white;
   position: relative;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(139, 92, 246, 0.3),
@@ -978,6 +978,7 @@ body {
   padding: 20px;
   text-align: center;
   position: relative;
+  max-width: 100% !important;
 }
 
 .payment-content::before {

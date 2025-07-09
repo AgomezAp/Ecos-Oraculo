@@ -166,25 +166,47 @@ export class AnimalInteriorComponent
     const paymentIntentClientSecret = urlParams.get(
       'payment_intent_client_secret'
     );
+
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
+            console.log('✅ Pago animal interior confirmado desde URL');
             this.hasUserPaid = true;
             sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
             this.blockedMessageId = null;
             sessionStorage.removeItem('animalInteriorBlockedMessageId');
+
             window.history.replaceState(
               {},
               document.title,
               window.location.pathname
             );
+
+            // Agregar mensaje de confirmación
+            const lastMessage = this.chatMessages[this.chatMessages.length - 1];
+            if (
+              !lastMessage ||
+              !lastMessage.content.includes('¡Pago confirmado!')
+            ) {
+              this.shouldScrollToBottom = true;
+              this.addMessage({
+                sender: 'Xamán Olivia',
+                content:
+                  '🦉 ✨ ¡Pago confirmado! Los espíritus animales han bendecido nuestra conexión. Ahora puedes acceder a toda la sabiduría del reino animal sin límites. ¡Que la magia ancestral te acompañe!',
+                timestamp: new Date(),
+                isUser: false,
+              });
+              this.saveMessagesToSession();
+            }
           }
+        })
+        .catch((error) => {
+          console.error('Error verificando el pago animal interior:', error);
         });
     }
   }
-
   sendMessage(): void {
     if (!this.currentMessage.trim() || this.isLoading) return;
     const userMessage = this.currentMessage.trim();
@@ -323,7 +345,7 @@ export class AnimalInteriorComponent
       const items = [{ id: 'animal_interior_unlimited', amount: 500 }];
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

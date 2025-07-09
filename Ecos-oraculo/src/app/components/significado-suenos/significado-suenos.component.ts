@@ -26,6 +26,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../environments/environmets.prod';
 @Component({
   selector: 'app-significado-suenos',
   imports: [
@@ -82,7 +83,7 @@ export class SignificadoSuenosComponent
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl =  environment.apiUrl;
 
   interpreterData: DreamInterpreterData = {
     name: 'Maestra Alma',
@@ -410,7 +411,7 @@ export class SignificadoSuenosComponent
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

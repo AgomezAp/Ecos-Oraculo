@@ -273,9 +273,9 @@
               target="_blank"
               href="terminos-y-condiciones"
               (click)="$event.stopPropagation()"
-              >
-                Términos y Condiciones
-             </a>
+            >
+              Términos y Condiciones
+            </a>
             *
           </label>
           <span *ngIf="showTerminosError" class="error-message"
@@ -294,7 +294,7 @@
           <button
             type="submit"
             (click)="submitUserData()"
-            [disabled]="isValidatingData"
+            [disabled]="isValidatingData || !aceptaTerminos"
             class="continue-button"
           >
             <span *ngIf="!isValidatingData">Continuar al Pago</span>

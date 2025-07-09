@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import {
   BirthChartRequest,
+  BirthChartResponse,
   TablaNacimientoService,
 } from '../../services/tabla-nacimiento.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -28,6 +29,8 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../environments/environmets.prod';
+import { Observable, map, catchError, of } from 'rxjs';
 interface BirthChartMessage {
   content: string;
   isUser: boolean;
@@ -56,11 +59,6 @@ interface AstrologerInfo {
   name: string;
   title: string;
   specialty: string;
-}
-interface ChartData {
-  sunSign?: string;
-  moonSign?: string;
-  ascendant?: string;
 }
 @Component({
   selector: 'app-tabla-nacimiento',
@@ -124,12 +122,13 @@ export class TablaNacimientoComponent
 
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl = environment.apiUrl;
 
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     @Optional() public dialogRef: MatDialogRef<TablaNacimientoComponent>,
-    private http: HttpClient
+    private http: HttpClient,
+    private tablaNacimientoService: TablaNacimientoService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -226,88 +225,161 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
+            console.log('✅ Pago carta natal confirmado desde URL');
             this.hasUserPaid = true;
             sessionStorage.setItem('hasUserPaidBirthChart', 'true');
             this.blockedMessageId = null;
             sessionStorage.removeItem('birthChartBlockedMessageId');
+
             window.history.replaceState(
               {},
               document.title,
               window.location.pathname
             );
+
+            // Agregar mensaje de confirmación
+            const lastMessage = this.messages[this.messages.length - 1];
+            if (
+              !lastMessage ||
+              !lastMessage.content.includes('¡Pago confirmado!')
+            ) {
+              this.shouldScrollToBottom = true;
+              this.addMessage({
+                sender: 'Maestra Emma',
+                content:
+                  '🌟 ✨ ¡Pago confirmado! Las puertas del conocimiento celestial se han abierto completamente para ti. Ahora puedes explorar todos los misterios de tu carta natal sin límites. ¡Que las estrellas te guíen hacia la sabiduría!',
+                timestamp: new Date(),
+                isUser: false,
+              });
+              this.saveMessagesToSession();
+            }
           }
+        })
+        .catch((error) => {
+          console.error('Error verificando el pago carta natal:', error);
         });
     }
   }
 
   sendMessage(): void {
-    if (!this.currentMessage.trim() || this.isLoading) return;
+    if (this.currentMessage?.trim() && !this.isLoading) {
+      const userMessage = this.currentMessage.trim();
 
-    const userMessage = this.currentMessage.trim();
-
-    // Verificar si necesita pago
-    if (!this.hasUserPaid && this.firstQuestionAsked) {
-      this.saveStateBeforePayment();
-      this.showDataModal = true;
-      return;
-    }
-
-    this.shouldScrollToBottom = true;
-
-    this.addMessage({
-      sender: 'Tú',
-      content: userMessage,
-      timestamp: new Date(),
-      isUser: true,
-    });
-
-    this.currentMessage = '';
-    this.isLoading = true;
-
-    // Simular respuesta de la API (reemplaza con tu servicio real)
-    setTimeout(() => {
-      this.shouldScrollToBottom = true;
-
-      const messageId = Date.now().toString();
-      const response = this.generateAstrologicalResponse(userMessage);
-
-      this.addMessage({
-        sender: 'Maestra Emma',
-        content: response,
-        timestamp: new Date(),
-        isUser: false,
-        id: messageId,
-      });
-
-      // Manejar el bloqueo después de la primera pregunta
-      if (this.firstQuestionAsked && !this.hasUserPaid) {
-        this.blockedMessageId = messageId;
-        sessionStorage.setItem('birthChartBlockedMessageId', messageId);
-        setTimeout(() => {
-          this.saveStateBeforePayment();
-          this.promptForPayment();
-        }, 2000);
-      } else if (!this.firstQuestionAsked) {
-        this.firstQuestionAsked = true;
-        sessionStorage.setItem('birthChartFirstQuestionAsked', 'true');
+      // Verificar si es la SEGUNDA pregunta y si no ha pagado
+      if (!this.hasUserPaid && this.firstQuestionAsked) {
+        this.saveStateBeforePayment();
+        this.showDataModal = true;
+        return;
       }
 
+      this.shouldScrollToBottom = true;
+
+      // Agregar mensaje del usuario
+      const userMsg = {
+        sender: 'Tú',
+        content: userMessage,
+        timestamp: new Date(),
+        isUser: true,
+      };
+      this.messages.push(userMsg);
+
       this.saveMessagesToSession();
-      this.isLoading = false;
-    }, 2000);
+      this.currentMessage = '';
+      this.isLoading = true;
+
+      // Usar el servicio real de carta natal
+      this.generateAstrologicalResponse(userMessage).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+
+          const messageId = Date.now().toString();
+          const astrologerMsg = {
+            sender: 'Maestra Emma',
+            content: response,
+            timestamp: new Date(),
+            isUser: false,
+            id: messageId,
+          };
+          this.messages.push(astrologerMsg);
+
+          this.shouldScrollToBottom = true;
+
+          if (this.firstQuestionAsked && !this.hasUserPaid) {
+            this.blockedMessageId = messageId;
+            sessionStorage.setItem('birthChartBlockedMessageId', messageId);
+
+            setTimeout(() => {
+              this.saveStateBeforePayment();
+              this.promptForPayment();
+            }, 2000);
+          } else if (!this.firstQuestionAsked) {
+            this.firstQuestionAsked = true;
+            sessionStorage.setItem('birthChartFirstQuestionAsked', 'true');
+          }
+
+          this.saveMessagesToSession();
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          console.error('Error al obtener respuesta de carta natal:', error);
+
+          const errorMsg = {
+            sender: 'Maestra Emma',
+            content:
+              '🌟 Disculpa, las configuraciones celestiales están temporalmente perturbadas. Por favor, intenta nuevamente en unos momentos.',
+            timestamp: new Date(),
+            isUser: false,
+          };
+          this.messages.push(errorMsg);
+          this.saveMessagesToSession();
+        },
+      });
+    }
   }
 
-  private generateAstrologicalResponse(userMessage: string): string {
-    // Respuestas de ejemplo - reemplaza con tu lógica real
-    const responses = [
-      `🌟 Las configuraciones celestiales revelan aspectos fascinantes sobre tu consulta. En tu carta natal, veo que ${userMessage.toLowerCase()} está profundamente conectado con las energías de transformación y crecimiento espiritual.`,
+  private generateAstrologicalResponse(
+    userMessage: string
+  ): Observable<string> {
+    // Crear el historial de conversación para el contexto
+    const conversationHistory = this.messages
+      .filter((msg) => msg.content && msg.content.trim() !== '')
+      .map((msg) => ({
+        role: msg.isUser ? ('user' as const) : ('astrologer' as const),
+        message: msg.content,
+      }));
 
-      `✨ Los planetas en tu tabla de nacimiento susurran secretos únicos. Tu pregunta sobre ${userMessage.toLowerCase()} resuena con las vibraciones de Venus y Júpiter, indicando un camino de expansión y armonía.`,
+    // Crear la solicitud con la estructura correcta
+    const request: BirthChartRequest = {
+      chartData: {
+        name: this.astrologerInfo.name,
+        specialty: this.astrologerInfo.specialty,
+        experience:
+          'Siglos de experiencia interpretando las configuraciones celestiales y los misterios de las cartas natales',
+      },
+      userMessage,
+      birthDate: this.birthDate,
+      birthTime: this.birthTime,
+      birthPlace: this.birthPlace,
+      fullName: this.fullName,
+      conversationHistory,
+    };
 
-      `🌙 La sabiduría ancestral de las estrellas me revela que ${userMessage.toLowerCase()} está influenciado por una conjunción especial en tu carta. Esto sugiere un momento propicio para la introspección y el autodescubrimiento.`,
-    ];
-
-    return responses[Math.floor(Math.random() * responses.length)];
+    // Llamar al servicio y transformar la respuesta
+    return this.tablaNacimientoService.chatWithAstrologer(request).pipe(
+      map((response: BirthChartResponse) => {
+        if (response.success && response.response) {
+          return response.response;
+        } else {
+          throw new Error(response.error || 'Error desconocido del servicio');
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Error en el servicio de carta natal:', error);
+        return of(
+          '🌟 Las configuraciones celestiales están temporalmente nubladas. Los astros me susurran que debo recargar mis energías cósmicas. Por favor, intenta nuevamente en unos momentos.'
+        );
+      })
+    );
   }
 
   private saveStateBeforePayment(): void {
@@ -374,7 +446,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       const items = [{ id: 'birth_chart_unlimited', amount: 500 }];
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

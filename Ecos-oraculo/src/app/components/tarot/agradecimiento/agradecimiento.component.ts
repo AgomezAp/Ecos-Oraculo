@@ -6,11 +6,15 @@ import { Router } from '@angular/router';
   selector: 'app-agradecimiento',
   imports: [],
   templateUrl: './agradecimiento.component.html',
-  styleUrl: './agradecimiento.component.css'
+  styleUrl: './agradecimiento.component.css',
 })
 export class AgradecimientoComponent {
- constructor(private router:Router) {}
-  redirigir(){
-    this.router.navigate(['/welcome']);
+  constructor(private router: Router) {}
+  redirigir() {
+    this.router.navigate(['/lectura-tarot']);
+  }
+  volverAlInicio() {
+    // Si usas Angular Router:
+    this.router.navigate(['/']);
   }
 }

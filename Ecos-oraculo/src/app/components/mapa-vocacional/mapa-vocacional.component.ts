@@ -26,6 +26,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../environments/environmets.prod';
 interface VocationalMessage {
   sender: string;
   content: string;
@@ -141,7 +142,7 @@ export class MapaVocacionalComponent
   // AGREGADO - Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl = environment.apiUrl;
 
   // Datos personales
   showPersonalForm: boolean = false;
@@ -254,20 +255,40 @@ export class MapaVocacionalComponent
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
+            console.log('✅ Pago vocacional confirmado desde URL');
             this.hasUserPaidForVocational = true;
             sessionStorage.setItem('hasUserPaidForVocational', 'true');
             this.blockedMessageId = null;
             sessionStorage.removeItem('vocationalBlockedMessageId');
+
             window.history.replaceState(
               {},
               document.title,
               window.location.pathname
             );
+
+            // Agregar mensaje de confirmación
+            const lastMessage = this.chatMessages[this.chatMessages.length - 1];
+            if (
+              !lastMessage ||
+              !lastMessage.content.includes('¡Pago confirmado!')
+            ) {
+              this.addMessage({
+                sender: this.counselorInfo.name,
+                content:
+                  '✨ ¡Pago confirmado! Ahora puedes acceder a orientación vocacional ilimitada. Tu futuro profesional está a tu alcance.',
+                timestamp: new Date(),
+                isUser: false,
+              });
+              this.saveMessagesToSession();
+            }
           }
+        })
+        .catch((error) => {
+          console.error('Error verificando el pago vocacional:', error);
         });
     }
   }
-
   // Inicializar mensaje de bienvenida
   initializeWelcomeMessage(): void {
     this.addMessage({
@@ -420,7 +441,7 @@ export class MapaVocacionalComponent
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

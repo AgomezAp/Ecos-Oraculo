@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { CardService } from '../../../services/tarot/card.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RecolectaDatosComponent } from '../../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../../environments/environmets.prod';
 @Component({
   selector: 'app-cards',
   imports: [CommonModule, RecolectaDatosComponent],
@@ -50,7 +51,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   // IMPORTANT: Replace with your actual Stripe publishable key and backend URL
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC'; // <--- REPLACE THIS
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl =  environment.apiUrl;
 
   constructor(
     private cardService: CardService,
@@ -231,7 +232,7 @@ export class CardsComponent implements OnInit, OnDestroy {
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

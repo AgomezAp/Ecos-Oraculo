@@ -28,6 +28,7 @@ import {
   StripePaymentElement,
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environmets.prod';
 
 interface ChatMessage {
   role: 'user' | 'master';
@@ -105,7 +106,7 @@ export class ZodiacoChinoComponent
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl = 'https://api.ecosdeloraculo.com';
+  private backendUrl = environment.apiUrl;
 
   constructor(
     private fb: FormBuilder,
@@ -331,7 +332,7 @@ export class ZodiacoChinoComponent
 
       const response = await this.http
         .post<{ clientSecret: string }>(
-          `${this.backendUrl}/create-payment-intent`,
+          `${this.backendUrl}create-payment-intent`,
           { items }
         )
         .toPromise();

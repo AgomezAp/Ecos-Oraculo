@@ -220,16 +220,6 @@
 
     <div class="payment-content">
       <div class="payment-info">
-        <div class="love-package">
-          <div class="package-icon">💕</div>
-          <h4>Lecturas de Compatibilidad Ilimitadas</h4>
-          <p class="package-description">
-            Accede a todas las interpretaciones de compatibilidad amorosa con la
-            Maestra Valentina. Descubre los secretos numerológicos de tu
-            relación y obtén consejos personalizados para fortalecer tu vínculo
-            amoroso.
-          </p>
-        </div>
         <div class="pricing">
           <div class="price">
             <span class="currency">€</span>
@@ -264,13 +254,6 @@
 
     <div class="payment-actions">
       <button
-        mat-stroked-button
-        (click)="cancelPayment()"
-        [disabled]="isProcessingPayment"
-      >
-        Cancelar
-      </button>
-      <button
         mat-raised-button
         color="primary"
         (click)="handlePaymentSubmit()"
@@ -280,26 +263,13 @@
         <mat-icon *ngIf="!isProcessingPayment">payment</mat-icon>
         {{ isProcessingPayment ? "Procesando..." : "Realizar Pago" }}
       </button>
-    </div>
-
-    <div class="payment-security">
-      <div class="security-badges">
-        <div class="security-badge">
-          <mat-icon>security</mat-icon>
-          <span>Pago 100% Seguro</span>
-        </div>
-        <div class="security-badge">
-          <mat-icon>verified_user</mat-icon>
-          <span>Encriptado SSL</span>
-        </div>
-        <div class="security-badge">
-          <span class="stripe-badge">Stripe</span>
-        </div>
-      </div>
-      <p class="security-text">
-        Tus datos de pago están protegidos con la misma tecnología que utilizan
-        los bancos. No almacenamos información de tarjetas de crédito.
-      </p>
+      <button
+        mat-stroked-button
+        (click)="cancelPayment()"
+        [disabled]="isProcessingPayment"
+      >
+        Cancelar
+      </button>
     </div>
   </div>
 </div>
