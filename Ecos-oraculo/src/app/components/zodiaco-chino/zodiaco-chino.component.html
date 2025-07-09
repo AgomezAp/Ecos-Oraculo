@@ -48,6 +48,7 @@
         </svg>
       </button>
     </div>
+    
     <!-- Chat Messages -->
     <div class="chat-messages" #messagesContainer>
       <div
@@ -102,7 +103,33 @@
           </div>
         </div>
       </div>
+
+      <!-- 👈 INDICADOR DE CARGA AGREGADO AQUÍ -->
+      <div *ngIf="isLoading" class="message-container typing-indicator">
+        <div class="interpreter-message-wrapper">
+          <div class="message-avatar">
+            <img
+              class="interpreter-avatar-small"
+              src="/Maestra-8.webp"
+              alt="Maestra Avatar"
+            />
+          </div>
+          <div class="message-content">
+            <div class="message-bubble interpreter-message typing">
+              <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p class="typing-text">
+              Astrologa Emma está consultando los astros para ti...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    
     <!-- Input Area -->
     <div class="chat-input-area">
       <div class="message-input">
