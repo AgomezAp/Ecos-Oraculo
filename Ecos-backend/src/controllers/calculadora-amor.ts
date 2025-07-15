@@ -63,14 +63,23 @@ export class LoveCalculatorController {
 
     if (person1Name && person1BirthDate && person2Name && person2BirthDate) {
       const compatibilityScore = this.calculateCompatibilityScore(
-        person1Name, person1BirthDate, person2Name, person2BirthDate
+        person1Name,
+        person1BirthDate,
+        person2Name,
+        person2BirthDate
       );
       loveInfo += `ANÁLISIS DE COMPATIBILIDAD:\n`;
       loveInfo += `- Puntuación de compatibilidad: ${compatibilityScore}%\n`;
     }
 
-    if (!person1Name || !person1BirthDate || !person2Name || !person2BirthDate) {
-      loveInfo += "- Datos incompletos (necesarios para análisis completo de compatibilidad)\n";
+    if (
+      !person1Name ||
+      !person1BirthDate ||
+      !person2Name ||
+      !person2BirthDate
+    ) {
+      loveInfo +=
+        "- Datos incompletos (necesarios para análisis completo de compatibilidad)\n";
     }
 
     return loveInfo;
@@ -90,9 +99,32 @@ export class LoveCalculatorController {
 
   private calculateDestinyNumber(name: string): number {
     const letterValues: { [key: string]: number } = {
-      A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, I: 9,
-      J: 1, K: 2, L: 3, M: 4, N: 5, O: 6, P: 7, Q: 8, R: 9,
-      S: 1, T: 2, U: 3, V: 4, W: 5, X: 6, Y: 7, Z: 8,
+      A: 1,
+      B: 2,
+      C: 3,
+      D: 4,
+      E: 5,
+      F: 6,
+      G: 7,
+      H: 8,
+      I: 9,
+      J: 1,
+      K: 2,
+      L: 3,
+      M: 4,
+      N: 5,
+      O: 6,
+      P: 7,
+      Q: 8,
+      R: 9,
+      S: 1,
+      T: 2,
+      U: 3,
+      V: 4,
+      W: 5,
+      X: 6,
+      Y: 7,
+      Z: 8,
     };
 
     const sum = name
@@ -107,7 +139,10 @@ export class LoveCalculatorController {
   }
 
   private calculateCompatibilityScore(
-    name1: string, date1: string, name2: string, date2: string
+    name1: string,
+    date1: string,
+    name2: string,
+    date2: string
   ): number {
     const lifePath1 = this.calculateLifePath(date1);
     const lifePath2 = this.calculateLifePath(date2);
@@ -157,7 +192,11 @@ export class LoveCalculatorController {
       throw error;
     }
 
-    if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+    if (
+      !userMessage ||
+      typeof userMessage !== "string" ||
+      userMessage.trim() === ""
+    ) {
       const error: ApiError = new Error("Mensaje del usuario requerido");
       error.statusCode = 400;
       error.code = "MISSING_USER_MESSAGE";
@@ -189,7 +228,12 @@ export class LoveCalculatorController {
             .join("\n")}\n`
         : "";
 
-    const loveData = this.generateLoveData(person1Name, person1BirthDate, person2Name, person2BirthDate);
+    const loveData = this.generateLoveData(
+      person1Name,
+      person1BirthDate,
+      person2Name,
+      person2BirthDate
+    );
 
     return `Eres Maestra Valentina, una experta en compatibilidad amorosa y relaciones basada en numerología del amor. Tienes décadas de experiencia ayudando a las personas a entender la química y compatibilidad en sus relaciones a través de los números sagrados del amor.
 
@@ -284,7 +328,13 @@ CÓMO DEBES COMPORTARTE:
 - 40-59%: "Compatibilidad promedio con gran potencial"
 - 20-39%: "Desafíos que pueden superarse con amor"
 - 0-19%: "Necesitan trabajar mucho en entenderse"
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 ${conversationContext}
 
 Recuerda: Eres una experta en amor que combina numerología con consejos románticos prácticos. Habla como una amiga cálida que realmente se interesa por las relaciones de las personas. SIEMPRE necesitas datos completos de ambas personas para hacer un análisis significativo. Las respuestas deben ser cálidas, optimistas y enfocadas en fortalecer el amor.`;
@@ -325,7 +375,7 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
       this.validateLoveCalculatorRequest(loveCalculatorData, userMessage);
 
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: {
           temperature: 0.9,
           topK: 40,
@@ -385,7 +435,8 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
       error.message?.includes("limit")
     ) {
       statusCode = 429;
-      errorMessage = "Se ha alcanzado el límite de consultas. Por favor, espera un momento.";
+      errorMessage =
+        "Se ha alcanzado el límite de consultas. Por favor, espera un momento.";
       errorCode = "QUOTA_EXCEEDED";
     } else if (error.message?.includes("safety")) {
       statusCode = 400;
@@ -418,7 +469,8 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
           name: "Maestra Valentina",
           title: "Guardiana del Amor Eterno",
           specialty: "Compatibilidad numerológica y análisis de relaciones",
-          description: "Experta en numerología del amor especializada en analizar la compatibilidad entre parejas",
+          description:
+            "Experta en numerología del amor especializada en analizar la compatibilidad entre parejas",
           services: [
             "Análisis de Compatibilidad Numerológica",
             "Cálculo de Números del Amor",

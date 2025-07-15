@@ -15,12 +15,12 @@ class ChineseZodiacController {
     constructor() {
         this.chatWithMaster = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const { zodiacData, userMessage, birthYear, birthDate, fullName, conversationHistory } = req.body;
+                const { zodiacData, userMessage, birthYear, birthDate, fullName, conversationHistory, } = req.body;
                 // Validar entrada
                 this.validateHoroscopeRequest(zodiacData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-2.5-flash",
                     generationConfig: {
                         temperature: 0.85, // Creatividad para interpretaciones astrológicas
                         topK: 40,
@@ -68,8 +68,8 @@ class ChineseZodiacController {
                             "Análisis de cartas astrales",
                             "Predicciones horoscópicas",
                             "Compatibilidades entre signos",
-                            "Consejos basados en astrología"
-                        ]
+                            "Consejos basados en astrología",
+                        ],
                     },
                     timestamp: new Date().toISOString(),
                 });
@@ -85,8 +85,10 @@ class ChineseZodiacController {
     }
     createHoroscopeContext(zodiacData, birthYear, birthDate, fullName, history) {
         const conversationContext = history && history.length > 0
-            ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-            : '';
+            ? `\n\nCONVERSACIÓN PREVIA:\n${history
+                .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+                .join("\n")}\n`
+            : "";
         const horoscopeDataSection = this.generateHoroscopeDataSection(birthYear, birthDate, fullName);
         return `Eres la Astróloga Luna, una sabia intérprete de los astros y guía celestial de los signos zodiacales. Tienes décadas de experiencia interpretando las influencias planetarias y las configuraciones estelares que moldean nuestro destino.
 
@@ -188,7 +190,13 @@ CÓMO DEBES COMPORTARTE:
 - "¡Hola! Me da mucho gusto conocerte. Para descubrir tu signo celestial, necesito saber cuál es tu fecha de nacimiento. ¿Me lo compartes?"
 - "¡Qué interesante! Los doce signos zodiacales tienen tanto que enseñar... Para comenzar, ¿cuál es tu fecha de nacimiento?"
 - "Me fascina poder ayudarte con esto. Cada fecha está bajo la influencia de una constelación diferente, ¿cuándo celebras tu cumpleaños?"
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 ${conversationContext}
 
 Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga sabia que realmente quiere conocer la fecha de nacimiento para poder compartir la sabiduría de los astros. SIEMPRE enfócate en obtener la fecha de nacimiento de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona.`;
@@ -209,10 +217,12 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
         }
         else if (birthYear) {
             dataSection += `- Año de nacimiento: ${birthYear}\n`;
-            dataSection += "- ⚠️ DATO FALTANTE: Fecha completa de nacimiento (ESENCIAL para determinar el signo zodiacal)\n";
+            dataSection +=
+                "- ⚠️ DATO FALTANTE: Fecha completa de nacimiento (ESENCIAL para determinar el signo zodiacal)\n";
         }
         if (!birthYear && !birthDate) {
-            dataSection += "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL para determinar el signo celestial)\n";
+            dataSection +=
+                "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL para determinar el signo celestial)\n";
         }
         return dataSection;
     }
@@ -253,33 +263,49 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
     }
     getSignElement(sign) {
         const elements = {
-            "Aries": "Fuego", "Leo": "Fuego", "Sagitario": "Fuego",
-            "Tauro": "Tierra", "Virgo": "Tierra", "Capricornio": "Tierra",
-            "Géminis": "Aire", "Libra": "Aire", "Acuario": "Aire",
-            "Cáncer": "Agua", "Escorpio": "Agua", "Piscis": "Agua"
+            Aries: "Fuego",
+            Leo: "Fuego",
+            Sagitario: "Fuego",
+            Tauro: "Tierra",
+            Virgo: "Tierra",
+            Capricornio: "Tierra",
+            Géminis: "Aire",
+            Libra: "Aire",
+            Acuario: "Aire",
+            Cáncer: "Agua",
+            Escorpio: "Agua",
+            Piscis: "Agua",
         };
         return elements[sign] || "Elemento desconocido";
     }
     getRulingPlanet(sign) {
         const planets = {
-            "Aries": "Marte", "Tauro": "Venus", "Géminis": "Mercurio",
-            "Cáncer": "Luna", "Leo": "Sol", "Virgo": "Mercurio",
-            "Libra": "Venus", "Escorpio": "Plutón", "Sagitario": "Júpiter",
-            "Capricornio": "Saturno", "Acuario": "Urano", "Piscis": "Neptuno"
+            Aries: "Marte",
+            Tauro: "Venus",
+            Géminis: "Mercurio",
+            Cáncer: "Luna",
+            Leo: "Sol",
+            Virgo: "Mercurio",
+            Libra: "Venus",
+            Escorpio: "Plutón",
+            Sagitario: "Júpiter",
+            Capricornio: "Saturno",
+            Acuario: "Urano",
+            Piscis: "Neptuno",
         };
         return planets[sign] || "Planeta desconocido";
     }
     ensureCompleteResponse(text) {
         const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith('...')) {
+        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+        if (endsIncomplete && !text.trim().endsWith("...")) {
             const sentences = text.split(/[.!?]/);
             if (sentences.length > 1) {
                 const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join('.') + '.';
+                return completeSentences.join(".") + ".";
             }
             else {
-                return text.trim() + '...';
+                return text.trim() + "...";
             }
         }
         return text;
@@ -291,7 +317,9 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
             error.code = "MISSING_ASTROLOGER_DATA";
             throw error;
         }
-        if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+        if (!userMessage ||
+            typeof userMessage !== "string" ||
+            userMessage.trim() === "") {
             const error = new Error("Mensaje del usuario requerido");
             error.statusCode = 400;
             error.code = "MISSING_USER_MESSAGE";

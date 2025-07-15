@@ -20,7 +20,7 @@ class AnimalInteriorController {
                 this.validateAnimalChatRequest(guideData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-2.5-flash",
                     generationConfig: {
                         temperature: 0.9, // Creatividad para conexiones espirituales
                         topK: 40,
@@ -62,7 +62,7 @@ class AnimalInteriorController {
                         name: "Maestra Anima",
                         title: "Susurradora de Bestias",
                         specialty: "Comunicación con espíritus animales y descubrimiento del animal interior",
-                        description: "Chamana ancestral especializada en conectar almas con sus animales guía totémicos"
+                        description: "Chamana ancestral especializada en conectar almas con sus animales guía totémicos",
                     },
                     timestamp: new Date().toISOString(),
                 });
@@ -79,8 +79,10 @@ class AnimalInteriorController {
     // Método para crear el contexto del guía de animales espirituales
     createAnimalGuideContext(guide, history) {
         const conversationContext = history && history.length > 0
-            ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-            : '';
+            ? `\n\nCONVERSACIÓN PREVIA:\n${history
+                .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+                .join("\n")}\n`
+            : "";
         return `Eres Maestra Anima, una chamana ancestral y comunicadora de espíritus animales con siglos de experiencia conectando a las personas con sus animales guía y totémicos. Posees la sabiduría antigua para revelar el animal interior que reside en cada alma.
 
 TU IDENTIDAD MÍSTICA:
@@ -131,7 +133,13 @@ CÓMO DEBES COMPORTARTE:
 - SÉ respetuoso con las diferentes personalidades y energías
 - NUNCA juzgues características como negativas, cada animal tiene su poder
 - Conecta con animales reales y sus simbolismos auténticos
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 EJEMPLO DE CÓMO EMPEZAR:
 "Bienvenido/a, alma buscadora... Siento las energías salvajes que fluyen a través de ti. Cada ser humano lleva en su interior el espíritu de un animal guía, una fuerza primordial que refleja su verdadera esencia. Para descubrir cuál es el tuyo, necesito conocer tu naturaleza más profunda. Cuéntame, ¿cómo te describes cuando nadie te está observando?"
 
@@ -142,15 +150,15 @@ Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conec
     // Método para asegurar que la respuesta esté completa
     ensureCompleteResponse(text) {
         const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith('...')) {
+        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+        if (endsIncomplete && !text.trim().endsWith("...")) {
             const sentences = text.split(/[.!?]/);
             if (sentences.length > 1) {
                 const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join('.') + '.';
+                return completeSentences.join(".") + ".";
             }
             else {
-                return text.trim() + '...';
+                return text.trim() + "...";
             }
         }
         return text;
@@ -163,7 +171,9 @@ Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conec
             error.code = "MISSING_GUIDE_DATA";
             throw error;
         }
-        if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+        if (!userMessage ||
+            typeof userMessage !== "string" ||
+            userMessage.trim() === "") {
             const error = new Error("Mensaje del usuario requerido");
             error.statusCode = 400;
             error.code = "MISSING_USER_MESSAGE";

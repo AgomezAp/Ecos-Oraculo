@@ -439,10 +439,26 @@ export class AnimalInteriorComponent
   }
 
   formatMessage(content: string): string {
-    return content
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/__(.*?)__/g, '<em>$1</em>');
+    if (!content) return '';
+
+    let formattedContent = content;
+
+    // Convertir **texto** a <strong>texto</strong> para negrilla
+    formattedContent = formattedContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong>$1</strong>'
+    );
+
+    // Convertir saltos de línea a <br> para mejor visualización
+    formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+    // Opcional: También puedes manejar *texto* (una sola asterisco) como cursiva
+    formattedContent = formattedContent.replace(
+      /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+      '<em>$1</em>'
+    );
+
+    return formattedContent;
   }
 
   getTimeString(timestamp: Date | string): string {

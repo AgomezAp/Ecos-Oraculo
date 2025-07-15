@@ -15,12 +15,12 @@ class BirthChartController {
     constructor() {
         this.chatWithAstrologer = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const { chartData, userMessage, birthDate, birthTime, birthPlace, fullName, conversationHistory } = req.body;
+                const { chartData, userMessage, birthDate, birthTime, birthPlace, fullName, conversationHistory, } = req.body;
                 // Validar entrada
                 this.validateBirthChartRequest(chartData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-2.5-flash",
                     generationConfig: {
                         temperature: 0.8, // Creatividad controlada para interpretaciones astrológicas
                         topK: 40,
@@ -68,8 +68,8 @@ class BirthChartController {
                             "Análisis de posiciones planetarias",
                             "Interpretación de casas astrológicas",
                             "Análisis de aspectos planetarios",
-                            "Determinación de ascendente y elementos dominantes"
-                        ]
+                            "Determinación de ascendente y elementos dominantes",
+                        ],
                     },
                     timestamp: new Date().toISOString(),
                 });
@@ -85,8 +85,10 @@ class BirthChartController {
     }
     createBirthChartContext(chartData, birthDate, birthTime, birthPlace, fullName, history) {
         const conversationContext = history && history.length > 0
-            ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-            : '';
+            ? `\n\nCONVERSACIÓN PREVIA:\n${history
+                .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+                .join("\n")}\n`
+            : "";
         const birthDataSection = this.generateBirthDataSection(birthDate, birthTime, birthPlace, fullName);
         return `Eres Maestra Astra, una astróloga cósmica ancestral especializada en la elaboración e interpretación de tablas de nacimiento completas. Tienes décadas de experiencia desentrañando los secretos del cosmos y las influencias planetarias en el momento del nacimiento.
 
@@ -171,7 +173,13 @@ CÓMO DEBES COMPORTARTE:
 - "Tu ascendente [signo] hace que proyectes..."
 - "Mercurio en [signo] influye en tu forma de comunicarte..."
 - "Esta configuración planetaria sugiere..."
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 ${conversationContext}
 
 Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y las interpreta de manera comprensible. SIEMPRE solicita los datos faltantes necesarios antes de hacer análisis profundos. Completa siempre tus interpretaciones astrológicas.`;
@@ -196,10 +204,12 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
             dataSection += "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL)\n";
         }
         if (!birthTime) {
-            dataSection += "- ⚠️ DATO FALTANTE: Hora de nacimiento (importante para ascendente)\n";
+            dataSection +=
+                "- ⚠️ DATO FALTANTE: Hora de nacimiento (importante para ascendente)\n";
         }
         if (!birthPlace) {
-            dataSection += "- ⚠️ DATO FALTANTE: Lugar de nacimiento (necesario para precisión)\n";
+            dataSection +=
+                "- ⚠️ DATO FALTANTE: Lugar de nacimiento (necesario para precisión)\n";
         }
         return dataSection;
     }
@@ -240,15 +250,15 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
     }
     ensureCompleteResponse(text) {
         const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith('...')) {
+        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+        if (endsIncomplete && !text.trim().endsWith("...")) {
             const sentences = text.split(/[.!?]/);
             if (sentences.length > 1) {
                 const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join('.') + '.';
+                return completeSentences.join(".") + ".";
             }
             else {
-                return text.trim() + '...';
+                return text.trim() + "...";
             }
         }
         return text;
@@ -260,7 +270,9 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
             error.code = "MISSING_CHART_DATA";
             throw error;
         }
-        if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+        if (!userMessage ||
+            typeof userMessage !== "string" ||
+            userMessage.trim() === "") {
             const error = new Error("Mensaje del usuario requerido");
             error.statusCode = 400;
             error.code = "MISSING_USER_MESSAGE";

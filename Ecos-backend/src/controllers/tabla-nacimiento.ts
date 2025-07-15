@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import {
-  ApiError,
-  ChatResponse,
-} from "../interfaces/helpers";
+import { ApiError, ChatResponse } from "../interfaces/helpers";
 
 interface BirthChartData {
   name: string;
@@ -19,7 +16,7 @@ interface BirthChartRequest {
   birthPlace?: string;
   fullName?: string;
   conversationHistory?: Array<{
-    role: 'user' | 'astrologer';
+    role: "user" | "astrologer";
     message: string;
   }>;
 }
@@ -36,16 +33,19 @@ export class BirthChartController {
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
 
-  public chatWithAstrologer = async (req: Request, res: Response): Promise<void> => {
+  public chatWithAstrologer = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const { 
-        chartData, 
-        userMessage, 
-        birthDate, 
-        birthTime, 
-        birthPlace, 
-        fullName, 
-        conversationHistory 
+      const {
+        chartData,
+        userMessage,
+        birthDate,
+        birthTime,
+        birthPlace,
+        fullName,
+        conversationHistory,
       }: BirthChartRequest = req.body;
 
       // Validar entrada
@@ -53,7 +53,7 @@ export class BirthChartController {
 
       // Obtener el modelo Gemini
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: {
           temperature: 0.8, // Creatividad controlada para interpretaciones astrológicas
           topK: 40,
@@ -64,11 +64,11 @@ export class BirthChartController {
 
       // Crear el prompt contextualizado
       const contextPrompt = this.createBirthChartContext(
-        chartData, 
-        birthDate, 
-        birthTime, 
-        birthPlace, 
-        fullName, 
+        chartData,
+        birthDate,
+        birthTime,
+        birthPlace,
+        fullName,
         conversationHistory
       );
       const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del astrólogo (completa tu análisis):`;
@@ -102,18 +102,26 @@ export class BirthChartController {
   };
 
   private createBirthChartContext(
-    chartData: BirthChartData, 
-    birthDate?: string, 
-    birthTime?: string, 
-    birthPlace?: string, 
-    fullName?: string, 
-    history?: Array<{role: string, message: string}>
+    chartData: BirthChartData,
+    birthDate?: string,
+    birthTime?: string,
+    birthPlace?: string,
+    fullName?: string,
+    history?: Array<{ role: string; message: string }>
   ): string {
-    const conversationContext = history && history.length > 0 
-      ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-      : '';
+    const conversationContext =
+      history && history.length > 0
+        ? `\n\nCONVERSACIÓN PREVIA:\n${history
+            .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+            .join("\n")}\n`
+        : "";
 
-    const birthDataSection = this.generateBirthDataSection(birthDate, birthTime, birthPlace, fullName);
+    const birthDataSection = this.generateBirthDataSection(
+      birthDate,
+      birthTime,
+      birthPlace,
+      fullName
+    );
 
     return `Eres Maestra Astra, una astróloga cósmica ancestral especializada en la elaboración e interpretación de tablas de nacimiento completas. Tienes décadas de experiencia desentrañando los secretos del cosmos y las influencias planetarias en el momento del nacimiento.
 
@@ -198,16 +206,22 @@ CÓMO DEBES COMPORTARTE:
 - "Tu ascendente [signo] hace que proyectes..."
 - "Mercurio en [signo] influye en tu forma de comunicarte..."
 - "Esta configuración planetaria sugiere..."
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 ${conversationContext}
 
 Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y las interpreta de manera comprensible. SIEMPRE solicita los datos faltantes necesarios antes de hacer análisis profundos. Completa siempre tus interpretaciones astrológicas.`;
   }
 
   private generateBirthDataSection(
-    birthDate?: string, 
-    birthTime?: string, 
-    birthPlace?: string, 
+    birthDate?: string,
+    birthTime?: string,
+    birthPlace?: string,
     fullName?: string
   ): string {
     let dataSection = "DATOS DISPONIBLES PARA TABLA DE NACIMIENTO:\n";
@@ -234,10 +248,12 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
       dataSection += "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL)\n";
     }
     if (!birthTime) {
-      dataSection += "- ⚠️ DATO FALTANTE: Hora de nacimiento (importante para ascendente)\n";
+      dataSection +=
+        "- ⚠️ DATO FALTANTE: Hora de nacimiento (importante para ascendente)\n";
     }
     if (!birthPlace) {
-      dataSection += "- ⚠️ DATO FALTANTE: Lugar de nacimiento (necesario para precisión)\n";
+      dataSection +=
+        "- ⚠️ DATO FALTANTE: Lugar de nacimiento (necesario para precisión)\n";
     }
 
     return dataSection;
@@ -249,18 +265,30 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
-      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Tauro";
-      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Géminis";
-      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cáncer";
-      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
-      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
-      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
-      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpio";
-      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitario";
-      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricornio";
-      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Acuario";
-      if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Piscis";
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
+        return "Aries";
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
+        return "Tauro";
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+        return "Géminis";
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
+        return "Cáncer";
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
+        return "Leo";
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
+        return "Virgo";
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
+        return "Libra";
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+        return "Escorpio";
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+        return "Sagitario";
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
+        return "Capricornio";
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+        return "Acuario";
+      if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
+        return "Piscis";
 
       return "Fecha inválida";
     } catch {
@@ -270,22 +298,25 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
 
   private ensureCompleteResponse(text: string): string {
     const lastChar = text.trim().slice(-1);
-    const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-    
-    if (endsIncomplete && !text.trim().endsWith('...')) {
+    const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+
+    if (endsIncomplete && !text.trim().endsWith("...")) {
       const sentences = text.split(/[.!?]/);
       if (sentences.length > 1) {
         const completeSentences = sentences.slice(0, -1);
-        return completeSentences.join('.') + '.';
+        return completeSentences.join(".") + ".";
       } else {
-        return text.trim() + '...';
+        return text.trim() + "...";
       }
     }
-    
+
     return text;
   }
 
-  private validateBirthChartRequest(chartData: BirthChartData, userMessage: string): void {
+  private validateBirthChartRequest(
+    chartData: BirthChartData,
+    userMessage: string
+  ): void {
     if (!chartData) {
       const error: ApiError = new Error("Datos del astrólogo requeridos");
       error.statusCode = 400;
@@ -293,7 +324,11 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
       throw error;
     }
 
-    if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+    if (
+      !userMessage ||
+      typeof userMessage !== "string" ||
+      userMessage.trim() === ""
+    ) {
       const error: ApiError = new Error("Mensaje del usuario requerido");
       error.statusCode = 400;
       error.code = "MISSING_USER_MESSAGE";
@@ -349,7 +384,10 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
     res.status(statusCode).json(errorResponse);
   }
 
-  public getBirthChartInfo = async (req: Request, res: Response): Promise<void> => {
+  public getBirthChartInfo = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       res.json({
         success: true,
@@ -357,14 +395,15 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
           name: "Maestra Astra",
           title: "Cartógrafa Celestial",
           specialty: "Tablas de nacimiento y análisis astrológico completo",
-          description: "Astróloga especializada en crear e interpretar tablas natales precisas basadas en posiciones planetarias del momento del nacimiento",
+          description:
+            "Astróloga especializada en crear e interpretar tablas natales precisas basadas en posiciones planetarias del momento del nacimiento",
           services: [
             "Creación de tabla de nacimiento completa",
             "Análisis de posiciones planetarias",
             "Interpretación de casas astrológicas",
             "Análisis de aspectos planetarios",
-            "Determinación de ascendente y elementos dominantes"
-          ]
+            "Determinación de ascendente y elementos dominantes",
+          ],
         },
         timestamp: new Date().toISOString(),
       });

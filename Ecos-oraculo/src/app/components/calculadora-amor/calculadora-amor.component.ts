@@ -98,7 +98,7 @@ export class CalculadoraAmorComponent
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl =environment.apiUrl;;
+  private backendUrl = environment.apiUrl;
 
   // Formulario reactivo
   compatibilityForm: FormGroup;
@@ -990,10 +990,26 @@ export class CalculadoraAmorComponent
   }
 
   formatMessage(content: string): string {
-    return content
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/__(.*?)__/g, '<em>$1</em>');
+    if (!content) return '';
+
+    let formattedContent = content;
+
+    // Convertir **texto** a <strong>texto</strong> para negrilla
+    formattedContent = formattedContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong>$1</strong>'
+    );
+
+    // Convertir saltos de línea a <br> para mejor visualización
+    formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+    // Opcional: También puedes manejar *texto* (una sola asterisco) como cursiva
+    formattedContent = formattedContent.replace(
+      /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+      '<em>$1</em>'
+    );
+
+    return formattedContent;
   }
 
   closeModal(): void {

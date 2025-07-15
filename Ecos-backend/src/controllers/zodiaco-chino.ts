@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import {
-  ApiError,
-  ChatResponse,
-} from "../interfaces/helpers";
+import { ApiError, ChatResponse } from "../interfaces/helpers";
 
 interface HoroscopeData {
   name: string;
@@ -18,7 +15,7 @@ interface HoroscopeRequest {
   birthDate?: string;
   fullName?: string;
   conversationHistory?: Array<{
-    role: 'user' | 'master';
+    role: "user" | "master";
     message: string;
   }>;
 }
@@ -35,15 +32,18 @@ export class ChineseZodiacController {
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
 
-  public chatWithMaster = async (req: Request, res: Response): Promise<void> => {
+  public chatWithMaster = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const { 
-        zodiacData, 
-        userMessage, 
-        birthYear, 
-        birthDate, 
-        fullName, 
-        conversationHistory 
+      const {
+        zodiacData,
+        userMessage,
+        birthYear,
+        birthDate,
+        fullName,
+        conversationHistory,
       }: HoroscopeRequest = req.body;
 
       // Validar entrada
@@ -51,7 +51,7 @@ export class ChineseZodiacController {
 
       // Obtener el modelo Gemini
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: {
           temperature: 0.85, // Creatividad para interpretaciones astrológicas
           topK: 40,
@@ -62,10 +62,10 @@ export class ChineseZodiacController {
 
       // Crear el prompt contextualizado
       const contextPrompt = this.createHoroscopeContext(
-        zodiacData, 
-        birthYear, 
-        birthDate, 
-        fullName, 
+        zodiacData,
+        birthYear,
+        birthDate,
+        fullName,
         conversationHistory
       );
       const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta de la astróloga (completa tu sabiduría):`;
@@ -99,17 +99,24 @@ export class ChineseZodiacController {
   };
 
   private createHoroscopeContext(
-    zodiacData: HoroscopeData, 
-    birthYear?: string, 
-    birthDate?: string, 
-    fullName?: string, 
-    history?: Array<{role: string, message: string}>
+    zodiacData: HoroscopeData,
+    birthYear?: string,
+    birthDate?: string,
+    fullName?: string,
+    history?: Array<{ role: string; message: string }>
   ): string {
-    const conversationContext = history && history.length > 0 
-      ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-      : '';
+    const conversationContext =
+      history && history.length > 0
+        ? `\n\nCONVERSACIÓN PREVIA:\n${history
+            .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+            .join("\n")}\n`
+        : "";
 
-    const horoscopeDataSection = this.generateHoroscopeDataSection(birthYear, birthDate, fullName);
+    const horoscopeDataSection = this.generateHoroscopeDataSection(
+      birthYear,
+      birthDate,
+      fullName
+    );
 
     return `Eres la Astróloga Luna, una sabia intérprete de los astros y guía celestial de los signos zodiacales. Tienes décadas de experiencia interpretando las influencias planetarias y las configuraciones estelares que moldean nuestro destino.
 
@@ -211,15 +218,21 @@ CÓMO DEBES COMPORTARTE:
 - "¡Hola! Me da mucho gusto conocerte. Para descubrir tu signo celestial, necesito saber cuál es tu fecha de nacimiento. ¿Me lo compartes?"
 - "¡Qué interesante! Los doce signos zodiacales tienen tanto que enseñar... Para comenzar, ¿cuál es tu fecha de nacimiento?"
 - "Me fascina poder ayudarte con esto. Cada fecha está bajo la influencia de una constelación diferente, ¿cuándo celebras tu cumpleaños?"
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 ${conversationContext}
 
 Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga sabia que realmente quiere conocer la fecha de nacimiento para poder compartir la sabiduría de los astros. SIEMPRE enfócate en obtener la fecha de nacimiento de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona.`;
   }
 
   private generateHoroscopeDataSection(
-    birthYear?: string, 
-    birthDate?: string, 
+    birthYear?: string,
+    birthDate?: string,
     fullName?: string
   ): string {
     let dataSection = "DATOS DISPONIBLES PARA CONSULTA HOROSCÓPICA:\n";
@@ -238,11 +251,13 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
       dataSection += `- Planeta regente: ${planet}\n`;
     } else if (birthYear) {
       dataSection += `- Año de nacimiento: ${birthYear}\n`;
-      dataSection += "- ⚠️ DATO FALTANTE: Fecha completa de nacimiento (ESENCIAL para determinar el signo zodiacal)\n";
+      dataSection +=
+        "- ⚠️ DATO FALTANTE: Fecha completa de nacimiento (ESENCIAL para determinar el signo zodiacal)\n";
     }
 
     if (!birthYear && !birthDate) {
-      dataSection += "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL para determinar el signo celestial)\n";
+      dataSection +=
+        "- ⚠️ DATO FALTANTE: Fecha de nacimiento (ESENCIAL para determinar el signo celestial)\n";
     }
 
     return dataSection;
@@ -254,19 +269,31 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
       const day = date.getDate();
       const month = date.getMonth() + 1; // getMonth() returns 0-11
 
-      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
-      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Tauro";
-      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Géminis";
-      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cáncer";
-      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
-      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
-      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
-      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpio";
-      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitario";
-      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricornio";
-      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Acuario";
-      if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Piscis";
-      
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
+        return "Aries";
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
+        return "Tauro";
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+        return "Géminis";
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
+        return "Cáncer";
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
+        return "Leo";
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
+        return "Virgo";
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
+        return "Libra";
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+        return "Escorpio";
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+        return "Sagitario";
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
+        return "Capricornio";
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+        return "Acuario";
+      if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
+        return "Piscis";
+
       return "Fecha inválida";
     } catch {
       return "Fecha inválida";
@@ -275,42 +302,61 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
 
   private getSignElement(sign: string): string {
     const elements: { [key: string]: string } = {
-      "Aries": "Fuego", "Leo": "Fuego", "Sagitario": "Fuego",
-      "Tauro": "Tierra", "Virgo": "Tierra", "Capricornio": "Tierra",
-      "Géminis": "Aire", "Libra": "Aire", "Acuario": "Aire",
-      "Cáncer": "Agua", "Escorpio": "Agua", "Piscis": "Agua"
+      Aries: "Fuego",
+      Leo: "Fuego",
+      Sagitario: "Fuego",
+      Tauro: "Tierra",
+      Virgo: "Tierra",
+      Capricornio: "Tierra",
+      Géminis: "Aire",
+      Libra: "Aire",
+      Acuario: "Aire",
+      Cáncer: "Agua",
+      Escorpio: "Agua",
+      Piscis: "Agua",
     };
     return elements[sign] || "Elemento desconocido";
   }
 
   private getRulingPlanet(sign: string): string {
     const planets: { [key: string]: string } = {
-      "Aries": "Marte", "Tauro": "Venus", "Géminis": "Mercurio",
-      "Cáncer": "Luna", "Leo": "Sol", "Virgo": "Mercurio",
-      "Libra": "Venus", "Escorpio": "Plutón", "Sagitario": "Júpiter",
-      "Capricornio": "Saturno", "Acuario": "Urano", "Piscis": "Neptuno"
+      Aries: "Marte",
+      Tauro: "Venus",
+      Géminis: "Mercurio",
+      Cáncer: "Luna",
+      Leo: "Sol",
+      Virgo: "Mercurio",
+      Libra: "Venus",
+      Escorpio: "Plutón",
+      Sagitario: "Júpiter",
+      Capricornio: "Saturno",
+      Acuario: "Urano",
+      Piscis: "Neptuno",
     };
     return planets[sign] || "Planeta desconocido";
   }
 
   private ensureCompleteResponse(text: string): string {
     const lastChar = text.trim().slice(-1);
-    const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-    
-    if (endsIncomplete && !text.trim().endsWith('...')) {
+    const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+
+    if (endsIncomplete && !text.trim().endsWith("...")) {
       const sentences = text.split(/[.!?]/);
       if (sentences.length > 1) {
         const completeSentences = sentences.slice(0, -1);
-        return completeSentences.join('.') + '.';
+        return completeSentences.join(".") + ".";
       } else {
-        return text.trim() + '...';
+        return text.trim() + "...";
       }
     }
-    
+
     return text;
   }
 
-  private validateHoroscopeRequest(zodiacData: HoroscopeData, userMessage: string): void {
+  private validateHoroscopeRequest(
+    zodiacData: HoroscopeData,
+    userMessage: string
+  ): void {
     if (!zodiacData) {
       const error: ApiError = new Error("Datos de la astróloga requeridos");
       error.statusCode = 400;
@@ -318,7 +364,11 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
       throw error;
     }
 
-    if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+    if (
+      !userMessage ||
+      typeof userMessage !== "string" ||
+      userMessage.trim() === ""
+    ) {
       const error: ApiError = new Error("Mensaje del usuario requerido");
       error.statusCode = 400;
       error.code = "MISSING_USER_MESSAGE";
@@ -374,7 +424,10 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
     res.status(statusCode).json(errorResponse);
   }
 
-  public getChineseZodiacInfo = async (req: Request, res: Response): Promise<void> => {
+  public getChineseZodiacInfo = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       res.json({
         success: true,
@@ -382,14 +435,15 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
           name: "Astróloga Luna",
           title: "Guía Celestial de los Signos",
           specialty: "Astrología occidental y horóscopo personalizado",
-          description: "Sabia astróloga especializada en interpretar las influencias celestiales y la sabiduría de los doce signos zodiacales",
+          description:
+            "Sabia astróloga especializada en interpretar las influencias celestiales y la sabiduría de los doce signos zodiacales",
           services: [
             "Interpretación de signos zodiacales",
             "Análisis de cartas astrales",
             "Predicciones horoscópicas",
             "Compatibilidades entre signos",
-            "Consejos basados en astrología"
-          ]
+            "Consejos basados en astrología",
+          ],
         },
         timestamp: new Date().toISOString(),
       });

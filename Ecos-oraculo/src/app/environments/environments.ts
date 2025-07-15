@@ -3,6 +3,6 @@
     apiUrl: 'http://localhost:3010/',
   };    */
   export const environment = {
-    production: false,
+    production: true,
     apiUrl: 'https://api.ecosdeloraculo.com/',
   };  

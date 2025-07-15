@@ -83,7 +83,7 @@ export class SignificadoSuenosComponent
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
-  private backendUrl =  environment.apiUrl;
+  private backendUrl = environment.apiUrl;
 
   interpreterData: DreamInterpreterData = {
     name: 'Maestra Alma',
@@ -660,7 +660,28 @@ export class SignificadoSuenosComponent
       return 'N/A';
     }
   }
+  formatMessage(content: string): string {
+    if (!content) return '';
 
+    let formattedContent = content;
+
+    // Convertir **texto** a <strong>texto</strong> para negrilla
+    formattedContent = formattedContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong>$1</strong>'
+    );
+
+    // Convertir saltos de línea a <br> para mejor visualización
+    formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+    // Opcional: También puedes manejar *texto* (una sola asterisco) como cursiva
+    formattedContent = formattedContent.replace(
+      /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+      '<em>$1</em>'
+    );
+
+    return formattedContent;
+  }
   onUserDataSubmitted(userData: any): void {
     console.log('Datos del usuario recibidos:', userData);
     this.showDataModal = false;

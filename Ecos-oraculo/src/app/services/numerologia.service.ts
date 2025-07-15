@@ -186,7 +186,7 @@ export class NumerologiaService {
     }
     
     if (error.status === 0) {
-      return 'No se puede conectar con el servidor de numerología. Verifica que el backend esté ejecutándose.';
+      return 'No se puede conectar con la maestra de numerología.Intenta de nuevo en unos minutos.';
     }
     
     if (error.error?.code === 'RATE_LIMIT_EXCEEDED') {

@@ -78,7 +78,7 @@
               <div class="message-bubble">
                 <!-- CONTENIDO ORIGINAL (se difumina si está bloqueado) -->
                 <div [class.blurred-content]="isMessageBlocked(message)">
-                  <p [innerHTML]="message.message"></p>
+                  <p [innerHTML]="formatMessage(message.message)"></p>
                 </div>
 
                 <!-- OVERLAY DE PAGO (solo aparece si está bloqueado) -->
@@ -184,7 +184,7 @@
     (onModalClosed)="onDataModalClosed()"
   >
   </app-recolecta-datos>
-  
+
   <div *ngIf="showPaymentModal" class="payment-modal-overlay">
     <div class="payment-modal">
       <div class="payment-header">

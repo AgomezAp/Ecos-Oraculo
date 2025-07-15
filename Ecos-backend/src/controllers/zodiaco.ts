@@ -82,18 +82,30 @@ export class ZodiacController {
       }
 
       // Determinar signo zodiacal
-      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
-      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Tauro";
-      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Géminis";
-      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cáncer";
-      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
-      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
-      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
-      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpio";
-      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitario";
-      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricornio";
-      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Acuario";
-      if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Piscis";
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
+        return "Aries";
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
+        return "Tauro";
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+        return "Géminis";
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
+        return "Cáncer";
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
+        return "Leo";
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
+        return "Virgo";
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
+        return "Libra";
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+        return "Escorpio";
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+        return "Sagitario";
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
+        return "Capricornio";
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+        return "Acuario";
+      if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
+        return "Piscis";
 
       return "Fecha inválida";
     } catch {
@@ -148,7 +160,12 @@ export class ZodiacController {
             .join("\n")}\n`
         : "";
 
-    const astrologicalData = this.generateZodiacData(birthDate, fullName, birthTime, birthPlace);
+    const astrologicalData = this.generateZodiacData(
+      birthDate,
+      fullName,
+      birthTime,
+      birthPlace
+    );
 
     return `Eres Maestra Celeste, una astróloga ancestral y guardiana de los secretos zodiacales. Tienes décadas de experiencia descifrando los misterios del cosmos y revelando los secretos que las estrellas guardan sobre el destino y la personalidad.
 
@@ -264,7 +281,17 @@ CÓMO DEBES COMPORTARTE:
 - RESPUESTAS POSTERIORES: Ve directo al contenido sin saludar de nuevo
 - Usa transiciones naturales como: "Interesante...", "Mira esto...", "Las estrellas me dicen...", "¡Qué buena pregunta!"
 - Mantén la calidez sin repetir saludos innecesarios
+- Si la conversación se vuelve confusa, pregunta de forma amigable: "No estoy segura de entender, ¿podrías aclarar un poco más?"
+ 🔤 MANEJO DE TEXTO MAL ESCRITO:
+  - SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Mantén tu personalidad astrológica incluso con mensajes confusos
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
 
+  IMPORTANTE: Siempre responde algo útil y relevante, sin importar cómo esté escrito el mensaje.
 ${conversationContext}
 
 Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga curiosa y entusiasta que realmente quiere conocer a la persona para poder ayudarla mejor. Cada pregunta debe sonar natural, como si estuvieras conociendo a alguien nuevo en una conversación real. SIEMPRE enfócate en obtener la fecha de nacimiento, pero de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona.`;
@@ -307,7 +334,7 @@ Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO I
 
       // Obtener el modelo Gemini
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: {
           temperature: 0.9,
           topK: 40,
@@ -394,10 +421,7 @@ Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO I
     res.status(statusCode).json(errorResponse);
   }
 
-  public getZodiacInfo = async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  public getZodiacInfo = async (req: Request, res: Response): Promise<void> => {
     try {
       res.json({
         success: true,

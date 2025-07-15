@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Request, Response } from "express";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Interfaces
 interface VocationalData {
@@ -23,7 +23,7 @@ interface VocationalRequest {
     category: string;
   }>;
   conversationHistory?: Array<{
-    role: 'user' | 'counselor';
+    role: "user" | "counselor";
     message: string;
   }>;
 }
@@ -46,22 +46,33 @@ export class VocationalController {
 
   constructor() {
     if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY no está configurada en las variables de entorno');
+      throw new Error(
+        "GEMINI_API_KEY no está configurada en las variables de entorno"
+      );
     }
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
 
   // Método principal para chat con consejero vocacional
-  public chatWithCounselor = async (req: Request, res: Response): Promise<void> => {
+  public chatWithCounselor = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
-      const { vocationalData, userMessage, personalInfo, assessmentAnswers, conversationHistory }: VocationalRequest = req.body;
+      const {
+        vocationalData,
+        userMessage,
+        personalInfo,
+        assessmentAnswers,
+        conversationHistory,
+      }: VocationalRequest = req.body;
 
       // Validar entrada
       this.validateVocationalRequest(vocationalData, userMessage);
 
       // Obtener el modelo Gemini
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         generationConfig: {
           temperature: 0.7, // Balance entre creatividad y precisión para orientación vocacional
           topK: 40,
@@ -71,7 +82,12 @@ export class VocationalController {
       });
 
       // Crear el prompt contextualizado
-      const contextPrompt = this.createVocationalContext(vocationalData, personalInfo, assessmentAnswers, conversationHistory);
+      const contextPrompt = this.createVocationalContext(
+        vocationalData,
+        personalInfo,
+        assessmentAnswers,
+        conversationHistory
+      );
       const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del consejero vocacional:`;
 
       console.log(`Generando orientación vocacional...`);
@@ -103,12 +119,23 @@ export class VocationalController {
   };
 
   // Método para crear contexto vocacional
-  private createVocationalContext(vocational: VocationalData, personalInfo?: any, assessmentAnswers?: any[], history?: Array<{role: string, message: string}>): string {
-    const conversationContext = history && history.length > 0 
-      ? `\n\nCONVERSACIÓN PREVIA:\n${history.map(h => `${h.role === 'user' ? 'Usuario' : 'Tú'}: ${h.message}`).join('\n')}\n`
-      : '';
+  private createVocationalContext(
+    vocational: VocationalData,
+    personalInfo?: any,
+    assessmentAnswers?: any[],
+    history?: Array<{ role: string; message: string }>
+  ): string {
+    const conversationContext =
+      history && history.length > 0
+        ? `\n\nCONVERSACIÓN PREVIA:\n${history
+            .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
+            .join("\n")}\n`
+        : "";
 
-    const personalData = this.generatePersonalProfile(personalInfo, assessmentAnswers);
+    const personalData = this.generatePersonalProfile(
+      personalInfo,
+      assessmentAnswers
+    );
 
     return `Eres Dr. Mentor Vocationis, un consejero vocacional experto con décadas de experiencia ayudando a personas a descubrir su verdadera vocación y propósito profesional. Combinas psicología vocacional, análisis de personalidad y conocimiento del mercado laboral.
 
@@ -189,7 +216,13 @@ METODOLOGÍA DE ORIENTACIÓN VOCACIONAL:
 - Sugiere direcciones vocacionales
 - Proporciona pasos concretos
 - Invita a profundizar en áreas específicas
-
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 EJEMPLOS DE INICIO:
 "Saludos, explorador vocacional. Soy Dr. Mentor Vocationis, y estoy aquí para ayudarte a descubrir tu verdadero camino profesional. Cada persona tiene un conjunto único de talentos, intereses y valores que, al alinearse correctamente, pueden llevar a una carrera extraordinariamente satisfactoria..."
 
@@ -199,102 +232,202 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
   }
 
   // Método para generar perfil personal
-  private generatePersonalProfile(personalInfo?: any, assessmentAnswers?: any[]): string {
+  private generatePersonalProfile(
+    personalInfo?: any,
+    assessmentAnswers?: any[]
+  ): string {
     let profile = "PERFIL DEL CONSULTANTE:\n";
-    
+
     if (personalInfo) {
-      profile += `- Edad: ${personalInfo.age || 'No especificada'}\n`;
-      profile += `- Educación actual: ${personalInfo.currentEducation || 'No especificada'}\n`;
-      profile += `- Experiencia laboral: ${personalInfo.workExperience || 'No especificada'}\n`;
-      profile += `- Intereses declarados: ${personalInfo.interests?.join(', ') || 'No especificados'}\n`;
+      profile += `- Edad: ${personalInfo.age || "No especificada"}\n`;
+      profile += `- Educación actual: ${
+        personalInfo.currentEducation || "No especificada"
+      }\n`;
+      profile += `- Experiencia laboral: ${
+        personalInfo.workExperience || "No especificada"
+      }\n`;
+      profile += `- Intereses declarados: ${
+        personalInfo.interests?.join(", ") || "No especificados"
+      }\n`;
     }
-    
+
     if (assessmentAnswers && assessmentAnswers.length > 0) {
       profile += "\nRESPUESTAS DE ASSESSMENT:\n";
       assessmentAnswers.forEach((answer, index) => {
-        profile += `${index + 1}. ${answer.question}\n   Respuesta: ${answer.answer}\n   Categoría: ${answer.category}\n`;
+        profile += `${index + 1}. ${answer.question}\n   Respuesta: ${
+          answer.answer
+        }\n   Categoría: ${answer.category}\n`;
       });
-      
+
       // Análizar patrones
-      const categories = assessmentAnswers.map(a => a.category);
+      const categories = assessmentAnswers.map((a) => a.category);
       const categoryCount = categories.reduce((acc, cat) => {
         acc[cat] = (acc[cat] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
+
       profile += "\nPATRONES IDENTIFICADOS:\n";
       Object.entries(categoryCount).forEach(([category, count]) => {
         profile += `- ${category}: ${count} respuestas relacionadas\n`;
       });
     }
-    
-    if (!personalInfo && (!assessmentAnswers || assessmentAnswers.length === 0)) {
-      profile += "- Sin datos de assessment previo (realizar evaluación inicial)\n";
+
+    if (
+      !personalInfo &&
+      (!assessmentAnswers || assessmentAnswers.length === 0)
+    ) {
+      profile +=
+        "- Sin datos de assessment previo (realizar evaluación inicial)\n";
     }
-    
+
     return profile;
   }
 
   // Método para obtener preguntas de assessment
-  public getAssessmentQuestions = async (req: Request, res: Response): Promise<void> => {
+  public getAssessmentQuestions = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const questions = [
         {
           id: 1,
           question: "¿Qué tipo de actividades te resultan más energizantes?",
           options: [
-            { value: "trabajar_con_personas", label: "Trabajar con personas y ayudar a otros", category: "social" },
-            { value: "resolver_problemas", label: "Resolver problemas complejos y analizar datos", category: "investigativo" },
-            { value: "crear_diseñar", label: "Crear, diseñar o expresarme artísticamente", category: "artístico" },
-            { value: "liderar_organizar", label: "Liderar equipos y organizar proyectos", category: "emprendedor" }
-          ]
+            {
+              value: "trabajar_con_personas",
+              label: "Trabajar con personas y ayudar a otros",
+              category: "social",
+            },
+            {
+              value: "resolver_problemas",
+              label: "Resolver problemas complejos y analizar datos",
+              category: "investigativo",
+            },
+            {
+              value: "crear_diseñar",
+              label: "Crear, diseñar o expresarme artísticamente",
+              category: "artístico",
+            },
+            {
+              value: "liderar_organizar",
+              label: "Liderar equipos y organizar proyectos",
+              category: "emprendedor",
+            },
+          ],
         },
         {
           id: 2,
-          question: "¿En qué tipo de ambiente te sientes más cómodo trabajando?",
+          question:
+            "¿En qué tipo de ambiente te sientes más cómodo trabajando?",
           options: [
-            { value: "estructurado", label: "Ambiente estructurado con reglas claras", category: "convencional" },
-            { value: "dinamico", label: "Ambiente dinámico y cambiante", category: "emprendedor" },
-            { value: "colaborativo", label: "Ambiente colaborativo y de equipo", category: "social" },
-            { value: "independiente", label: "Trabajo independiente y autónomo", category: "realista" }
-          ]
+            {
+              value: "estructurado",
+              label: "Ambiente estructurado con reglas claras",
+              category: "convencional",
+            },
+            {
+              value: "dinamico",
+              label: "Ambiente dinámico y cambiante",
+              category: "emprendedor",
+            },
+            {
+              value: "colaborativo",
+              label: "Ambiente colaborativo y de equipo",
+              category: "social",
+            },
+            {
+              value: "independiente",
+              label: "Trabajo independiente y autónomo",
+              category: "realista",
+            },
+          ],
         },
         {
           id: 3,
           question: "¿Qué te motiva más en el trabajo?",
           options: [
-            { value: "ayudar_otros", label: "Ayudar a otros y hacer una diferencia social", category: "social" },
-            { value: "desafios_intelectuales", label: "Desafíos intelectuales y aprendizaje continuo", category: "investigativo" },
-            { value: "reconocimiento", label: "Reconocimiento y avance profesional", category: "emprendedor" },
-            { value: "estabilidad", label: "Estabilidad y seguridad laboral", category: "convencional" }
-          ]
+            {
+              value: "ayudar_otros",
+              label: "Ayudar a otros y hacer una diferencia social",
+              category: "social",
+            },
+            {
+              value: "desafios_intelectuales",
+              label: "Desafíos intelectuales y aprendizaje continuo",
+              category: "investigativo",
+            },
+            {
+              value: "reconocimiento",
+              label: "Reconocimiento y avance profesional",
+              category: "emprendedor",
+            },
+            {
+              value: "estabilidad",
+              label: "Estabilidad y seguridad laboral",
+              category: "convencional",
+            },
+          ],
         },
         {
           id: 4,
           question: "¿Cómo prefieres trabajar con información?",
           options: [
-            { value: "analizar_datos", label: "Analizar datos y encontrar patrones", category: "investigativo" },
-            { value: "presentar_ideas", label: "Presentar ideas y comunicar conceptos", category: "social" },
-            { value: "crear_contenido", label: "Crear contenido original y expresivo", category: "artístico" },
-            { value: "organizar_sistemas", label: "Organizar sistemas y procesos", category: "convencional" }
-          ]
+            {
+              value: "analizar_datos",
+              label: "Analizar datos y encontrar patrones",
+              category: "investigativo",
+            },
+            {
+              value: "presentar_ideas",
+              label: "Presentar ideas y comunicar conceptos",
+              category: "social",
+            },
+            {
+              value: "crear_contenido",
+              label: "Crear contenido original y expresivo",
+              category: "artístico",
+            },
+            {
+              value: "organizar_sistemas",
+              label: "Organizar sistemas y procesos",
+              category: "convencional",
+            },
+          ],
         },
         {
           id: 5,
           question: "¿Qué tipo de impacto quieres tener?",
           options: [
-            { value: "impacto_social", label: "Impacto social y comunitario", category: "social" },
-            { value: "avance_cientifico", label: "Avance científico o tecnológico", category: "investigativo" },
-            { value: "innovacion_creativa", label: "Innovación creativa y cultural", category: "artístico" },
-            { value: "crecimiento_economico", label: "Crecimiento económico y empresarial", category: "emprendedor" }
-          ]
-        }
+            {
+              value: "impacto_social",
+              label: "Impacto social y comunitario",
+              category: "social",
+            },
+            {
+              value: "avance_cientifico",
+              label: "Avance científico o tecnológico",
+              category: "investigativo",
+            },
+            {
+              value: "innovacion_creativa",
+              label: "Innovación creativa y cultural",
+              category: "artístico",
+            },
+            {
+              value: "crecimiento_economico",
+              label: "Crecimiento económico y empresarial",
+              category: "emprendedor",
+            },
+          ],
+        },
       ];
 
       res.json({
         success: true,
         questions,
-        instructions: "Responde cada pregunta seleccionando la opción que mejor te represente. No hay respuestas correctas o incorrectas.",
+        instructions:
+          "Responde cada pregunta seleccionando la opción que mejor te represente. No hay respuestas correctas o incorrectas.",
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -303,45 +436,52 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
   };
 
   // Método para analizar resultados de assessment
-  public analyzeAssessment = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { answers } = req.body;
-    
-    if (!answers || !Array.isArray(answers)) {
-      throw new Error("Respuestas de assessment requeridas");
+  public analyzeAssessment = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const { answers } = req.body;
+
+      if (!answers || !Array.isArray(answers)) {
+        throw new Error("Respuestas de assessment requeridas");
+      }
+
+      // Contar categorías
+      const categoryCount = answers.reduce((acc, answer) => {
+        const category = answer.category;
+        acc[category] = (acc[category] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Determinar perfil dominante - CORRECCIÓN AQUÍ
+      const sortedCategories = Object.entries(categoryCount)
+        .sort(([, a], [, b]) => (b as number) - (a as number)) // ← Agregar type assertion
+        .map(([category, count]) => ({
+          category,
+          count: count as number, // ← Agregar type assertion
+          percentage: ((count as number) / answers.length) * 100,
+        }));
+
+      const vocationalProfile = this.getVocationalProfile(
+        sortedCategories[0].category
+      );
+
+      res.json({
+        success: true,
+        analysis: {
+          profileDistribution: sortedCategories,
+          dominantProfile: vocationalProfile,
+          recommendations: this.getCareerRecommendations(
+            sortedCategories[0].category
+          ),
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.handleError(error, res);
     }
-
-    // Contar categorías
-    const categoryCount = answers.reduce((acc, answer) => {
-      const category = answer.category;
-      acc[category] = (acc[category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Determinar perfil dominante - CORRECCIÓN AQUÍ
-    const sortedCategories = Object.entries(categoryCount)
-      .sort(([, a], [, b]) => (b as number) - (a as number)) // ← Agregar type assertion
-      .map(([category, count]) => ({ 
-        category, 
-        count: count as number, // ← Agregar type assertion
-        percentage: ((count as number) / answers.length) * 100 
-      }));
-
-    const vocationalProfile = this.getVocationalProfile(sortedCategories[0].category);
-
-    res.json({
-      success: true,
-      analysis: {
-        profileDistribution: sortedCategories,
-        dominantProfile: vocationalProfile,
-        recommendations: this.getCareerRecommendations(sortedCategories[0].category),
-      },
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    this.handleError(error, res);
-  }
-};
+  };
 
   // Obtener perfil vocacional
   private getVocationalProfile(category: string): any {
@@ -349,39 +489,79 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
       social: {
         name: "Perfil Social",
         description: "Te motiva ayudar, enseñar y trabajar con personas",
-        characteristics: ["Empático", "Comunicativo", "Colaborativo", "Orientado al servicio"],
-        workEnvironments: ["Educación", "Salud", "Servicios sociales", "Recursos humanos"]
+        characteristics: [
+          "Empático",
+          "Comunicativo",
+          "Colaborativo",
+          "Orientado al servicio",
+        ],
+        workEnvironments: [
+          "Educación",
+          "Salud",
+          "Servicios sociales",
+          "Recursos humanos",
+        ],
       },
       investigativo: {
         name: "Perfil Investigativo",
         description: "Te atrae resolver problemas, investigar y analizar",
-        characteristics: ["Analítico", "Curioso", "Metódico", "Orientado a datos"],
-        workEnvironments: ["Ciencia", "Tecnología", "Investigación", "Ingeniería"]
+        characteristics: [
+          "Analítico",
+          "Curioso",
+          "Metódico",
+          "Orientado a datos",
+        ],
+        workEnvironments: [
+          "Ciencia",
+          "Tecnología",
+          "Investigación",
+          "Ingeniería",
+        ],
       },
       artístico: {
         name: "Perfil Artístico",
         description: "Te motiva crear, diseñar y expresarte creativamente",
         characteristics: ["Creativo", "Original", "Expresivo", "Innovador"],
-        workEnvironments: ["Artes", "Diseño", "Medios", "Entretenimiento"]
+        workEnvironments: ["Artes", "Diseño", "Medios", "Entretenimiento"],
       },
       emprendedor: {
         name: "Perfil Emprendedor",
         description: "Te atrae liderar, persuadir y dirigir proyectos",
-        characteristics: ["Líder", "Ambicioso", "Persuasivo", "Orientado a resultados"],
-        workEnvironments: ["Negocios", "Ventas", "Gerencia", "Emprendimiento"]
+        characteristics: [
+          "Líder",
+          "Ambicioso",
+          "Persuasivo",
+          "Orientado a resultados",
+        ],
+        workEnvironments: ["Negocios", "Ventas", "Gerencia", "Emprendimiento"],
       },
       convencional: {
         name: "Perfil Convencional",
         description: "Te motiva organizar, administrar y trabajar con datos",
         characteristics: ["Organizado", "Detallista", "Eficiente", "Confiable"],
-        workEnvironments: ["Administración", "Finanzas", "Contabilidad", "Operaciones"]
+        workEnvironments: [
+          "Administración",
+          "Finanzas",
+          "Contabilidad",
+          "Operaciones",
+        ],
       },
       realista: {
         name: "Perfil Realista",
         description: "Te atrae trabajar con herramientas, máquinas y objetos",
-        characteristics: ["Práctico", "Técnico", "Independiente", "Orientado a resultados"],
-        workEnvironments: ["Ingeniería", "Construcción", "Agricultura", "Oficios especializados"]
-      }
+        characteristics: [
+          "Práctico",
+          "Técnico",
+          "Independiente",
+          "Orientado a resultados",
+        ],
+        workEnvironments: [
+          "Ingeniería",
+          "Construcción",
+          "Agricultura",
+          "Oficios especializados",
+        ],
+      },
     };
 
     return profiles[category] || profiles.social;
@@ -396,7 +576,7 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Trabajo Social",
         "Recursos Humanos",
         "Enfermería y Salud",
-        "Orientación Vocacional"
+        "Orientación Vocacional",
       ],
       investigativo: [
         "Ingeniería en sus diversas ramas",
@@ -404,7 +584,7 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Ciencias de la Computación",
         "Investigación Científica",
         "Análisis de Datos",
-        "Arquitectura"
+        "Arquitectura",
       ],
       artístico: [
         "Diseño Gráfico y Web",
@@ -412,7 +592,7 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Comunicación Social y Periodismo",
         "Artes Visuales y Escénicas",
         "Marketing Creativo",
-        "Producción Audiovisual"
+        "Producción Audiovisual",
       ],
       emprendedor: [
         "Administración de Empresas",
@@ -420,7 +600,7 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Finanzas y Banca",
         "Derecho Empresarial",
         "Comercio Internacional",
-        "Consultoría"
+        "Consultoría",
       ],
       convencional: [
         "Contabilidad y Auditoría",
@@ -428,7 +608,7 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Gestión de Operaciones",
         "Sistemas de Información",
         "Logística y Cadena de Suministro",
-        "Finanzas"
+        "Finanzas",
       ],
       realista: [
         "Ingeniería Mecánica y Civil",
@@ -436,8 +616,8 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
         "Agricultura y Veterinaria",
         "Tecnología Industrial",
         "Oficios Especializados",
-        "Ciencias Ambientales"
-      ]
+        "Ciencias Ambientales",
+      ],
     };
 
     return recommendations[category] || recommendations.social;
@@ -446,31 +626,40 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
   // Método para asegurar respuesta completa
   private ensureCompleteResponse(text: string): string {
     const lastChar = text.trim().slice(-1);
-    const endsIncomplete = !['!', '?', '.', '…'].includes(lastChar);
-    
-    if (endsIncomplete && !text.trim().endsWith('...')) {
+    const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+
+    if (endsIncomplete && !text.trim().endsWith("...")) {
       const sentences = text.split(/[.!?]/);
       if (sentences.length > 1) {
         const completeSentences = sentences.slice(0, -1);
-        return completeSentences.join('.') + '.';
+        return completeSentences.join(".") + ".";
       } else {
-        return text.trim() + '...';
+        return text.trim() + "...";
       }
     }
-    
+
     return text;
   }
 
   // Validación para orientación vocacional
-  private validateVocationalRequest(vocationalData: VocationalData, userMessage: string): void {
+  private validateVocationalRequest(
+    vocationalData: VocationalData,
+    userMessage: string
+  ): void {
     if (!vocationalData) {
-      const error: ApiError = new Error("Datos del consejero vocacional requeridos");
+      const error: ApiError = new Error(
+        "Datos del consejero vocacional requeridos"
+      );
       error.statusCode = 400;
       error.code = "MISSING_VOCATIONAL_DATA";
       throw error;
     }
 
-    if (!userMessage || typeof userMessage !== "string" || userMessage.trim() === "") {
+    if (
+      !userMessage ||
+      typeof userMessage !== "string" ||
+      userMessage.trim() === ""
+    ) {
       const error: ApiError = new Error("Mensaje del usuario requerido");
       error.statusCode = 400;
       error.code = "MISSING_USER_MESSAGE";
@@ -489,24 +678,28 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
 
   // Manejo de errores
   private handleError(error: any, res: Response): void {
-    console.error('Error en VocationalController:', error);
+    console.error("Error en VocationalController:", error);
 
     let statusCode = 500;
-    let errorMessage = 'Error interno del servidor';
-    let errorCode = 'INTERNAL_ERROR';
+    let errorMessage = "Error interno del servidor";
+    let errorCode = "INTERNAL_ERROR";
 
     if (error.statusCode) {
       statusCode = error.statusCode;
       errorMessage = error.message;
-      errorCode = error.code || 'CLIENT_ERROR';
-    } else if (error.message?.includes('quota') || error.message?.includes('limit')) {
+      errorCode = error.code || "CLIENT_ERROR";
+    } else if (
+      error.message?.includes("quota") ||
+      error.message?.includes("limit")
+    ) {
       statusCode = 429;
-      errorMessage = 'Se ha alcanzado el límite de consultas. Por favor, espera un momento.';
-      errorCode = 'QUOTA_EXCEEDED';
-    } else if (error.message?.includes('API key')) {
+      errorMessage =
+        "Se ha alcanzado el límite de consultas. Por favor, espera un momento.";
+      errorCode = "QUOTA_EXCEEDED";
+    } else if (error.message?.includes("API key")) {
       statusCode = 401;
-      errorMessage = 'Error de autenticación con el servicio de IA.';
-      errorCode = 'AUTH_ERROR';
+      errorMessage = "Error de autenticación con el servicio de IA.";
+      errorCode = "AUTH_ERROR";
     }
 
     const errorResponse: VocationalResponse = {
@@ -520,30 +713,35 @@ Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocació
   }
 
   // Método info para consejero vocacional
-  public getVocationalInfo = async (req: Request, res: Response): Promise<void> => {
+  public getVocationalInfo = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       res.json({
         success: true,
         counselor: {
           name: "Dr. Mentor Vocationis",
           title: "Consejero Vocacional Especialista",
-          specialty: "Orientación profesional y mapas vocacionales personalizados",
-          description: "Experto en psicología vocacional con décadas de experiencia ayudando a personas a descubrir su verdadera vocación",
+          specialty:
+            "Orientación profesional y mapas vocacionales personalizados",
+          description:
+            "Experto en psicología vocacional con décadas de experiencia ayudando a personas a descubrir su verdadera vocación",
           services: [
             "Assessment vocacional completo",
             "Análisis de intereses y habilidades",
             "Recomendaciones de carrera personalizadas",
             "Planificación de ruta formativa",
             "Orientación sobre mercado laboral",
-            "Coaching vocacional continuo"
+            "Coaching vocacional continuo",
           ],
           methodology: [
             "Evaluación de intereses Holland (RIASEC)",
             "Análisis de valores laborales",
             "Assessment de habilidades",
             "Exploración de personalidad vocacional",
-            "Investigación de tendencias del mercado"
-          ]
+            "Investigación de tendencias del mercado",
+          ],
         },
         timestamp: new Date().toISOString(),
       });

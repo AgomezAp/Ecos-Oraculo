@@ -82,7 +82,7 @@ class ChatController {
     // Método para generar contenido con reintentos
     generateContentWithRetry(prompt_1) {
         return __awaiter(this, arguments, void 0, function* (prompt, maxRetries = 3) {
-            const model = 'gemini-1.5-flash';
+            const model = "gemini-1.5-flash";
             const generationConfig = {
                 maxOutputTokens: 300,
                 temperature: 1,
@@ -103,7 +103,7 @@ class ChatController {
                     {
                         category: genai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
                         threshold: genai_1.HarmBlockThreshold.BLOCK_NONE,
-                    }
+                    },
                 ],
             };
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -112,9 +112,9 @@ class ChatController {
                         model: model,
                         contents: [
                             {
-                                role: 'user',
-                                parts: [{ text: prompt }]
-                            }
+                                role: "user",
+                                parts: [{ text: prompt }],
+                            },
                         ],
                         config: generationConfig,
                     };
@@ -122,11 +122,13 @@ class ChatController {
                     // Extraer el texto de la respuesta
                     if (response.candidates && response.candidates.length > 0) {
                         const candidate = response.candidates[0];
-                        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-                            return candidate.content.parts[0].text || '';
+                        if (candidate.content &&
+                            candidate.content.parts &&
+                            candidate.content.parts.length > 0) {
+                            return candidate.content.parts[0].text || "";
                         }
                     }
-                    throw new Error('No se pudo extraer el texto de la respuesta');
+                    throw new Error("No se pudo extraer el texto de la respuesta");
                 }
                 catch (error) {
                     console.log(`Intento ${attempt} fallido:`, error.message);
@@ -134,14 +136,14 @@ class ChatController {
                     if (error.status === 503 && attempt < maxRetries) {
                         const delay = Math.pow(2, attempt) * 1000; // Delay exponencial: 2s, 4s, 8s
                         console.log(`Esperando ${delay}ms antes del siguiente intento...`);
-                        yield new Promise(resolve => setTimeout(resolve, delay));
+                        yield new Promise((resolve) => setTimeout(resolve, delay));
                         continue;
                     }
                     // Si es el último intento o no es un error 503, lanzar el error
                     throw error;
                 }
             }
-            throw new Error('Se agotaron todos los intentos de generación');
+            throw new Error("Se agotaron todos los intentos de generación");
         });
     }
     // Método para crear el contexto del intérprete de sueños
@@ -151,7 +153,7 @@ class ChatController {
                 .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
                 .join("\n")}\n`
             : "";
-        return `Eres Maestra Oneiros, una bruja mística y vidente ancestral especializada en la interpretación de sueños. Tienes siglos de experiencia desentrañando los misterios del mundo onírico y conectando los sueños con la realidad espiritual.
+        return `Eres Maestra Alma, una bruja mística y vidente ancestral especializada en la interpretación de sueños. Tienes siglos de experiencia desentrañando los misterios del mundo onírico y conectando los sueños con la realidad espiritual.
 
 TU IDENTIDAD MÍSTICA:
 - Nombre: Maestro Alma, la Guardiana de los Sueños
@@ -199,6 +201,13 @@ CÓMO DEBES COMPORTARTE:
 - SÉ empático y respetuoso con las experiencias oníricas de las personas
 - NUNCA predicas el futuro de forma absoluta, siempre habla de posibilidades y reflexiones
 
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  
 EJEMPLO DE CÓMO EMPEZAR:
 "Ah, veo que has venido a mí buscando desentrañar los misterios de tu mundo onírico... Los sueños son ventanas al alma y mensajes de planos superiores. Cuéntame, ¿qué visiones te han visitado en el reino de Morfeo?"
 
@@ -258,7 +267,8 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
         }
         else if (error.status === 503) {
             statusCode = 503;
-            errorMessage = "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+            errorMessage =
+                "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
             errorCode = "SERVICE_OVERLOADED";
         }
         else if (((_a = error.message) === null || _a === void 0 ? void 0 : _a.includes("quota")) ||

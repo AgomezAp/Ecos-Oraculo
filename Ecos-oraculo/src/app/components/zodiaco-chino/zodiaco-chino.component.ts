@@ -863,11 +863,27 @@ sendMessage(): void {
     );
   }
 
-  formatMessage(message: string): string {
-    return message
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>');
+  formatMessage(content: string): string {
+    if (!content) return '';
+
+    let formattedContent = content;
+
+    // Convertir **texto** a <strong>texto</strong> para negrilla
+    formattedContent = formattedContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong>$1</strong>'
+    );
+
+    // Convertir saltos de línea a <br> para mejor visualización
+    formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+    // Opcional: También puedes manejar *texto* (una sola asterisco) como cursiva
+    formattedContent = formattedContent.replace(
+      /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+      '<em>$1</em>'
+    );
+
+    return formattedContent;
   }
 
   formatTime(timestamp?: string): string {

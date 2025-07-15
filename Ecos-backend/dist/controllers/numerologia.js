@@ -18,33 +18,12 @@ class ChatController {
                 const { numerologyData, userMessage, birthDate, fullName, conversationHistory, } = req.body;
                 // Validar entrada
                 this.validateNumerologyRequest(numerologyData, userMessage);
-                // Obtener el modelo Gemini
-                const model = this.genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
-                    generationConfig: {
-                        temperature: 0.6, // Equilibrio entre creatividad y precisión
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 400,
-                    },
-                });
-                // Crear el prompt contextualizado
-                const contextPrompt = this.createNumerologyContext(numerologyData, birthDate, fullName, conversationHistory);
-                const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del numerólogo (completa tu análisis):`;
-                console.log(`Generando lectura numerológica...`);
-                // Generar contenido con Gemini
-                const result = yield model.generateContent(fullPrompt);
-                const response = result.response;
-                let text = response.text();
-                if (!text || text.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini");
-                }
-                // Verificar si la respuesta parece estar cortada
-                text = this.ensureCompleteResponse(text);
+                // Intentar generar respuesta con fallback
+                const response = yield this.generateWithFallback(numerologyData, userMessage, birthDate, fullName, conversationHistory);
                 // Respuesta exitosa
                 const chatResponse = {
                     success: true,
-                    response: text.trim(),
+                    response: response,
                     timestamp: new Date().toISOString(),
                 };
                 console.log(`Lectura numerológica generada exitosamente`);
@@ -59,7 +38,7 @@ class ChatController {
                 res.json({
                     success: true,
                     numerologist: {
-                        name: "Maestra Pythia",
+                        name: "Maestra Sofia",
                         title: "Guardiana de los Números Sagrados",
                         specialty: "Numerología pitagórica y análisis numérico del destino",
                         description: "Numeróloga ancestral especializada en descifrar los misterios de los números y su influencia en la vida",
@@ -191,10 +170,10 @@ class ChatController {
                 .join("\n")}\n`
             : "";
         const personalData = this.generateNumerologyData(birthDate, fullName);
-        return `Eres Maestra Pythia, una numeróloga ancestral y guardiana de los números sagrados. Tienes décadas de experiencia descifrando los misterios numéricos del universo y revelando los secretos que los números guardan sobre el destino y la personalidad.
+        return `Eres Maestra Sofia, una numeróloga ancestral y guardiana de los números sagrados. Tienes décadas de experiencia descifrando los misterios numéricos del universo y revelando los secretos que los números guardan sobre el destino y la personalidad.
 
 TU IDENTIDAD NUMEROLÓGICA:
-- Nombre: Maestra Pythia, la Guardiana de los Números Sagrados
+- Nombre: Maestra Sofia, la Guardiana de los Números Sagrados
 - Origen: Descendiente de los antiguos matemáticos místicos de Pitágoras
 - Especialidad: Numerología pitagórica, números del destino, vibración numérica personal
 - Experiencia: Décadas interpretando los códigos numéricos del universo
@@ -317,6 +296,15 @@ CÓMO DEBES COMPORTARTE:
 - RESPUESTAS POSTERIORES: Ve directo al contenido sin saludar de nuevo
 - Usa transiciones naturales como: "Interesante...", "Mira esto...", "Los números me dicen...", "¡Qué buena pregunta!"
 - Mantén la calidez sin repetir saludos innecesarios
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+  - Interpreta el mensaje del usuario aunque esté mal escrito
+  - No corrijas los errores del usuario, simplemente entiende la intención
+  - Si no entiendes algo específico, pregunta de forma amigable
+  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
+  - NUNCA devuelvas respuestas vacías por errores de escritura
+  - Si el usuario escribe insultos o comentarios negativos, responde con empatía y sin confrontación, como: "Entiendo que puedas sentirte frustrado. Estoy aquí para ayudarte a encontrar respuestas en los números."
+  -NUNCA DEJES UNA RESPUESTA INCOMPLETA - SIEMPRE completa lo que empiezas
+  
 ${conversationContext}
 
 Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga curiosa y entusiasta que realmente quiere conocer a la persona para poder ayudarla mejor. Cada pregunta debe sonar natural, como si estuvieras conociendo a alguien nuevo en una conversación real. SIEMPRE enfócate en obtener nombre completo y fecha de nacimiento, pero de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona.`;
@@ -336,11 +324,113 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
         }
         return text;
     }
+    generateWithFallback(numerologyData, userMessage, birthDate, fullName, conversationHistory) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const maxRetries = 3;
+            let lastError = null;
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    console.log(`Intento ${attempt} de ${maxRetries} para generar respuesta...`);
+                    // Obtener el modelo Gemini con configuración ajustada según el intento
+                    const model = this.genAI.getGenerativeModel({
+                        model: "gemini-2.5-flash",
+                        generationConfig: {
+                            temperature: 1.6 + attempt * 0.1, // Aumentar temperatura en cada intento
+                            topK: 40,
+                            topP: 1,
+                            maxOutputTokens: 400,
+                        },
+                    });
+                    // Crear prompt con variaciones según el intento
+                    const contextPrompt = this.createNumerologyContext(numerologyData, birthDate, fullName, conversationHistory);
+                    let fullPrompt;
+                    if (attempt === 1) {
+                        // Primer intento: prompt normal
+                        fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del numerólogo (completa tu análisis):`;
+                    }
+                    else if (attempt === 2) {
+                        // Segundo intento: prompt más directo
+                        fullPrompt = `${contextPrompt}\n\nUsuario escribió: "${userMessage}"\n\nResponde de forma conversacional y completa como numeróloga:`;
+                    }
+                    else {
+                        // Tercer intento: prompt simplificado
+                        fullPrompt = `Eres Maestra Sofia, una numeróloga amigable. El usuario dice: "${userMessage}"\n\nResponde de forma natural y útil:`;
+                    }
+                    // Generar contenido
+                    const result = yield model.generateContent(fullPrompt);
+                    const response = result.response;
+                    let text = response.text();
+                    // Verificar si la respuesta es válida
+                    if (text && text.trim() !== "") {
+                        text = this.ensureCompleteResponse(text);
+                        console.log(`✅ Respuesta generada exitosamente en el intento ${attempt}`);
+                        return text.trim();
+                    }
+                    else {
+                        throw new Error(`Respuesta vacía en el intento ${attempt}`);
+                    }
+                }
+                catch (error) {
+                    lastError = error;
+                    console.log(`❌ Error en intento ${attempt}:`, error.message);
+                    // Esperar antes del siguiente intento (excepto en el último)
+                    if (attempt < maxRetries) {
+                        yield new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+                    }
+                }
+            }
+            // Si todos los intentos fallan, devolver respuesta predeterminada
+            console.log("⚠️ Todos los intentos fallaron, usando respuesta predeterminada");
+            return this.getFallbackResponse(userMessage, birthDate, fullName);
+        });
+    }
+    getFallbackResponse(userMessage, birthDate, fullName) {
+        // Respuestas dinámicas basadas en los datos disponibles
+        if (birthDate && fullName) {
+            const lifePath = this.calculateLifePath(birthDate);
+            const destiny = this.calculateDestinyNumber(fullName);
+            return `¡Hola! Me da mucho gusto conocerte. Aunque hay una pequeña interferencia en las vibraciones cósmicas, puedo decirte que tus números principales son fascinantes:
+
+**Tu Camino de Vida es ${lifePath}**, lo que significa que tienes un propósito especial en esta vida. Este número revela tu misión principal y las lecciones que vienes a aprender.
+
+**Tu Número del Destino es ${destiny}**, que representa tu potencial máximo y hacia dónde te diriges naturalmente.
+
+Los números están tratando de decirme algo más sobre ti, pero necesito un momento para que las energías se estabilicen. ¿Te gustaría que profundicemos en algún aspecto específico de tu perfil numerológico?
+
+¿Hay algo en particular sobre los números que te gustaría explorar?`;
+        }
+        if (birthDate) {
+            const lifePath = this.calculateLifePath(birthDate);
+            return `¡Hola! Las vibraciones numéricas están un poco dispersas en este momento, pero puedo ver que tu **Camino de Vida es ${lifePath}**.
+
+Este número es súper especial porque representa tu propósito principal en esta vida. Para darte una lectura más completa, me encantaría conocer tu nombre completo.
+
+¿Qué aspecto de tu perfil numerológico te gustaría explorar más? ¿O hay alguna pregunta específica sobre los números que tengas en mente?`;
+        }
+        if (fullName) {
+            const destiny = this.calculateDestinyNumber(fullName);
+            return `¡Hola! Me encanta poder ayudarte con los números. Aunque las energías están un poco revueltas, puedo ver que tu **Número del Destino es ${destiny}**.
+
+Este número habla de tu potencial máximo y tu dirección natural en la vida. Para una lectura más completa, me encantaría conocer tu fecha de nacimiento.
+
+¿Hay algo específico sobre los números que te gustaría saber? ¿O alguna situación en tu vida donde sientes que los números podrían guiarte?`;
+        }
+        // Respuesta general cuando no hay datos específicos
+        return `¡Hola! Me da mucho gusto que hayas venido a explorar el mundo de los números conmigo. Las energías numerológicas están un poco dispersas en este momento, pero estoy aquí para ayudarte.
+
+Para poder darte la mejor lectura posible, me encantaría conocer:
+- Tu nombre completo (para calcular tu Número del Destino)
+- Tu fecha de nacimiento (para tu Camino de Vida)
+
+Los números tienen tanto que revelarte sobre tu personalidad, tu propósito y tu futuro. ¿Qué te gustaría saber sobre la numerología? ¿Hay alguna situación en tu vida donde sientes que los números podrían guiarte?
+
+¡Estoy aquí para ayudarte a descifrar los mensajes que los números tienen para ti!`;
+    }
     handleError(error, res) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
         console.error("Error en ChatController:", error);
         let statusCode = 500;
-        let errorMessage = "Error interno del servidor";
+        let errorMessage = "Las energías numéricas están temporalmente perturbadas. Por favor, intenta nuevamente.";
         let errorCode = "INTERNAL_ERROR";
         if (error.statusCode) {
             statusCode = error.statusCode;
@@ -351,18 +441,25 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
             ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes("limit"))) {
             statusCode = 429;
             errorMessage =
-                "Se ha alcanzado el límite de consultas. Por favor, espera un momento.";
+                "Se ha alcanzado el límite de consultas numéricas. Por favor, espera un momento para que las vibraciones se estabilicen.";
             errorCode = "QUOTA_EXCEEDED";
         }
         else if ((_c = error.message) === null || _c === void 0 ? void 0 : _c.includes("safety")) {
             statusCode = 400;
-            errorMessage = "El contenido no cumple con las políticas de seguridad.";
+            errorMessage =
+                "El contenido no cumple con las políticas de seguridad numerológica.";
             errorCode = "SAFETY_FILTER";
         }
         else if ((_d = error.message) === null || _d === void 0 ? void 0 : _d.includes("API key")) {
             statusCode = 401;
-            errorMessage = "Error de autenticación con el servicio de IA.";
+            errorMessage = "Error de autenticación con el servicio de numerología.";
             errorCode = "AUTH_ERROR";
+        }
+        else if ((_e = error.message) === null || _e === void 0 ? void 0 : _e.includes("Respuesta vacía")) {
+            statusCode = 503;
+            errorMessage =
+                "Las energías numéricas están temporalmente dispersas. Por favor, intenta nuevamente en un momento.";
+            errorCode = "EMPTY_RESPONSE";
         }
         const errorResponse = {
             success: false,

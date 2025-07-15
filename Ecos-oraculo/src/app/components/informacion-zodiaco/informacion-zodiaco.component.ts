@@ -197,7 +197,6 @@ export class InformacionZodiacoComponent
     );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
@@ -659,10 +658,27 @@ export class InformacionZodiacoComponent
       console.error('Error scrolling to bottom:', err);
     }
   }
-
   formatMessage(content: string): string {
-    // Método para formatear mensajes - implementa según necesites
-    return content;
+    if (!content) return '';
+
+    let formattedContent = content;
+
+    // Convertir **texto** a <strong>texto</strong> para negrilla
+    formattedContent = formattedContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong>$1</strong>'
+    );
+
+    // Convertir saltos de línea a <br> para mejor visualización
+    formattedContent = formattedContent.replace(/\n/g, '<br>');
+
+    // Opcional: También puedes manejar *texto* (una sola asterisco) como cursiva
+    formattedContent = formattedContent.replace(
+      /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+      '<em>$1</em>'
+    );
+
+    return formattedContent;
   }
 
   // Métodos específicos del zodíaco - implementa según tu lógica
