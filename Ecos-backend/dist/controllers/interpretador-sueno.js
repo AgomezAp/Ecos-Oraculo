@@ -85,7 +85,7 @@ class ChatController {
             const model = "gemini-1.5-flash";
             const generationConfig = {
                 maxOutputTokens: 300,
-                temperature: 1,
+                temperature: 0.8,
                 topP: 1,
                 safetySettings: [
                     {

@@ -33,6 +33,8 @@ export class RecolectaDatosComponent {
   };
   aceptaTerminos = false;
   showTerminosError = false;
+  datosVeridicos = false;
+  showDatosVeridicosError = false;
   // ✅ Control de formulario
   dataFormErrors: { [key: string]: string } = {};
   isValidatingData: boolean = false;
@@ -199,7 +201,11 @@ export class RecolectaDatosComponent {
         this.showTerminosError = true;
         return;
       }
-
+      this.showDatosVeridicosError = false;
+      if (!this.datosVeridicos) {
+        this.showDatosVeridicosError = true;
+        return;
+      }
       // ✅ Llamar al servicio createProduct
       this.recolecta.createProduct(datosToSend).subscribe({
         next: (response: Datos) => {

@@ -278,6 +278,18 @@
             </a>
             *
           </label>
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="aceptaTerminos"
+              name="datosVeridicos"
+              required
+            />
+            Confirmo que los datos proporcionados son verídicos y completos        
+          </label>
+           <span *ngIf="datosVeridicos" class="error-message"
+            >Debes aceptar que los datos introducidos son los reales</span
+          >
           <span *ngIf="showTerminosError" class="error-message"
             >Debes aceptar los Términos y Condiciones</span
           >
