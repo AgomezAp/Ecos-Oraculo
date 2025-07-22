@@ -82,11 +82,11 @@ class ChatController {
     // Método para generar contenido con reintentos
     generateContentWithRetry(prompt_1) {
         return __awaiter(this, arguments, void 0, function* (prompt, maxRetries = 3) {
-            const model = "gemini-1.5-flash";
+            const model = "gemini-2.0-flash";
             const generationConfig = {
                 maxOutputTokens: 300,
-                temperature: 0.8,
-                topP: 1,
+                temperature: 1.5,
+                topP: 0.5,
                 safetySettings: [
                     {
                         category: genai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,

@@ -14,7 +14,7 @@ import calculadoraAmor from "../routes/calculadora-amor";
 import RPagos from "../routes/Pagos";
 import Recolecta from "../routes/recolecta";
 import { recolecta } from "./recolecta-datos";
-
+import Monei from "../routes/monei";
 // Cargar variables de entorno
 dotenv.config();
 
@@ -69,13 +69,14 @@ class Server {
     this.app.use(calculadoraAmor);
     this.app.use(RPagos);
     this.app.use(Recolecta);
+    this.app.use(Monei)
 
     // Health check endpoint
     this.app.get("/health", (req, res) => {
       res.json({
         status: "OK",
         timestamp: new Date().toISOString(),
-        service: "Hagiografia Chat API",
+        service: " Chat API",
       });
     });
 

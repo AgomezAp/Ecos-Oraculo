@@ -29,6 +29,7 @@ import {
 } from '@stripe/stripe-js';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environmets.prod';
+import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 
 interface ChatMessage {
   role: 'user' | 'master';
@@ -68,6 +69,7 @@ interface ZodiacAnimal {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    RecolectaDatosComponent,
   ],
   templateUrl: './zodiaco-chino.component.html',
   styleUrl: './zodiaco-chino.component.css',
@@ -102,7 +104,9 @@ export class ZodiacoChinoComponent
   hasUserPaidForHoroscope: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-
+  //Datos para enviar
+  showDataModal: boolean = false;
+  userData: any = null;
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
@@ -604,77 +608,77 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   // Enviar mensaje en el chat
-sendMessage(): void {
-  if (this.currentMessage.trim() && !this.isLoading) {
-    const message = this.currentMessage.trim();
+  sendMessage(): void {
+    if (this.currentMessage.trim() && !this.isLoading) {
+      const message = this.currentMessage.trim();
 
-    // Verificar si es la SEGUNDA pregunta y si no ha pagado
-    if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
-      this.saveHoroscopeStateBeforePayment();
-      this.promptForHoroscopePayment();
-      return;
-    }
+      // Verificar si es la SEGUNDA pregunta y si no ha pagado
+      if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
+        this.saveHoroscopeStateBeforePayment();
+        this.showDataModal = true;
+        return;
+      }
 
-    this.currentMessage = '';
-    this.isLoading = true;
-    this.isTyping = true; // <-- Activa el indicador de escritura
+      this.currentMessage = '';
+      this.isLoading = true;
+      this.isTyping = true; // <-- Activa el indicador de escritura
 
-    // Agregar mensaje del usuario
-    this.addMessage('user', message);
+      // Agregar mensaje del usuario
+      this.addMessage('user', message);
 
-    const formData = this.userForm.value;
-    const consultationData = {
-      zodiacData: {
-        name: 'Astróloga María',
-        specialty: 'Astrología occidental y horóscopo personalizado',
-        experience: 'Décadas de experiencia en interpretación astrológica',
-      },
-      userMessage: message,
-      fullName: formData.fullName,
-      birthYear: formData.birthYear?.toString(),
-      birthDate: formData.birthDate,
-      conversationHistory: this.conversationHistory,
-    };
+      const formData = this.userForm.value;
+      const consultationData = {
+        zodiacData: {
+          name: 'Astróloga María',
+          specialty: 'Astrología occidental y horóscopo personalizado',
+          experience: 'Décadas de experiencia en interpretación astrológica',
+        },
+        userMessage: message,
+        fullName: formData.fullName,
+        birthYear: formData.birthYear?.toString(),
+        birthDate: formData.birthDate,
+        conversationHistory: this.conversationHistory,
+      };
 
-    this.zodiacoChinoService.chatWithMaster(consultationData).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        this.isTyping = false; // <-- Desactiva el indicador al recibir respuesta
-        if (response.success && response.response) {
-          const messageId = Date.now().toString();
+      this.zodiacoChinoService.chatWithMaster(consultationData).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          this.isTyping = false; // <-- Desactiva el indicador al recibir respuesta
+          if (response.success && response.response) {
+            const messageId = Date.now().toString();
 
-          this.addMessage('master', response.response, messageId);
+            this.addMessage('master', response.response, messageId);
 
-          // Si no ha pagado y ya hizo la primera pregunta, bloquear el mensaje
-          if (this.firstQuestionAsked && !this.hasUserPaidForHoroscope) {
-            this.blockedMessageId = messageId;
-            sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
+            // Si no ha pagado y ya hizo la primera pregunta, bloquear el mensaje
+            if (this.firstQuestionAsked && !this.hasUserPaidForHoroscope) {
+              this.blockedMessageId = messageId;
+              sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
 
-            setTimeout(() => {
-              this.saveHoroscopeStateBeforePayment();
-              this.promptForHoroscopePayment();
-            }, 2000);
-          } else if (!this.firstQuestionAsked) {
-            this.firstQuestionAsked = true;
-            sessionStorage.setItem('horoscopeFirstQuestionAsked', 'true');
+              setTimeout(() => {
+                this.saveHoroscopeStateBeforePayment();
+                this.promptForHoroscopePayment();
+              }, 2000);
+            } else if (!this.firstQuestionAsked) {
+              this.firstQuestionAsked = true;
+              sessionStorage.setItem('horoscopeFirstQuestionAsked', 'true');
+            }
+
+            this.saveHoroscopeMessagesToSession();
+          } else {
+            this.handleError('Error en la respuesta de la astróloga');
           }
-
-          this.saveHoroscopeMessagesToSession();
-        } else {
-          this.handleError('Error en la respuesta de la astróloga');
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.isTyping = false; // <-- Desactiva también en caso de error
-        this.handleError(
-          'Error conectando con la astróloga: ' +
-            (error.error?.error || error.message)
-        );
-      },
-    });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.isTyping = false; // <-- Desactiva también en caso de error
+          this.handleError(
+            'Error conectando con la astróloga: ' +
+              (error.error?.error || error.message)
+          );
+        },
+      });
+    }
   }
-}
 
   // Calcular animal del zodiaco chino (mantenido para compatibilidad)
   calculateZodiacAnimal(birthYear: number, birthDate?: string): void {
@@ -943,5 +947,39 @@ sendMessage(): void {
     this.conversationHistory = [];
     this.currentMessage = '';
     // Si tienes algún estado adicional que resetear, agrégalo aquí
+  }
+  onUserDataSubmitted(userData: any): void {
+    console.log('Datos del usuario recibidos:', userData);
+    this.userData = userData;
+    this.showDataModal = false;
+
+    // Enviar datos al backend
+    this.sendUserDataToBackend(userData);
+  }
+  private sendUserDataToBackend(userData: any): void {
+    console.log('📤 Enviando datos al backend...');
+
+    this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
+      next: (response) => {
+        console.log('✅ Datos enviados correctamente:', response);
+        // Proceder al pago después de guardar los datos
+        setTimeout(() => {
+          this.promptForHoroscopePayment();
+        }, 300);
+      },
+      error: (error) => {
+        console.error('❌ Error enviando datos:', error);
+        // Aún así proceder al pago, pero mostrar advertencia
+        alert(
+          'Hubo un problema guardando los datos, pero puedes continuar con el pago.'
+        );
+        setTimeout(() => {
+          this.promptForHoroscopePayment();
+        }, 300);
+      },
+    });
+  }
+  onDataModalClosed(): void {
+    this.showDataModal = false;
   }
 }

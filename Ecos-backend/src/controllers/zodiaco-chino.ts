@@ -51,7 +51,7 @@ export class ChineseZodiacController {
 
       // Obtener el modelo Gemini
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
+        model: "gemini-1.5-flash",
         generationConfig: {
           temperature: 0.85, // Creatividad para interpretaciones astrológicas
           topK: 40,

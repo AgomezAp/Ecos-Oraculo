@@ -95,12 +95,12 @@ export class ChatController {
     prompt: string,
     maxRetries: number = 3
   ): Promise<string> {
-    const model = "gemini-1.5-flash";
+    const model = "gemini-2.0-flash";
 
     const generationConfig = {
       maxOutputTokens: 300,
-      temperature: 0.8,
-      topP: 1,
+      temperature: 1.5,
+      topP: 0.5,
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,

@@ -48,7 +48,7 @@
         </svg>
       </button>
     </div>
-    
+
     <!-- Chat Messages -->
     <div class="chat-messages" #messagesContainer>
       <div
@@ -122,14 +122,14 @@
                 <span></span>
               </div>
               <p class="typing-text">
-              Astrologa Emma está consultando los astros para ti...
+                Astrologa Emma está consultando los astros para ti...
               </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Input Area -->
     <div class="chat-input-area">
       <div class="message-input">
@@ -173,7 +173,12 @@
     </div>
   </div>
 </div>
-
+<app-recolecta-datos
+  *ngIf="showDataModal"
+  (onDataSubmitted)="onUserDataSubmitted($event)"
+  (onModalClosed)="onDataModalClosed()"
+>
+</app-recolecta-datos>
 <!-- ===== MODAL DE PAGO HORÓSCOPO ===== -->
 <div
   *ngIf="showPaymentModal"
@@ -189,7 +194,6 @@
     </div>
 
     <div class="payment-content">
-
       <div class="payment-price">
         <div class="price-container">
           <span class="currency">$</span>

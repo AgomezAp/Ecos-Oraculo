@@ -72,7 +72,6 @@ export class BienvenidaComponent implements AfterViewInit {
   }
 
   private setupUserInteractionFallback() {
-    // Si el autoplay falla, reproduce el video con cualquier interacción del usuario
     const playOnInteraction = () => {
       if (this.backgroundVideo && this.backgroundVideo.nativeElement) {
         this.backgroundVideo.nativeElement.play();

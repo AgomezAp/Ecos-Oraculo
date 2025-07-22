@@ -35,6 +35,7 @@ export class RecolectaDatosComponent {
   showTerminosError = false;
   datosVeridicos = false;
   showDatosVeridicosError = false;
+  emailNotifications = false;
   // ✅ Control de formulario
   dataFormErrors: { [key: string]: string } = {};
   isValidatingData: boolean = false;
@@ -170,16 +171,37 @@ export class RecolectaDatosComponent {
   }
 
   async submitUserData(): Promise<void> {
+    console.log('🔍 Iniciando submitUserData...'); // DEBUG
+
     this.attemptedDataSubmission = true;
 
+    // Validar formulario
     if (!this.validateUserData()) {
+      console.log('❌ Validación fallida:', this.dataFormErrors); // DEBUG
+      return;
+    }
+
+    // Validar términos y condiciones
+    this.showTerminosError = false;
+    this.showDatosVeridicosError = false;
+
+    if (!this.aceptaTerminos) {
+      this.showTerminosError = true;
+      console.log('❌ Términos no aceptados'); // DEBUG
+      return;
+    }
+
+    if (!this.datosVeridicos) {
+      this.showDatosVeridicosError = true;
+      console.log('❌ Datos verídicos no confirmados'); // DEBUG
       return;
     }
 
     this.isValidatingData = true;
+    console.log('✅ Todas las validaciones pasaron, enviando datos...'); // DEBUG
 
     try {
-      // ✅ Crear objeto Datos según tu interfaz
+      // Crear objeto según tu interfaz
       const datosToSend: Datos = {
         NIF: this.userData.NIF,
         numero_pasapote: this.userData.numero_pasapote,
@@ -196,41 +218,37 @@ export class RecolectaDatosComponent {
         email: this.userData.email,
       };
 
-      this.showTerminosError = false;
-      if (!this.aceptaTerminos) {
-        this.showTerminosError = true;
-        return;
-      }
-      this.showDatosVeridicosError = false;
-      if (!this.datosVeridicos) {
-        this.showDatosVeridicosError = true;
-        return;
-      }
-      // ✅ Llamar al servicio createProduct
+      console.log('📤 Datos a enviar:', datosToSend); // DEBUG
+
+      // Llamar al servicio
       this.recolecta.createProduct(datosToSend).subscribe({
         next: (response: Datos) => {
-          console.log('✅ Datos guardados exitosamente:', response);
+          console.log('✅ Respuesta del backend:', response); // DEBUG
           this.isValidatingData = false;
-
-          // Emitir evento con los datos guardados
           this.onDataSubmitted.emit(response);
         },
         error: (error: any) => {
-          console.error('❌ Error al guardar datos:', error);
+          console.error('❌ Error del backend:', error); // DEBUG
+          console.error('❌ Error completo:', {
+            message: error.message,
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            error: error.error,
+          });
           this.dataFormErrors['general'] =
             'Error al guardar los datos. Por favor, inténtalo de nuevo.';
           this.isValidatingData = false;
         },
       });
     } catch (error) {
-      console.error('❌ Error inesperado:', error);
+      console.error('❌ Error inesperado:', error); // DEBUG
       this.dataFormErrors['general'] =
         'Error inesperado. Por favor, inténtalo de nuevo.';
       this.isValidatingData = false;
     }
   }
 
-  // ✅ Método para cancelar modal
   cancelDataModal(): void {
     this.onModalClosed.emit();
   }

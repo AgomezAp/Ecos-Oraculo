@@ -16,7 +16,7 @@
           <h4>Datos de Identificación</h4>
           <div class="form-row">
             <div class="form-group">
-              <label for="nif">NIF/DNI:</label>
+              <label for="nif">NIE/DNI:</label>
               <input
                 type="text"
                 id="nif"
@@ -100,6 +100,24 @@
             }}</span>
           </div>
 
+          <!-- ✅ Nuevo checkbox para factura y noticias -->
+          <div class="form-group checkbox-group">
+            <label class="checkbox-container">
+              <input
+                type="checkbox"
+                id="emailNotifications"
+                [(ngModel)]="userData.emailNotifications"
+                name="emailNotifications"
+              />
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                Deseo que me envíen la factura al correo electrónico y recibir
+                noticias, ofertas especiales y actualizaciones sobre nuestros
+                servicios.
+              </span>
+            </label>
+          </div>
+          <div></div>
           <div class="form-group">
             <label for="pais">País *:</label>
             <select
@@ -278,22 +296,26 @@
             </a>
             *
           </label>
+
           <label>
             <input
               type="checkbox"
-              [(ngModel)]="aceptaTerminos"
+              [(ngModel)]="datosVeridicos"
               name="datosVeridicos"
               required
             />
-            Confirmo que los datos proporcionados son verídicos y completos        
+            Confirmo que los datos proporcionados son verídicos y completos
           </label>
-           <span *ngIf="datosVeridicos" class="error-message"
-            >Debes aceptar que los datos introducidos son los reales</span
-          >
-          <span *ngIf="showTerminosError" class="error-message"
-            >Debes aceptar los Términos y Condiciones</span
-          >
+
+          <!-- ✅ Mensajes de error corregidos -->
+          <span *ngIf="showDatosVeridicosError" class="error-message">
+            Debes confirmar que los datos introducidos son verídicos
+          </span>
+          <span *ngIf="showTerminosError" class="error-message">
+            Debes aceptar los Términos y Condiciones
+          </span>
         </div>
+
         <div class="data-actions">
           <button
             type="button"
@@ -303,10 +325,10 @@
           >
             Cancelar
           </button>
+          <!-- ✅ Botón corregido - solo type="submit", sin (click) -->
           <button
             type="submit"
-            (click)="submitUserData()"
-            [disabled]="isValidatingData || !aceptaTerminos"
+            [disabled]="isValidatingData || !aceptaTerminos || !datosVeridicos"
             class="continue-button"
           >
             <span *ngIf="!isValidatingData">Continuar al Pago</span>

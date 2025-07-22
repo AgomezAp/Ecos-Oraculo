@@ -2246,3 +2246,41 @@
     font-size: 11px;
   }
 }
+/* //BIZUM */
+.payment-form {
+  margin-top: 20px;
+}
+
+.payment-methods h4 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 16px;
+}
+
+.bizum-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.card-payment-option {
+  margin-top: 15px;
+}
+
+.card-payment-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.card-payment-btn:hover {
+  background-color: #0056b3;
+}

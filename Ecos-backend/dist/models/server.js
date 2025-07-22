@@ -27,6 +27,7 @@ const calculadora_amor_1 = __importDefault(require("../routes/calculadora-amor")
 const Pagos_1 = __importDefault(require("../routes/Pagos"));
 const recolecta_1 = __importDefault(require("../routes/recolecta"));
 const recolecta_datos_1 = require("./recolecta-datos");
+const monei_1 = __importDefault(require("../routes/monei"));
 // Cargar variables de entorno
 dotenv_1.default.config();
 class Server {
@@ -73,12 +74,13 @@ class Server {
         this.app.use(calculadora_amor_1.default);
         this.app.use(Pagos_1.default);
         this.app.use(recolecta_1.default);
+        this.app.use(monei_1.default);
         // Health check endpoint
         this.app.get("/health", (req, res) => {
             res.json({
                 status: "OK",
                 timestamp: new Date().toISOString(),
-                service: "Hagiografia Chat API",
+                service: " Chat API",
             });
         });
         // Error handling middleware

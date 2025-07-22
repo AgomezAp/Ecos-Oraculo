@@ -344,7 +344,7 @@ export class SignificadoSuenosComponent
     }
     setTimeout(() => {
       this.textareaHeight = this.minTextareaHeight;
-    }, 50);
+    }, 5000);
   }
 
   private saveStateBeforePayment(): void {
@@ -684,13 +684,37 @@ export class SignificadoSuenosComponent
   }
   onUserDataSubmitted(userData: any): void {
     console.log('Datos del usuario recibidos:', userData);
+    this.userData = userData;
     this.showDataModal = false;
 
-    setTimeout(() => {
-      this.promptForPayment();
-    }, 300);
+    // Enviar datos al backend
+    this.sendUserDataToBackend(userData);
   }
+  private sendUserDataToBackend(userData: any): void {
+    console.log('📤 Enviando datos al backend...');
 
+    this.http
+      .post(`${this.backendUrl}api/recolecta`, userData)
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Datos enviados correctamente:', response);
+          // Proceder al pago después de guardar los datos
+          setTimeout(() => {
+            this.promptForPayment();
+          }, 300);
+        },
+        error: (error) => {
+          console.error('❌ Error enviando datos:', error);
+          // Aún así proceder al pago, pero mostrar advertencia
+          alert(
+            'Hubo un problema guardando los datos, pero puedes continuar con el pago.'
+          );
+          setTimeout(() => {
+            this.promptForPayment();
+          }, 300);
+        },
+      });
+  }
   onDataModalClosed(): void {
     this.showDataModal = false;
   }
