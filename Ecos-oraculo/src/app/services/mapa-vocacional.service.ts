@@ -99,7 +99,7 @@ interface CounselorInfoResponse {
 })
 export class MapaVocacionalService {
   // ✅ CORREGIR: Usar solo la URL base
-  private readonly API_URL = environment.apiUrl || 'http://localhost:3010';
+  private readonly API_URL = environment.apiUrl;
 
   private readonly httpOptions = {
     headers: new HttpHeaders({

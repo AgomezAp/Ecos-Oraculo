@@ -20,11 +20,10 @@ class AnimalInteriorController {
                 this.validateAnimalChatRequest(guideData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.5-flash",
+                    model: "gemini-2.0-flash",
                     generationConfig: {
-                        temperature: 0.9, // Creatividad para conexiones espirituales
-                        topK: 40,
-                        topP: 0.95,
+                        temperature: 1.5, // Creatividad para conexiones espirituales
+                        topP: 0.5,
                         maxOutputTokens: 300,
                     },
                 });

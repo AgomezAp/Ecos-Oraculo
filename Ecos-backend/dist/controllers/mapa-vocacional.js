@@ -21,12 +21,11 @@ class VocationalController {
                 this.validateVocationalRequest(vocationalData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.5-flash",
+                    model: "gemini-2.0-flash",
                     generationConfig: {
-                        temperature: 0.7, // Balance entre creatividad y precisión para orientación vocacional
-                        topK: 40,
-                        topP: 0.9,
-                        maxOutputTokens: 500,
+                        temperature: 1.5, // Balance entre creatividad y precisión para orientación vocacional
+                        topP: 0.5,
+                        maxOutputTokens: 400,
                     },
                 });
                 // Crear el prompt contextualizado
