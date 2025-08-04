@@ -27,6 +27,10 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 import { environment } from '../../environments/environmets.prod';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 interface VocationalMessage {
   sender: string;
   content: string;
@@ -96,6 +100,7 @@ interface AnalysisResult {
     MatStepperModule,
     MatProgressBarModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './mapa-vocacional.component.html',
   styleUrl: './mapa-vocacional.component.css',
@@ -138,7 +143,35 @@ export class MapaVocacionalComponent
   hasUserPaidForVocational: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-
+  //Variables para la ruleta
+  showFortuneWheel: boolean = false;
+  vocationalPrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Sesiones de Orientación Gratis',
+      color: '#4ecdc4',
+      icon: '🎯',
+    },
+    {
+      id: '2',
+      name: '1 Análisis Vocacional Premium',
+      color: '#45b7d1',
+      icon: '✨',
+    },
+    {
+      id: '3',
+      name: '2 Consultas Vocacionales Extra',
+      color: '#ffeaa7',
+      icon: '🌟',
+    },
+    {
+      id: '4',
+      name: '¡Tu vocación dice: otra oportunidad!',
+      color: '#ff7675',
+      icon: '🔄',
+    },
+  ];
+  private wheelTimer: any;
   // AGREGADO - Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
@@ -207,6 +240,10 @@ export class MapaVocacionalComponent
     this.checkPaymentStatus();
 
     this.loadAssessmentQuestions();
+
+    if (this.chatMessages.length > 0 && FortuneWheelComponent.canShowWheel()) {
+      this.showWheelAfterDelay(2000);
+    }
   }
 
   // AGREGADO - Métodos para control de scroll
@@ -231,6 +268,9 @@ export class MapaVocacionalComponent
 
   // AGREGADO - Cleanup Stripe
   ngOnDestroy(): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
@@ -297,6 +337,13 @@ export class MapaVocacionalComponent
       timestamp: new Date(),
       isUser: false,
     });
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta vocacional - sin tiradas disponibles'
+      );
+    }
   }
 
   // Cambiar pestaña
@@ -310,11 +357,36 @@ export class MapaVocacionalComponent
 
     const userMessage = this.currentMessage.trim();
 
-    // MODIFICADO - Verificar si es la segunda pregunta y no ha pagado
+    // ✅ NUEVA LÓGICA: Verificar consultas vocacionales gratuitas ANTES de verificar pago
     if (!this.hasUserPaidForVocational && this.firstQuestionAsked) {
-      this.saveStateBeforePayment();
-      this.showDataModal = true;
-      return;
+      // Verificar si tiene consultas vocacionales gratis disponibles
+      if (this.hasFreeVocationalConsultationsAvailable()) {
+        console.log('🎁 Usando consulta vocacional gratis del premio');
+        this.useFreeVocationalConsultation();
+        // Continuar con el mensaje sin bloquear
+      } else {
+        // Si no tiene consultas gratis, mostrar modal de datos
+        console.log(
+          '💳 No hay consultas vocacionales gratis - mostrando modal de datos'
+        );
+
+        // Cerrar otros modales primero
+        this.showFortuneWheel = false;
+        this.showPaymentModal = false;
+
+        // Guardar el mensaje para procesarlo después del pago
+        sessionStorage.setItem('pendingVocationalMessage', userMessage);
+
+        this.saveStateBeforePayment();
+
+        // Mostrar modal de datos con timeout
+        setTimeout(() => {
+          this.showDataModal = true;
+          console.log('📝 showDataModal establecido a:', this.showDataModal);
+        }, 100);
+
+        return; // Salir aquí para no procesar el mensaje aún
+      }
     }
 
     this.addMessage({
@@ -479,7 +551,140 @@ export class MapaVocacionalComponent
       this.isProcessingPayment = false;
     }
   }
+   showWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
 
+    console.log('⏰ Timer vocacional configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta vocacional...');
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta vocacional - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log('❌ No se puede mostrar ruleta vocacional en este momento');
+      }
+    }, delayMs);
+  }
+
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio vocacional ganado:', prize);
+
+    const prizeMessage: ChatMessage = {
+      sender: this.counselorInfo.name,
+      content: `🎯 ¡Excelente! El destino profesional te ha bendecido. Has ganado: **${prize.name}** ${prize.icon}\n\nEste regalo del universo vocacional ha sido activado para ti. Las oportunidades profesionales se alinean a tu favor. ¡Que esta fortuna te guíe hacia tu verdadera vocación!`,
+      timestamp: new Date(),
+      isUser: false,
+    };
+
+    this.chatMessages.push(prizeMessage);
+    this.shouldAutoScroll = true;
+    this.saveMessagesToSession();
+
+    this.processVocationalPrize(prize);
+  }
+
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta vocacional');
+    this.showFortuneWheel = false;
+  }
+
+  triggerFortuneWheel(): void {
+    console.log('🎰 Intentando activar ruleta vocacional manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta vocacional manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log('❌ No se puede activar ruleta vocacional - sin tiradas disponibles');
+      alert('No tienes tiradas disponibles. ' + FortuneWheelComponent.getSpinStatus());
+    }
+  }
+
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+
+  private processVocationalPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Sesiones Gratis
+        this.addFreeVocationalConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium
+        this.addFreeVocationalConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeVocationalConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad vocacional concedida');
+        break;
+    }
+  }
+
+  private addFreeVocationalConsultations(count: number): void {
+    const current = parseInt(sessionStorage.getItem('freeVocationalConsultations') || '0');
+    const newTotal = current + count;
+    sessionStorage.setItem('freeVocationalConsultations', newTotal.toString());
+    console.log(`🎁 Agregadas ${count} consultas vocacionales. Total: ${newTotal}`);
+
+    if (this.blockedMessageId && !this.hasUserPaidForVocational) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('vocationalBlockedMessageId');
+      console.log('🔓 Mensaje vocacional desbloqueado con consulta gratuita');
+    }
+  }
+
+  private hasFreeVocationalConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeVocationalConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeVocationalConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeVocationalConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem('freeVocationalConsultations', remaining.toString());
+      console.log(`🎁 Consulta vocacional gratis usada. Restantes: ${remaining}`);
+
+      const prizeMsg: ChatMessage = {
+        sender: this.counselorInfo.name,
+        content: `✨ *Has usado una consulta vocacional gratis* ✨\n\nTe quedan **${remaining}** consultas vocacionales gratis disponibles.`,
+        timestamp: new Date(),
+        isUser: false,
+      };
+      this.chatMessages.push(prizeMsg);
+      this.shouldAutoScroll = true;
+      this.saveMessagesToSession();
+    }
+  }
+
+  debugVocationalWheel(): void {
+    console.log('=== DEBUG RULETA VOCACIONAL ===');
+    console.log('showFortuneWheel:', this.showFortuneWheel);
+    console.log('FortuneWheelComponent.canShowWheel():', FortuneWheelComponent.canShowWheel());
+    
+    this.showFortuneWheel = true;
+    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
+  }
+ 
   async handlePaymentSubmit(): Promise<void> {
     if (
       !this.stripe ||
@@ -578,7 +783,7 @@ export class MapaVocacionalComponent
     setTimeout(() => this.scrollToBottom(), 100);
   }
 
-    formatMessage(content: string): string {
+  formatMessage(content: string): string {
     if (!content) return '';
 
     let formattedContent = content;

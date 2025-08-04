@@ -28,6 +28,10 @@ import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.comp
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environmets.prod';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 interface ZodiacMessage {
   content: string;
   isUser: boolean;
@@ -79,6 +83,7 @@ interface AstrologerInfo {
     MatInputModule,
     MatProgressSpinnerModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './informacion-zodiaco.component.html',
   styleUrl: './informacion-zodiaco.component.css',
@@ -111,7 +116,30 @@ export class InformacionZodiacoComponent
   paymentError: string | null = null;
   hasUserPaidForAstrology: boolean = false;
   firstQuestionAsked: boolean = false;
-
+  //Configuración de la rueda de la fortuna
+  showFortuneWheel: boolean = false;
+  astralPrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Consultas Astrales Gratis',
+      color: '#4ecdc4',
+      icon: '🔮',
+    },
+    { id: '2', name: '1 Lectura Astral Premium', color: '#45b7d1', icon: '✨' },
+    {
+      id: '3',
+      name: '2 Consultas Zodiacales Extra',
+      color: '#ffeaa7',
+      icon: '🌟',
+    },
+    {
+      id: '4',
+      name: '¡Los astros dicen: otra oportunidad!',
+      color: '#ff7675',
+      icon: '🌙',
+    },
+  ];
+  private wheelTimer: any;
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
 
@@ -265,6 +293,141 @@ export class InformacionZodiacoComponent
         this.paymentElement = undefined;
       }
     }
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+  }
+  showWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    console.log('⏰ Timer configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta...');
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta astral - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log('❌ No se puede mostrar ruleta astral en este momento');
+      }
+    }, delayMs);
+  }
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio astral ganado:', prize);
+
+    // Mostrar mensaje del astrólogo sobre el premio
+    const prizeMessage = {
+      isUser: false,
+      content: `🌟 ¡Las energías cósmicas te han bendecido! Has ganado: **${prize.name}** ${prize.icon}\n\nEste regalo del universo ha sido activado para ti. Los misterios del zodíaco se revelan ante ti con mayor claridad. ¡Que la fortuna astral te acompañe en tus próximas consultas!`,
+      timestamp: new Date(),
+      isPrizeAnnouncement: true,
+    };
+
+    this.messages.push(prizeMessage);
+    this.shouldAutoScroll = true;
+    this.saveMessagesToSession();
+
+    // Procesar el premio
+    this.processAstralPrize(prize);
+  }
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta astral');
+    this.showFortuneWheel = false;
+  }
+
+  triggerFortuneWheel(): void {
+    console.log('🎰 Intentando activar ruleta astral manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta astral manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta astral - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+  private processAstralPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Consultas Gratis
+        this.addFreeAstrologyConsultations(3);
+        break;
+      case '2': // 1 Lectura Premium
+        this.addFreeAstrologyConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeAstrologyConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad astral concedida');
+        break;
+    }
+  }
+  private addFreeAstrologyConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeAstrologyConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeAstrologyConsultations', newTotal.toString());
+    console.log(`🎁 Agregadas ${count} consultas astrales. Total: ${newTotal}`);
+
+    // Si había un mensaje bloqueado, desbloquearlo
+    if (this.blockedMessageId && !this.hasUserPaidForAstrology) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('blockedAstrologyMessageId');
+      console.log('🔓 Mensaje astral desbloqueado con consulta gratuita');
+    }
+  }
+
+  private hasFreeAstrologyConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeAstrologyConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeAstrologyConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeAstrologyConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem(
+        'freeAstrologyConsultations',
+        remaining.toString()
+      );
+      console.log(`🎁 Consulta astral gratis usada. Restantes: ${remaining}`);
+
+      // Mostrar mensaje informativo
+      const prizeMsg = {
+        isUser: false,
+        content: `✨ *Has usado una consulta astral gratis* ✨\n\nTe quedan **${remaining}** consultas astrales gratis disponibles.`,
+        timestamp: new Date(),
+      };
+      this.messages.push(prizeMsg);
+      this.shouldAutoScroll = true;
+      this.saveMessagesToSession();
+    }
   }
 
   onScroll(event: any): void {
@@ -298,17 +461,51 @@ export class InformacionZodiacoComponent
       this.messages.push(welcomeMessage);
     }
     this.hasStartedConversation = true;
+
+    // ✅ AGREGAR VERIFICACIÓN DE RULETA
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta astral - sin tiradas disponibles'
+      );
+    }
   }
 
   sendMessage(): void {
     if (this.currentMessage?.trim() && !this.isLoading) {
       const userMessage = this.currentMessage.trim();
 
-      // Verificar si es la SEGUNDA pregunta y si no ha pagado
+      // ✅ NUEVA LÓGICA: Verificar consultas gratuitas ANTES de verificar pago
       if (!this.hasUserPaidForAstrology && this.firstQuestionAsked) {
-        this.saveStateBeforePayment();
-        this.showDataModal = true;
-        return;
+        // Verificar si tiene consultas astrales gratis disponibles
+        if (this.hasFreeAstrologyConsultationsAvailable()) {
+          console.log('🎁 Usando consulta astral gratis del premio');
+          this.useFreeAstrologyConsultation();
+          // Continuar con el mensaje sin bloquear
+        } else {
+          // Si no tiene consultas gratis, mostrar modal de datos
+          console.log(
+            '💳 No hay consultas astrales gratis - mostrando modal de datos'
+          );
+
+          // Cerrar otros modales primero
+          this.showFortuneWheel = false;
+          this.showPaymentModal = false;
+
+          // Guardar el mensaje para procesarlo después del pago
+          sessionStorage.setItem('pendingAstrologyMessage', userMessage);
+
+          this.saveStateBeforePayment();
+
+          // Mostrar modal de datos con timeout
+          setTimeout(() => {
+            this.showDataModal = true;
+            console.log('📝 showDataModal establecido a:', this.showDataModal);
+          }, 100);
+
+          return; // Salir aquí para no procesar el mensaje aún
+        }
       }
 
       this.shouldAutoScroll = true;

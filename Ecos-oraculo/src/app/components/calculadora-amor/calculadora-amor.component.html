@@ -205,7 +205,7 @@
   *ngIf="showPaymentModal"
   class="payment-modal-overlay"
   (click)="cancelPayment()"
->
+ >
   <div class="payment-modal" (click)="$event.stopPropagation()">
     <div class="payment-header">
       <h3>💕 Acceso Completo a Lecturas de Amor</h3>
@@ -273,3 +273,11 @@
     </div>
   </div>
 </div>
+<app-fortune-wheel
+  *ngIf="showFortuneWheel"
+  [isVisible]="showFortuneWheel"
+  [prizes]="lovePrizes"
+  (onPrizeWon)="onPrizeWon($event)"
+  (onWheelClosed)="onWheelClosed()"
+>
+</app-fortune-wheel>

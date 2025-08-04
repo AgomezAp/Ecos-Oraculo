@@ -30,6 +30,10 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 import { environment } from '../../environments/environmets.prod';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 interface NumerologyMessage {
   sender: string;
   content: string;
@@ -57,6 +61,7 @@ interface ConversationMessage {
     MatIconModule,
     MatProgressSpinnerModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './lectura-numerologia.component.html',
   styleUrl: './lectura-numerologia.component.css',
@@ -91,7 +96,15 @@ export class LecturaNumerologiaComponent
   paymentError: string | null = null;
   hasUserPaidForNumerology: boolean = false;
   firstQuestionAsked: boolean = false;
-
+  //Modal de rueda de la fortuna
+  showFortuneWheel: boolean = false;
+  numerologyPrizes: Prize[] = [
+    { id: '1', name: '3 Lecturas Numerológicas Gratis', color: '#4ecdc4', icon: '🔢' },
+    { id: '2', name: '1 Análisis Numérico Premium', color: '#45b7d1', icon: '✨' },
+    { id: '3', name: '2 Consultas Numerológicas Extra', color: '#ffeaa7', icon: '🌟' },
+    { id: '4', name: '¡Los números dicen: otra oportunidad!', color: '#ff7675', icon: '🔄' },
+  ];
+  private wheelTimer: any;
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
 
@@ -186,8 +199,105 @@ export class LecturaNumerologiaComponent
         console.error('❌ Error de conexión con numerología:', error);
       },
     });
+    if (this.hasStartedConversation && FortuneWheelComponent.canShowWheel()) {
+      this.showWheelAfterDelay(2000);
+    }
+  }
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta numerológica');
+    this.showFortuneWheel = false;
+  }
+  triggerFortuneWheel(): void {
+    console.log('🎰 Intentando activar ruleta numerológica manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta numerológica manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta numerológica - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+  private processNumerologyPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Lecturas Gratis
+        this.addFreeNumerologyConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium
+        this.addFreeNumerologyConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeNumerologyConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad numerológica concedida');
+        break;
+    }
+  }
+  private addFreeNumerologyConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeNumerologyConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeNumerologyConsultations', newTotal.toString());
+    console.log(
+      `🎁 Agregadas ${count} consultas numerológicas. Total: ${newTotal}`
+    );
+
+    // Si había un mensaje bloqueado, desbloquearlo
+    if (this.blockedMessageId && !this.hasUserPaidForNumerology) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('numerologyBlockedMessageId');
+      console.log('🔓 Mensaje numerológico desbloqueado con consulta gratuita');
+    }
   }
 
+  private hasFreeNumerologyConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeNumerologyConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeNumerologyConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeNumerologyConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem(
+        'freeNumerologyConsultations',
+        remaining.toString()
+      );
+      console.log(
+        `🎁 Consulta numerológica gratis usada. Restantes: ${remaining}`
+      );
+
+      // Mostrar mensaje informativo
+      const prizeMsg: ConversationMessage = {
+        role: 'numerologist',
+        message: `✨ *Has usado una consulta numerológica gratis* ✨\n\nTe quedan **${remaining}** consultas numerológicas gratis disponibles.`,
+        timestamp: new Date(),
+      };
+      this.messages.push(prizeMsg);
+      this.shouldAutoScroll = true;
+      this.saveMessagesToSession();
+    }
+  }
   private checkPaymentStatus(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentIntent = urlParams.get('payment_intent');
@@ -275,6 +385,9 @@ export class LecturaNumerologiaComponent
         this.paymentElement = undefined;
       }
     }
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
   }
 
   autoResize(event: any): void {
@@ -282,7 +395,6 @@ export class LecturaNumerologiaComponent
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
   }
-
   startConversation(): void {
     if (this.messages.length === 0) {
       const randomWelcome =
@@ -299,6 +411,14 @@ export class LecturaNumerologiaComponent
       this.messages.push(welcomeMessage);
     }
     this.hasStartedConversation = true;
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta numerológica - sin tiradas disponibles'
+      );
+    }
   }
 
   sendMessage(): void {
@@ -306,11 +426,36 @@ export class LecturaNumerologiaComponent
 
     const userMessage = this.currentMessage.trim();
 
-    // Verificar si es la SEGUNDA pregunta y si no ha pagado
+    // ✅ NUEVA LÓGICA: Verificar consultas numerológicas gratuitas ANTES de verificar pago
     if (!this.hasUserPaidForNumerology && this.firstQuestionAsked) {
-      this.saveStateBeforePayment();
-      this.showDataModal = true;
-      return;
+      // Verificar si tiene consultas numerológicas gratis disponibles
+      if (this.hasFreeNumerologyConsultationsAvailable()) {
+        console.log('🎁 Usando consulta numerológica gratis del premio');
+        this.useFreeNumerologyConsultation();
+        // Continuar con el mensaje sin bloquear
+      } else {
+        // Si no tiene consultas gratis, mostrar modal de datos
+        console.log(
+          '💳 No hay consultas numerológicas gratis - mostrando modal de datos'
+        );
+
+        // Cerrar otros modales primero
+        this.showFortuneWheel = false;
+        this.showPaymentModal = false;
+
+        // Guardar el mensaje para procesarlo después del pago
+        sessionStorage.setItem('pendingNumerologyMessage', userMessage);
+
+        this.saveStateBeforePayment();
+
+        // Mostrar modal de datos con timeout
+        setTimeout(() => {
+          this.showDataModal = true;
+          console.log('📝 showDataModal establecido a:', this.showDataModal);
+        }, 100);
+
+        return; // Salir aquí para no procesar el mensaje aún
+      }
     }
 
     this.shouldAutoScroll = true;
@@ -360,13 +505,29 @@ export class LecturaNumerologiaComponent
 
             this.shouldAutoScroll = true;
 
-            if (this.firstQuestionAsked && !this.hasUserPaidForNumerology) {
+            // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+            if (
+              this.firstQuestionAsked &&
+              !this.hasUserPaidForNumerology &&
+              !this.hasFreeNumerologyConsultationsAvailable()
+            ) {
               this.blockedMessageId = messageId;
               sessionStorage.setItem('numerologyBlockedMessageId', messageId);
 
               setTimeout(() => {
+                console.log(
+                  '🔒 Mensaje numerológico bloqueado - mostrando modal de datos'
+                );
                 this.saveStateBeforePayment();
-                this.promptForPayment();
+
+                // Cerrar otros modales
+                this.showFortuneWheel = false;
+                this.showPaymentModal = false;
+
+                // Mostrar modal de datos
+                setTimeout(() => {
+                  this.showDataModal = true;
+                }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
               this.firstQuestionAsked = true;
@@ -386,7 +547,6 @@ export class LecturaNumerologiaComponent
         },
       });
   }
-
   private saveStateBeforePayment(): void {
     console.log('💾 Guardando estado de numerología antes del pago...');
     this.saveMessagesToSession();
@@ -761,4 +921,34 @@ export class LecturaNumerologiaComponent
   onDataModalClosed(): void {
     this.showDataModal = false;
   }
+   onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio numerológico ganado:', prize);
+
+    const prizeMessage: ConversationMessage = {
+      role: 'numerologist',
+      message: `🔢 ¡Los números sagrados te han bendecido! Has ganado: **${prize.name}** ${prize.icon}`,
+      timestamp: new Date(),
+    };
+
+    this.messages.push(prizeMessage);
+    this.shouldAutoScroll = true;
+    this.saveMessagesToSession();
+  }
+
+  showWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    this.wheelTimer = setTimeout(() => {
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        this.showFortuneWheel = true;
+      }
+    }, delayMs);
+  }
 }
+

@@ -27,7 +27,11 @@ const calculadora_amor_1 = __importDefault(require("../routes/calculadora-amor")
 const Pagos_1 = __importDefault(require("../routes/Pagos"));
 const recolecta_1 = __importDefault(require("../routes/recolecta"));
 const recolecta_datos_1 = require("./recolecta-datos");
+const page_views_1 = require("./page_views");
+const analytics_usuario_1 = require("./analytics_usuario");
+const service_popularity_1 = require("./service_popularity");
 const monei_1 = __importDefault(require("../routes/monei"));
+const analytics_1 = __importDefault(require("../routes/analytics"));
 // Cargar variables de entorno
 dotenv_1.default.config();
 class Server {
@@ -41,6 +45,9 @@ class Server {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield recolecta_datos_1.recolecta.sync({ alter: true });
+                yield page_views_1.PageAnalytics.sync({ alter: true });
+                yield analytics_usuario_1.AnalyticsUsuario.sync({ alter: true });
+                yield service_popularity_1.ServicePopularity.sync({ alter: true });
                 console.log("✅ Conexión a base de datos establecida correctamente");
             }
             catch (error) {
@@ -75,6 +82,7 @@ class Server {
         this.app.use(Pagos_1.default);
         this.app.use(recolecta_1.default);
         this.app.use(monei_1.default);
+        this.app.use(analytics_1.default);
         // Health check endpoint
         this.app.get("/health", (req, res) => {
             res.json({

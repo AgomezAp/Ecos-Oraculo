@@ -30,6 +30,10 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environmets.prod';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 
 interface ChatMessage {
   role: 'user' | 'master';
@@ -70,6 +74,7 @@ interface ZodiacAnimal {
     MatIconModule,
     MatProgressSpinnerModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './zodiaco-chino.component.html',
   styleUrl: './zodiaco-chino.component.css',
@@ -92,7 +97,35 @@ export class ZodiacoChinoComponent
   private shouldScrollToBottom = false;
   private shouldAutoScroll = true;
   private lastMessageCount = 0;
-
+  //Variables para control de fortuna
+  showFortuneWheel: boolean = false;
+  horoscopePrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Lecturas Horoscópicas Gratis',
+      color: '#4ecdc4',
+      icon: '🔮',
+    },
+    {
+      id: '2',
+      name: '1 Análisis Zodiacal Premium',
+      color: '#45b7d1',
+      icon: '✨',
+    },
+    {
+      id: '3',
+      name: '2 Consultas Astrológicas Extra',
+      color: '#ffeaa7',
+      icon: '🌟',
+    },
+    {
+      id: '4',
+      name: '¡Los astros dicen: otra oportunidad!',
+      color: '#ff7675',
+      icon: '🌙',
+    },
+  ];
+  private wheelTimer: any;
   // Variables para control de pagos
   showPaymentModal: boolean = false;
   stripe: Stripe | null = null;
@@ -180,9 +213,25 @@ export class ZodiacoChinoComponent
     // Solo agregar mensaje de bienvenida si no hay mensajes guardados
     if (this.conversationHistory.length === 0) {
       this.addWelcomeMessage();
+
+      // ✅ AGREGAR VERIFICACIÓN DE RULETA HOROSCÓPICA
+      if (FortuneWheelComponent.canShowWheel()) {
+        this.showHoroscopeWheelAfterDelay(3000);
+      } else {
+        console.log(
+          '🚫 No se puede mostrar ruleta horoscópica - sin tiradas disponibles'
+        );
+      }
+    }
+
+    // ✅ AGREGAR ESTA LÍNEA AL FINAL:
+    if (
+      this.conversationHistory.length > 1 &&
+      FortuneWheelComponent.canShowWheel()
+    ) {
+      this.showHoroscopeWheelAfterDelay(2000);
     }
   }
-
   ngAfterViewChecked(): void {
     if (this.shouldScrollToBottom) {
       this.scrollToBottom();
@@ -199,6 +248,9 @@ export class ZodiacoChinoComponent
   }
 
   ngOnDestroy(): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
@@ -607,21 +659,45 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     }
   }
 
-  // Enviar mensaje en el chat
   sendMessage(): void {
     if (this.currentMessage.trim() && !this.isLoading) {
       const message = this.currentMessage.trim();
 
-      // Verificar si es la SEGUNDA pregunta y si no ha pagado
+      // ✅ NUEVA LÓGICA: Verificar consultas horoscópicas gratuitas ANTES de verificar pago
       if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
-        this.saveHoroscopeStateBeforePayment();
-        this.showDataModal = true;
-        return;
+        // Verificar si tiene consultas horoscópicas gratis disponibles
+        if (this.hasFreeHoroscopeConsultationsAvailable()) {
+          console.log('🎁 Usando consulta horoscópica gratis del premio');
+          this.useFreeHoroscopeConsultation();
+          // Continuar con el mensaje sin bloquear
+        } else {
+          // Si no tiene consultas gratis, mostrar modal de datos
+          console.log(
+            '💳 No hay consultas horoscópicas gratis - mostrando modal de datos'
+          );
+
+          // Cerrar otros modales primero
+          this.showFortuneWheel = false;
+          this.showPaymentModal = false;
+
+          // Guardar el mensaje para procesarlo después del pago
+          sessionStorage.setItem('pendingHoroscopeMessage', message);
+
+          this.saveHoroscopeStateBeforePayment();
+
+          // Mostrar modal de datos con timeout
+          setTimeout(() => {
+            this.showDataModal = true;
+            console.log('📝 showDataModal establecido a:', this.showDataModal);
+          }, 100);
+
+          return; // Salir aquí para no procesar el mensaje aún
+        }
       }
 
       this.currentMessage = '';
       this.isLoading = true;
-      this.isTyping = true; // <-- Activa el indicador de escritura
+      this.isTyping = true;
 
       // Agregar mensaje del usuario
       this.addMessage('user', message);
@@ -643,20 +719,35 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       this.zodiacoChinoService.chatWithMaster(consultationData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.isTyping = false; // <-- Desactiva el indicador al recibir respuesta
+          this.isTyping = false;
           if (response.success && response.response) {
             const messageId = Date.now().toString();
 
             this.addMessage('master', response.response, messageId);
 
-            // Si no ha pagado y ya hizo la primera pregunta, bloquear el mensaje
-            if (this.firstQuestionAsked && !this.hasUserPaidForHoroscope) {
+            // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+            if (
+              this.firstQuestionAsked &&
+              !this.hasUserPaidForHoroscope &&
+              !this.hasFreeHoroscopeConsultationsAvailable()
+            ) {
               this.blockedMessageId = messageId;
               sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
 
               setTimeout(() => {
+                console.log(
+                  '🔒 Mensaje horoscópico bloqueado - mostrando modal de datos'
+                );
                 this.saveHoroscopeStateBeforePayment();
-                this.promptForHoroscopePayment();
+
+                // Cerrar otros modales
+                this.showFortuneWheel = false;
+                this.showPaymentModal = false;
+
+                // Mostrar modal de datos
+                setTimeout(() => {
+                  this.showDataModal = true;
+                }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
               this.firstQuestionAsked = true;
@@ -670,7 +761,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         },
         error: (error) => {
           this.isLoading = false;
-          this.isTyping = false; // <-- Desactiva también en caso de error
+          this.isTyping = false;
           this.handleError(
             'Error conectando con la astróloga: ' +
               (error.error?.error || error.message)
@@ -679,7 +770,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       });
     }
   }
-
   // Calcular animal del zodiaco chino (mantenido para compatibilidad)
   calculateZodiacAnimal(birthYear: number, birthDate?: string): void {
     if (birthYear) {
@@ -981,5 +1071,168 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
   onDataModalClosed(): void {
     this.showDataModal = false;
+  }
+  showHoroscopeWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    console.log('⏰ Timer horoscópico configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta horoscópica...');
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta horoscópica - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log(
+          '❌ No se puede mostrar ruleta horoscópica en este momento'
+        );
+      }
+    }, delayMs);
+  }
+
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio horoscópico ganado:', prize);
+
+    const prizeMessage: ChatMessage = {
+      role: 'master',
+      message: `🔮 ¡Los astros han conspirado a tu favor! Has ganado: **${prize.name}** ${prize.icon}\n\nLas fuerzas celestiales han decidido bendecirte con este regalo sagrado. La energía zodiacal fluye a través de ti, revelando secretos más profundos de tu horóscopo personal. ¡Que la sabiduría astrológica te ilumine!`,
+      timestamp: new Date().toISOString(),
+    };
+
+    this.conversationHistory.push(prizeMessage);
+    this.shouldScrollToBottom = true;
+    this.saveHoroscopeMessagesToSession();
+
+    this.processHoroscopePrize(prize);
+  }
+
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta horoscópica');
+    this.showFortuneWheel = false;
+  }
+
+  triggerHoroscopeWheel(): void {
+    console.log('🎰 Intentando activar ruleta horoscópica manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta horoscópica manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta horoscópica - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+
+  private processHoroscopePrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Lecturas Horoscópicas
+        this.addFreeHoroscopeConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium
+        this.addFreeHoroscopeConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeHoroscopeConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad horoscópica concedida');
+        break;
+    }
+  }
+
+  private addFreeHoroscopeConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeHoroscopeConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeHoroscopeConsultations', newTotal.toString());
+    console.log(
+      `🎁 Agregadas ${count} consultas horoscópicas. Total: ${newTotal}`
+    );
+
+    if (this.blockedMessageId && !this.hasUserPaidForHoroscope) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('horoscopeBlockedMessageId');
+      console.log('🔓 Mensaje horoscópico desbloqueado con consulta gratuita');
+    }
+  }
+
+  private hasFreeHoroscopeConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeHoroscopeConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeHoroscopeConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeHoroscopeConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem(
+        'freeHoroscopeConsultations',
+        remaining.toString()
+      );
+      console.log(
+        `🎁 Consulta horoscópica gratis usada. Restantes: ${remaining}`
+      );
+
+      const prizeMsg: ChatMessage = {
+        role: 'master',
+        message: `✨ *Has usado una lectura horoscópica gratis* ✨\n\nTe quedan **${remaining}** consultas astrológicas disponibles.`,
+        timestamp: new Date().toISOString(),
+      };
+      this.conversationHistory.push(prizeMsg);
+      this.shouldScrollToBottom = true;
+      this.saveHoroscopeMessagesToSession();
+    }
+  }
+
+  debugHoroscopeWheel(): void {
+    console.log('=== DEBUG RULETA HOROSCÓPICA ===');
+    console.log('showFortuneWheel:', this.showFortuneWheel);
+    console.log(
+      'FortuneWheelComponent.canShowWheel():',
+      FortuneWheelComponent.canShowWheel()
+    );
+    console.log('showPaymentModal:', this.showPaymentModal);
+    console.log('showDataModal:', this.showDataModal);
+    console.log(
+      'freeHoroscopeConsultations:',
+      sessionStorage.getItem('freeHoroscopeConsultations')
+    );
+
+    this.showFortuneWheel = true;
+    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
+  }
+
+  // ✅ MÉTODO AUXILIAR para el template
+  getHoroscopeConsultationsCount(): number {
+    return parseInt(
+      sessionStorage.getItem('freeHoroscopeConsultations') || '0'
+    );
   }
 }

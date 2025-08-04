@@ -1,16 +1,39 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-
+import { CookieService } from 'ngx-cookie-service';
+import { environment } from '../../environments/environmets.prod';
+import { HttpClient } from '@angular/common/http';
+import { AnalyticsService } from '../../services/analytics.service';
 @Component({
   selector: 'app-bienvenida',
-  imports: [MatIconModule],
+  imports: [MatIconModule, CommonModule],
   templateUrl: './bienvenida.component.html',
   styleUrl: './bienvenida.component.css',
 })
-export class BienvenidaComponent implements AfterViewInit {
+export class BienvenidaComponent implements AfterViewInit, OnInit {
   @ViewChild('backgroundVideo') backgroundVideo!: ElementRef<HTMLVideoElement>;
-  constructor(private router: Router) {}
+  showCookieBanner = false;
+  isReturningUser = false;
+  userZodiacSign: string | null = null;
+  visitCount = 0;
+  sessionStartTime: Date = new Date();
+  private apiUrl = environment.apiUrl; // Asegúrate de tener esto en tu environment
+
+  constructor(
+    private router: Router,
+    private cookieService: CookieService,
+    private http: HttpClient,
+    private analyticsService: AnalyticsService
+  ) {}
+
   ngAfterViewInit() {
     this.startVideo();
     const serviceCards = document.querySelectorAll('.service-card');
@@ -41,9 +64,80 @@ export class BienvenidaComponent implements AfterViewInit {
       }
     });
   }
-  navigateTo(route: string): void {
-    this.router.navigate([route]);
+  ngOnInit() {
+    this.sessionStartTime = new Date();
+    this.initializeCookies();
   }
+  ngOnDestroy() {
+    // Enviar analytics al cerrar la sesión
+    if (this.cookieService.get('cookieConsent') === 'accepted') {
+      this.sendAnalytics();
+    }
+  }
+  async sendAnalytics() {
+    try {
+      await this.analyticsService.collectAndSendUserAnalytics(
+        this.sessionStartTime
+      );
+    } catch (error) {
+      console.error('❌ Error enviando analytics:', error);
+    }
+  }
+  calculateSessionDuration(): number {
+    const now = new Date();
+    return Math.round((now.getTime() - this.sessionStartTime.getTime()) / 1000); // en segundos
+  }
+
+  // ✅ Obtener información del dispositivo
+  getDeviceInfo() {
+    return {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      screenResolution: `${screen.width}x${screen.height}`,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      cookiesEnabled: navigator.cookieEnabled,
+    };
+  }
+  getBrowserInfo() {
+    const ua = navigator.userAgent;
+    let browser = 'Unknown';
+
+    if (ua.includes('Chrome')) browser = 'Chrome';
+    else if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Safari')) browser = 'Safari';
+    else if (ua.includes('Edge')) browser = 'Edge';
+
+    return {
+      name: browser,
+      version: this.getBrowserVersion(ua),
+      mobile: /Mobi|Android/i.test(ua),
+    };
+  }
+  private getBrowserVersion(ua: string): string {
+    const match = ua.match(/(Chrome|Firefox|Safari|Edge)\/(\d+)/);
+    return match ? match[2] : 'Unknown';
+  }
+  generateAnonymousId(): string {
+    let userId = this.cookieService.get('anonymousUserId');
+
+    if (!userId) {
+      userId =
+        'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+      this.cookieService.set('anonymousUserId', userId, 365);
+    }
+
+    return userId;
+  }
+  trackServicePopularity(serviceName: string) {
+    this.analyticsService.trackServicePopularity(serviceName);
+  }
+  private trackServiceVisit(service: string) {
+    this.analyticsService.trackServiceVisit(service);
+  }
+  // ✅ Actualizar navegateTo para incluir tracking
+
   private startVideo() {
     if (this.backgroundVideo && this.backgroundVideo.nativeElement) {
       const video = this.backgroundVideo.nativeElement;
@@ -82,5 +176,129 @@ export class BienvenidaComponent implements AfterViewInit {
 
     document.addEventListener('click', playOnInteraction);
     document.addEventListener('touchstart', playOnInteraction);
+  }
+  initializeCookies() {
+    console.log('🔍 === INICIANDO SISTEMA DE COOKIES ===');
+
+    try {
+      const consent = this.cookieService.get('cookieConsent');
+      this.showCookieBanner = !consent || consent === '';
+      console.log('¿Mostrar banner?', this.showCookieBanner);
+
+      if (consent === 'accepted') {
+        this.loadUserData();
+        this.personalizeExperience();
+        this.trackVisit();
+      }
+    } catch (error) {
+      console.error('❌ Error en initializeCookies:', error);
+    }
+  }
+
+  forceCreateAppCookies() {
+    this.cookieService.set('cookieConsent', 'accepted', 365);
+    this.cookieService.set('visitCount', '1', 30);
+    this.cookieService.set('lastVisit', new Date().toISOString(), 30);
+    this.cookieService.set('userZodiacSign', 'Leo', 365);
+  }
+  loadUserData() {
+    this.userZodiacSign = this.cookieService.get('userZodiacSign') || null;
+    this.visitCount = parseInt(this.cookieService.get('visitCount') || '0');
+    this.isReturningUser = this.visitCount > 1;
+  }
+
+  // ✅ Personalizar experiencia
+  personalizeExperience() {
+    if (this.isReturningUser) {
+      this.showWelcomeBackMessage();
+    }
+
+    if (this.userZodiacSign) {
+      this.highlightZodiacContent();
+    }
+  }
+
+  // ✅ Trackear visita
+  trackVisit() {
+    this.visitCount++;
+    this.cookieService.set('visitCount', this.visitCount.toString(), 30);
+    this.cookieService.set('lastVisit', new Date().toISOString(), 30);
+  }
+
+  // ✅ Aceptar cookies
+  acceptCookies() {
+    this.cookieService.set('cookieConsent', 'accepted', 365);
+    this.showCookieBanner = false;
+
+    this.initializeCookies();
+    this.enableAnalytics();
+    this.sendAnalytics(); // 👈 Usa el método refactorizado
+
+    console.log('✅ Cookies aceptadas - Analytics iniciado');
+  }
+
+  // ✅ Rechazar cookies
+  rejectCookies() {
+    this.cookieService.set('cookieConsent', 'rejected', 365);
+    this.showCookieBanner = false;
+    console.log('Cookies rechazadas');
+  }
+
+  navigateTo(route: string): void {
+    if (this.cookieService.get('cookieConsent') === 'accepted') {
+      this.trackServiceVisit(route);
+      this.trackServicePopularity(route);
+      this.sendPageViewAnalytics(route);
+    }
+    this.router.navigate([route]);
+  }
+
+ 
+
+  async sendPageViewAnalytics(route: string) {
+    try {
+      await this.analyticsService.sendPageViewAnalytics(
+        route,
+        this.sessionStartTime
+      );
+    } catch (error) {
+      console.error('Error enviando page analytics:', error);
+    }
+  }
+  private saveAnalyticsLocally(data: any) {
+    try {
+      let localAnalytics = JSON.parse(
+        localStorage.getItem('pendingAnalytics') || '[]'
+      );
+      localAnalytics.push(data);
+      localStorage.setItem('pendingAnalytics', JSON.stringify(localAnalytics));
+      console.log('💾 Analytics guardados localmente como backup');
+    } catch (error) {
+      console.error('Error guardando analytics localmente:', error);
+    }
+  }
+  async sendPendingAnalytics() {
+    try {
+      await this.analyticsService.sendPendingAnalytics();
+    } catch (error) {
+      console.error('Error enviando analytics pendientes:', error);
+    }
+  }
+
+  // ✅ Funciones auxiliares
+  private showWelcomeBackMessage() {
+    // Mostrar mensaje de bienvenida personalizado
+    console.log(
+      `¡Bienvenido de vuelta! Esta es tu visita número ${this.visitCount}`
+    );
+  }
+  private highlightZodiacContent() {
+    // Destacar contenido relacionado con el signo zodiacal
+    console.log(`Personalizando para signo: ${this.userZodiacSign}`);
+  }
+
+  private enableAnalytics() {
+    // Habilitar Google Analytics u otras herramientas
+    console.log('Analytics habilitado');
   }
 }

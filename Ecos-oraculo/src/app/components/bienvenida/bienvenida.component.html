@@ -297,4 +297,30 @@
       </div>
     </div>
   </footer>
+  <div class="cookie-banner" *ngIf="showCookieBanner">
+    <div class="cookie-content">
+      <div class="cookie-icon">
+        <img
+          src="/Ecos del Oráculo Logo-1.svg"
+          alt="Ecos del Oráculo"
+          class="cookie-icon"
+        />
+      </div>
+      <div class="cookie-text">
+        <h4>Ecos del Oráculo utiliza cookies</h4>
+        <p>
+          Para personalizar tu experiencia espiritual y recordar tus
+          preferencias astrales. Las cookies nos ayudan a ofrecerte contenido
+          más relevante.
+        </p>
+      </div>
+      <div class="cookie-buttons">
+        <button class="btn-accept" (click)="acceptCookies()">
+          ✨ Aceptar y Continuar
+        </button>
+        <button class="btn-reject" (click)="rejectCookies()">Rechazar</button>
+      </div>
+    </div>
+  </div>
+
 </div>

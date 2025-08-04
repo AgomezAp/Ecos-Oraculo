@@ -39,6 +39,10 @@ import { HttpClient } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 import { environment } from '../../environments/environmets.prod';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 
 @Component({
   selector: 'app-calculadora-amor',
@@ -54,6 +58,7 @@ import { environment } from '../../environments/environmets.prod';
     MatProgressSpinnerModule,
     MatNativeDateModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './calculadora-amor.component.html',
   styleUrl: './calculadora-amor.component.css',
@@ -94,7 +99,35 @@ export class CalculadoraAmorComponent
 
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
-
+  //propiedades para la ruleta
+  showFortuneWheel: boolean = false;
+  lovePrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Lecturas Amorosas Gratis',
+      color: '#ff69b4',
+      icon: '💕',
+    },
+    {
+      id: '2',
+      name: '1 Análisis de Compatibilidad Premium',
+      color: '#ff1493',
+      icon: '💖',
+    },
+    {
+      id: '3',
+      name: '2 Consultas Románticas Extra',
+      color: '#ff6347',
+      icon: '💝',
+    },
+    {
+      id: '4',
+      name: '¡El amor dice: otra oportunidad!',
+      color: '#dc143c',
+      icon: '💘',
+    },
+  ];
+  private wheelTimer: any;
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
@@ -176,6 +209,23 @@ export class CalculadoraAmorComponent
 
     this.loadLoveExpertInfo();
     this.subscribeToCompatibilityData();
+    console.log('🎰 Verificando ruleta del amor...');
+    console.log(
+      '- conversationHistory.length:',
+      this.conversationHistory.length
+    );
+    console.log(
+      '- FortuneWheelComponent.canShowWheel():',
+      FortuneWheelComponent.canShowWheel()
+    );
+
+    // Mostrar ruleta después de tener algunos mensajes
+    if (
+      this.conversationHistory.length > 0 &&
+      FortuneWheelComponent.canShowWheel()
+    ) {
+      this.showLoveWheelAfterDelay(3000);
+    }
   }
 
   private checkPaymentStatus(): void {
@@ -260,6 +310,10 @@ export class CalculadoraAmorComponent
   }
 
   ngOnDestroy(): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
 
@@ -415,11 +469,27 @@ export class CalculadoraAmorComponent
 
     const userMessage = this.currentMessage.trim();
 
-    // Verificar si es la SEGUNDA pregunta y si no ha pagado
+    // ✅ NUEVA LÓGICA: Verificar consultas amorosas gratuitas ANTES de verificar pago
     if (!this.hasUserPaidForLove && this.firstQuestionAsked) {
-      this.saveStateBeforePayment();
-      this.showDataModal = true;
-      return;
+      // Verificar si tiene consultas amorosas gratis disponibles
+      if (this.hasFreeLoveConsultationsAvailable()) {
+        console.log('🎁 Usando consulta amorosa gratis del premio');
+        this.useFreeLoveConsultation();
+        // Continuar con el mensaje sin bloquear
+      } else {
+        // Si no tiene consultas gratis, mostrar modal de datos
+        console.log(
+          '💳 No hay consultas amorosas gratis - mostrando modal de datos'
+        );
+
+        // Cerrar otros modales primero
+        this.showFortuneWheel = false;
+        this.showPaymentModal = false;
+
+        this.saveStateBeforePayment();
+        this.showDataModal = true;
+        return; // Salir aquí para no procesar el mensaje aún
+      }
     }
 
     this.shouldAutoScroll = true;
@@ -477,13 +547,29 @@ export class CalculadoraAmorComponent
 
             this.shouldAutoScroll = true;
 
-            if (this.firstQuestionAsked && !this.hasUserPaidForLove) {
+            // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+            if (
+              this.firstQuestionAsked &&
+              !this.hasUserPaidForLove &&
+              !this.hasFreeLoveConsultationsAvailable()
+            ) {
               this.blockedMessageId = messageId;
               sessionStorage.setItem('loveBlockedMessageId', messageId);
 
               setTimeout(() => {
+                console.log(
+                  '🔒 Mensaje amoroso bloqueado - mostrando modal de datos'
+                );
                 this.saveStateBeforePayment();
-                this.promptForPayment();
+
+                // Cerrar otros modales
+                this.showFortuneWheel = false;
+                this.showPaymentModal = false;
+
+                // Mostrar modal de datos
+                setTimeout(() => {
+                  this.showDataModal = true;
+                }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
               this.firstQuestionAsked = true;
@@ -1027,5 +1113,145 @@ export class CalculadoraAmorComponent
 
   onDataModalClosed(): void {
     this.showDataModal = false;
+  }
+
+  showLoveWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    console.log('⏰ Timer amoroso configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta del amor...');
+      console.log('- canShowWheel:', FortuneWheelComponent.canShowWheel());
+      console.log('- !showPaymentModal:', !this.showPaymentModal);
+      console.log('- !showDataModal:', !this.showDataModal);
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta del amor - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log('❌ No se puede mostrar ruleta del amor en este momento');
+      }
+    }, delayMs);
+  }
+
+  // ✅ MANEJAR PREMIO GANADO
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio amoroso ganado:', prize);
+
+    const prizeMessage: ConversationMessage = {
+      role: 'love_expert',
+      message: `💕 ¡El amor verdadero ha conspirado a tu favor! Has ganado: **${prize.name}** ${prize.icon}\n\nLas fuerzas románticas del universo han decidido bendecirte con este regalo celestial. La energía del amor fluye a través de ti, revelando secretos más profundos sobre la compatibilidad y el romance. ¡Que el amor eterno te acompañe!`,
+      timestamp: new Date(),
+    };
+
+    this.conversationHistory.push(prizeMessage);
+    this.shouldAutoScroll = true;
+    this.saveMessagesToSession();
+
+    this.processLovePrize(prize);
+  }
+
+  // ✅ PROCESAR PREMIO ESPECÍFICO
+  private processLovePrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Lecturas Amorosas
+        this.addFreeLoveConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium
+        this.addFreeLoveConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeLoveConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad amorosa concedida');
+        break;
+    }
+  }
+
+  // ✅ AGREGAR CONSULTAS GRATIS
+  private addFreeLoveConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeLoveConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeLoveConsultations', newTotal.toString());
+    console.log(`🎁 Agregadas ${count} consultas amorosas. Total: ${newTotal}`);
+
+    if (this.blockedMessageId && !this.hasUserPaidForLove) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('loveBlockedMessageId');
+      console.log('🔓 Mensaje amoroso desbloqueado con consulta gratuita');
+    }
+  }
+
+  // ✅ VERIFICAR CONSULTAS GRATIS DISPONIBLES
+  private hasFreeLoveConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeLoveConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+  private useFreeLoveConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeLoveConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem('freeLoveConsultations', remaining.toString());
+      console.log(`🎁 Consulta amorosa gratis usada. Restantes: ${remaining}`);
+
+      // Mostrar mensaje informativo
+      const prizeMsg: ConversationMessage = {
+        role: 'love_expert',
+        message: `✨ *Has usado una consulta amorosa gratis* ✨\n\nTe quedan **${remaining}** consultas amorosas gratis disponibles.`,
+        timestamp: new Date(),
+      };
+      this.conversationHistory.push(prizeMsg);
+      this.shouldAutoScroll = true;
+      this.saveMessagesToSession();
+    }
+  }
+
+  // ✅ CERRAR RULETA
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta del amor');
+    this.showFortuneWheel = false;
+  }
+
+  // ✅ ACTIVAR RULETA MANUALMENTE
+  triggerLoveWheel(): void {
+    console.log('🎰 Intentando activar ruleta del amor manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta del amor manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta del amor - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+
+  // ✅ OBTENER ESTADO DE SPINS
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
   }
 }

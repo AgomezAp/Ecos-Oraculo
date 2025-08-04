@@ -27,6 +27,10 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 import { environment } from '../../environments/environmets.prod';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 interface Message {
   role: 'user' | 'guide';
   content: string;
@@ -51,6 +55,7 @@ interface ChatMessage {
     MatInputModule,
     MatProgressSpinnerModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './animal-interior.component.html',
   styleUrl: './animal-interior.component.css',
@@ -77,7 +82,30 @@ export class AnimalInteriorComponent
     specialty: 'Guía de Animales Interiores',
     experience: 'Especialista en conexión espiritual con el reino animal',
   };
-
+  //Propiedades para la ruleta
+  showFortuneWheel: boolean = false;
+  animalPrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Conexiones Espirituales Gratis',
+      color: '#4ecdc4',
+      icon: '🦉',
+    },
+    { id: '2', name: '1 Guía Animal Premium', color: '#45b7d1', icon: '🦋' },
+    {
+      id: '3',
+      name: '2 Consultas Espirituales Extra',
+      color: '#ffeaa7',
+      icon: '🐺',
+    },
+    {
+      id: '4',
+      name: '¡Los espíritus dicen: otra oportunidad!',
+      color: '#ff7675',
+      icon: '🌙',
+    },
+  ];
+  private wheelTimer: any;
   // Stripe/payment
   showPaymentModal: boolean = false;
   stripe: Stripe | null = null;
@@ -133,11 +161,24 @@ export class AnimalInteriorComponent
         timestamp: new Date(),
         isUser: false,
       });
+
+      // ✅ MOVER LA VERIFICACIÓN DE RULETA AQUÍ
+      if (FortuneWheelComponent.canShowWheel()) {
+        this.showAnimalWheelAfterDelay(3000);
+      } else {
+        console.log(
+          '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
+        );
+      }
     }
 
     this.checkPaymentStatus();
-  }
 
+    // ✅ TAMBIÉN VERIFICAR PARA MENSAJES RESTAURADOS
+    if (this.chatMessages.length > 1 && FortuneWheelComponent.canShowWheel()) {
+      this.showAnimalWheelAfterDelay(2000);
+    }
+  }
   ngAfterViewChecked(): void {
     // Solo hacer scroll automático si hay nuevos mensajes y el usuario no está haciendo scroll manual
     if (
@@ -152,6 +193,9 @@ export class AnimalInteriorComponent
   }
 
   ngOnDestroy(): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
@@ -211,10 +255,36 @@ export class AnimalInteriorComponent
     if (!this.currentMessage.trim() || this.isLoading) return;
     const userMessage = this.currentMessage.trim();
 
+    // ✅ NUEVA LÓGICA: Verificar consultas animales gratuitas ANTES de verificar pago
     if (!this.hasUserPaid && this.firstQuestionAsked) {
-      this.saveStateBeforePayment();
-      this.showDataModal = true;
-      return;
+      // Verificar si tiene consultas animales gratis disponibles
+      if (this.hasFreeAnimalConsultationsAvailable()) {
+        console.log('🎁 Usando consulta animal gratis del premio');
+        this.useFreeAnimalConsultation();
+        // Continuar con el mensaje sin bloquear
+      } else {
+        // Si no tiene consultas gratis, mostrar modal de datos
+        console.log(
+          '💳 No hay consultas animales gratis - mostrando modal de datos'
+        );
+
+        // Cerrar otros modales primero
+        this.showFortuneWheel = false;
+        this.showPaymentModal = false;
+
+        // Guardar el mensaje para procesarlo después del pago
+        sessionStorage.setItem('pendingAnimalMessage', userMessage);
+
+        this.saveStateBeforePayment();
+
+        // Mostrar modal de datos con timeout
+        setTimeout(() => {
+          this.showDataModal = true;
+          console.log('📝 showDataModal establecido a:', this.showDataModal);
+        }, 100);
+
+        return; // Salir aquí para no procesar el mensaje aún
+      }
     }
 
     // Indicar que se debe hacer scroll porque hay un mensaje nuevo
@@ -258,12 +328,28 @@ export class AnimalInteriorComponent
             id: messageId,
           });
 
-          if (this.firstQuestionAsked && !this.hasUserPaid) {
+          // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+          if (
+            this.firstQuestionAsked &&
+            !this.hasUserPaid &&
+            !this.hasFreeAnimalConsultationsAvailable()
+          ) {
             this.blockedMessageId = messageId;
             sessionStorage.setItem('animalInteriorBlockedMessageId', messageId);
             setTimeout(() => {
+              console.log(
+                '🔒 Mensaje animal bloqueado - mostrando modal de datos'
+              );
               this.saveStateBeforePayment();
-              this.promptForPayment();
+
+              // Cerrar otros modales
+              this.showFortuneWheel = false;
+              this.showPaymentModal = false;
+
+              // Mostrar modal de datos
+              setTimeout(() => {
+                this.showDataModal = true;
+              }, 100);
             }, 2000);
           } else if (!this.firstQuestionAsked) {
             this.firstQuestionAsked = true;
@@ -555,6 +641,13 @@ export class AnimalInteriorComponent
       timestamp: new Date(),
       isUser: false,
     });
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showAnimalWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
+      );
+    }
   }
   onUserDataSubmitted(userData: any): void {
     console.log('Datos del usuario recibidos:', userData);
@@ -567,5 +660,153 @@ export class AnimalInteriorComponent
 
   onDataModalClosed(): void {
     this.showDataModal = false;
+  }
+  showAnimalWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    console.log('⏰ Timer animal espiritual configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta animal...');
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta animal - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log('❌ No se puede mostrar ruleta animal en este momento');
+      }
+    }, delayMs);
+  }
+
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio espiritual animal ganado:', prize);
+
+    const prizeMessage: ChatMessage = {
+      sender: 'Xamán Olivia',
+      content: `🦉 ¡Los espíritus animales han hablado! Has ganado: **${prize.name}** ${prize.icon}\n\nLos antiguos guardianes del reino animal han decidido bendecirte con este regalo sagrado. La energía espiritual fluye a través de ti, conectándote más profundamente con tu animal interior. ¡Que la sabiduría ancestral te guíe!`,
+      timestamp: new Date(),
+      isUser: false,
+    };
+
+    this.chatMessages.push(prizeMessage);
+    this.shouldScrollToBottom = true;
+    this.saveMessagesToSession();
+
+    this.processAnimalPrize(prize);
+  }
+
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta animal espiritual');
+    this.showFortuneWheel = false;
+  }
+
+  triggerAnimalWheel(): void {
+    console.log('🎰 Intentando activar ruleta animal manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta animal manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta animal - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+
+  private processAnimalPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Conexiones Espirituales
+        this.addFreeAnimalConsultations(3);
+        break;
+      case '2': // 1 Guía Premium
+        this.addFreeAnimalConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeAnimalConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad espiritual concedida');
+        break;
+    }
+  }
+  private addFreeAnimalConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeAnimalConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeAnimalConsultations', newTotal.toString());
+    console.log(`🎁 Agregadas ${count} consultas animales. Total: ${newTotal}`);
+
+    if (this.blockedMessageId && !this.hasUserPaid) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('animalInteriorBlockedMessageId');
+      console.log('🔓 Mensaje animal desbloqueado con consulta gratuita');
+    }
+  }
+
+  private hasFreeAnimalConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeAnimalConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeAnimalConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeAnimalConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem('freeAnimalConsultations', remaining.toString());
+      console.log(`🎁 Consulta animal gratis usada. Restantes: ${remaining}`);
+
+      const prizeMsg: ChatMessage = {
+        sender: 'Xamán Olivia',
+        content: `✨ *Has usado una conexión espiritual gratis* ✨\n\nTe quedan **${remaining}** consultas con el reino animal disponibles.`,
+        timestamp: new Date(),
+        isUser: false,
+      };
+      this.chatMessages.push(prizeMsg);
+      this.shouldScrollToBottom = true;
+      this.saveMessagesToSession();
+    }
+  }
+
+  debugAnimalWheel(): void {
+    console.log('=== DEBUG RULETA ANIMAL ===');
+    console.log('showFortuneWheel:', this.showFortuneWheel);
+    console.log(
+      'FortuneWheelComponent.canShowWheel():',
+      FortuneWheelComponent.canShowWheel()
+    );
+    console.log('showPaymentModal:', this.showPaymentModal);
+    console.log('showDataModal:', this.showDataModal);
+    console.log(
+      'freeAnimalConsultations:',
+      sessionStorage.getItem('freeAnimalConsultations')
+    );
+
+    this.showFortuneWheel = true;
+    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 }

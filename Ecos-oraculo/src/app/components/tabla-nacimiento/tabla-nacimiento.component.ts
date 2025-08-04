@@ -31,6 +31,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecolectaDatosComponent } from '../recolecta-datos/recolecta-datos.component';
 import { environment } from '../../environments/environmets.prod';
 import { Observable, map, catchError, of } from 'rxjs';
+import {
+  FortuneWheelComponent,
+  Prize,
+} from '../fortune-wheel/fortune-wheel.component';
 interface BirthChartMessage {
   content: string;
   isUser: boolean;
@@ -71,6 +75,7 @@ interface AstrologerInfo {
     MatInputModule,
     MatProgressSpinnerModule,
     RecolectaDatosComponent,
+    FortuneWheelComponent,
   ],
   templateUrl: './tabla-nacimiento.component.html',
   styleUrl: './tabla-nacimiento.component.css',
@@ -107,7 +112,35 @@ export class TablaNacimientoComponent
   //Datos para enviar
   showDataModal: boolean = false;
   userData: any = null;
-
+  //Variables para la ruleta
+  showFortuneWheel: boolean = false;
+  birthChartPrizes: Prize[] = [
+    {
+      id: '1',
+      name: '3 Lecturas Astrales Gratis',
+      color: '#4ecdc4',
+      icon: '🌟',
+    },
+    {
+      id: '2',
+      name: '1 Análisis Natal Premium',
+      color: '#45b7d1',
+      icon: '✨',
+    },
+    {
+      id: '3',
+      name: '2 Consultas Celestiales Extra',
+      color: '#ffeaa7',
+      icon: '🌙',
+    },
+    {
+      id: '4',
+      name: '¡Las estrellas dicen: otra oportunidad!',
+      color: '#ff7675',
+      icon: '🔮',
+    },
+  ];
+  private wheelTimer: any;
   // Sistema de pagos
   showPaymentModal: boolean = false;
   stripe: Stripe | null = null;
@@ -155,6 +188,20 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         timestamp: new Date(),
         isUser: false,
       });
+
+      // ✅ AGREGAR VERIFICACIÓN DE RULETA NATAL
+      if (FortuneWheelComponent.canShowWheel()) {
+        this.showBirthChartWheelAfterDelay(3000);
+      } else {
+        console.log(
+          '🚫 No se puede mostrar ruleta natal - sin tiradas disponibles'
+        );
+      }
+    }
+
+    // ✅ AGREGAR ESTA LÍNEA AL FINAL:
+    if (this.messages.length > 1 && FortuneWheelComponent.canShowWheel()) {
+      this.showBirthChartWheelAfterDelay(2000);
     }
   }
 
@@ -171,6 +218,9 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
   }
 
   ngOnDestroy(): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
@@ -265,11 +315,36 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     if (this.currentMessage?.trim() && !this.isLoading) {
       const userMessage = this.currentMessage.trim();
 
-      // Verificar si es la SEGUNDA pregunta y si no ha pagado
+      // ✅ NUEVA LÓGICA: Verificar consultas natales gratuitas ANTES de verificar pago
       if (!this.hasUserPaid && this.firstQuestionAsked) {
-        this.saveStateBeforePayment();
-        this.showDataModal = true;
-        return;
+        // Verificar si tiene consultas natales gratis disponibles
+        if (this.hasFreeBirthChartConsultationsAvailable()) {
+          console.log('🎁 Usando consulta natal gratis del premio');
+          this.useFreeBirthChartConsultation();
+          // Continuar con el mensaje sin bloquear
+        } else {
+          // Si no tiene consultas gratis, mostrar modal de datos
+          console.log(
+            '💳 No hay consultas natales gratis - mostrando modal de datos'
+          );
+
+          // Cerrar otros modales primero
+          this.showFortuneWheel = false;
+          this.showPaymentModal = false;
+
+          // Guardar el mensaje para procesarlo después del pago
+          sessionStorage.setItem('pendingBirthChartMessage', userMessage);
+
+          this.saveStateBeforePayment();
+
+          // Mostrar modal de datos con timeout
+          setTimeout(() => {
+            this.showDataModal = true;
+            console.log('📝 showDataModal establecido a:', this.showDataModal);
+          }, 100);
+
+          return; // Salir aquí para no procesar el mensaje aún
+        }
       }
 
       this.shouldScrollToBottom = true;
@@ -304,13 +379,29 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
           this.shouldScrollToBottom = true;
 
-          if (this.firstQuestionAsked && !this.hasUserPaid) {
+          // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+          if (
+            this.firstQuestionAsked &&
+            !this.hasUserPaid &&
+            !this.hasFreeBirthChartConsultationsAvailable()
+          ) {
             this.blockedMessageId = messageId;
             sessionStorage.setItem('birthChartBlockedMessageId', messageId);
 
             setTimeout(() => {
+              console.log(
+                '🔒 Mensaje natal bloqueado - mostrando modal de datos'
+              );
               this.saveStateBeforePayment();
-              this.promptForPayment();
+
+              // Cerrar otros modales
+              this.showFortuneWheel = false;
+              this.showPaymentModal = false;
+
+              // Mostrar modal de datos
+              setTimeout(() => {
+                this.showDataModal = true;
+              }, 100);
             }, 2000);
           } else if (!this.firstQuestionAsked) {
             this.firstQuestionAsked = true;
@@ -728,4 +819,172 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
   onDataModalClosed(): void {
     this.showDataModal = false;
   }
+  showBirthChartWheelAfterDelay(delayMs: number = 3000): void {
+    if (this.wheelTimer) {
+      clearTimeout(this.wheelTimer);
+    }
+
+    console.log('⏰ Timer carta natal configurado para', delayMs, 'ms');
+
+    this.wheelTimer = setTimeout(() => {
+      console.log('🎰 Verificando si puede mostrar ruleta natal...');
+
+      if (
+        FortuneWheelComponent.canShowWheel() &&
+        !this.showPaymentModal &&
+        !this.showDataModal
+      ) {
+        console.log('✅ Mostrando ruleta natal - usuario puede girar');
+        this.showFortuneWheel = true;
+      } else {
+        console.log('❌ No se puede mostrar ruleta natal en este momento');
+      }
+    }, delayMs);
+  }
+
+  onPrizeWon(prize: Prize): void {
+    console.log('🎉 Premio celestial ganado:', prize);
+
+    const prizeMessage: Message = {
+      sender: 'Maestra Emma',
+      content: `🌟 ¡Las configuraciones celestiales han conspirado a tu favor! Has ganado: **${prize.name}** ${prize.icon}\n\nLos antiguos guardianes de las estrellas han decidido bendecirte con este regalo sagrado. La energía cósmica fluye a través de ti, revelando secretos más profundos de tu carta natal. ¡Que la sabiduría celestial te ilumine!`,
+      timestamp: new Date(),
+      isUser: false,
+    };
+
+    this.messages.push(prizeMessage);
+    this.shouldScrollToBottom = true;
+    this.saveMessagesToSession();
+
+    this.processBirthChartPrize(prize);
+  }
+
+  onWheelClosed(): void {
+    console.log('🎰 Cerrando ruleta de carta natal');
+    this.showFortuneWheel = false;
+  }
+
+  triggerBirthChartWheel(): void {
+    console.log('🎰 Intentando activar ruleta natal manualmente...');
+
+    if (this.showPaymentModal || this.showDataModal) {
+      console.log('❌ No se puede mostrar - hay otros modales abiertos');
+      return;
+    }
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      console.log('✅ Activando ruleta natal manualmente');
+      this.showFortuneWheel = true;
+    } else {
+      console.log(
+        '❌ No se puede activar ruleta natal - sin tiradas disponibles'
+      );
+      alert(
+        'No tienes tiradas disponibles. ' +
+          FortuneWheelComponent.getSpinStatus()
+      );
+    }
+  }
+
+  getSpinStatus(): string {
+    return FortuneWheelComponent.getSpinStatus();
+  }
+  private processBirthChartPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Lecturas Astrales
+        this.addFreeBirthChartConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium
+        this.addFreeBirthChartConsultations(1);
+        break;
+      case '3': // 2 Consultas Extra
+        this.addFreeBirthChartConsultations(2);
+        break;
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad celestial concedida');
+        break;
+    }
+  }
+
+  private addFreeBirthChartConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeBirthChartConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeBirthChartConsultations', newTotal.toString());
+    console.log(
+      `🎁 Agregadas ${count} consultas de carta natal. Total: ${newTotal}`
+    );
+
+    if (this.blockedMessageId && !this.hasUserPaid) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('birthChartBlockedMessageId');
+      console.log('🔓 Mensaje natal desbloqueado con consulta gratuita');
+    }
+  }
+
+  private hasFreeBirthChartConsultationsAvailable(): boolean {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeBirthChartConsultations') || '0'
+    );
+    return freeConsultations > 0;
+  }
+
+  private useFreeBirthChartConsultation(): void {
+    const freeConsultations = parseInt(
+      sessionStorage.getItem('freeBirthChartConsultations') || '0'
+    );
+
+    if (freeConsultations > 0) {
+      const remaining = freeConsultations - 1;
+      sessionStorage.setItem(
+        'freeBirthChartConsultations',
+        remaining.toString()
+      );
+      console.log(`🎁 Consulta natal gratis usada. Restantes: ${remaining}`);
+
+      const prizeMsg: Message = {
+        sender: 'Maestra Emma',
+        content: `✨ *Has usado una lectura astral gratis* ✨\n\nTe quedan **${remaining}** consultas celestiales disponibles.`,
+        timestamp: new Date(),
+        isUser: false,
+      };
+      this.messages.push(prizeMsg);
+      this.shouldScrollToBottom = true;
+      this.saveMessagesToSession();
+    }
+  }
+
+  debugBirthChartWheel(): void {
+    console.log('=== DEBUG RULETA CARTA NATAL ===');
+    console.log('showFortuneWheel:', this.showFortuneWheel);
+    console.log(
+      'FortuneWheelComponent.canShowWheel():',
+      FortuneWheelComponent.canShowWheel()
+    );
+    console.log('showPaymentModal:', this.showPaymentModal);
+    console.log('showDataModal:', this.showDataModal);
+    console.log(
+      'freeBirthChartConsultations:',
+      sessionStorage.getItem('freeBirthChartConsultations')
+    );
+
+    this.showFortuneWheel = true;
+    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
+  }
+
+  // ✅ MÉTODO AUXILIAR para el template
+  getBirthChartConsultationsCount(): number {
+    return parseInt(
+      sessionStorage.getItem('freeBirthChartConsultations') || '0'
+    );
+  }
+
+  // ✅ MÉTODO AUXILIAR para parsing en template
+  parseInt(value: string): number {
+    return parseInt(value);
+  }
+
+  // ✅ MODIFICAR clearChat para incluir datos de la ruleta
+ 
 }
