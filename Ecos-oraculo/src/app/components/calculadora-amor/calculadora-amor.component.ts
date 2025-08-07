@@ -130,7 +130,7 @@ export class CalculadoraAmorComponent
   private wheelTimer: any;
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+    'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
   private backendUrl = environment.apiUrl;
 
   // Formulario reactivo

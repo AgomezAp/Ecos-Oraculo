@@ -283,15 +283,64 @@
       <!-- ✅ AGREGAR: Buzón de sugerencias - TERCERA COLUMNA -->
       <div class="suggestion-box">
         <div class="suggestion-wrapper">
-          <!-- ✅ Título pegado al input -->
           <h4 class="suggestion-title">Buzón de Sugerencias</h4>
-          <div class="suggestion-input-container">
-            <input
-              type="text"
-              class="suggestion-input"
-              placeholder="Escribe tu sugerencia aquí..."
-            />
-            <i class="fas fa-paper-plane suggestion-input-icon"></i>
+
+          <div class="suggestion-form">
+            <!-- Input de texto -->
+            <div class="suggestion-input-container">
+              <textarea
+                class="suggestion-input"
+                placeholder="Escribe tu sugerencia aquí..."
+                [(ngModel)]="sugerenciaTexto"
+                [disabled]="enviandoSugerencia"
+                maxlength="1000"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <!-- Contador de caracteres -->
+            <div
+              class="character-counter"
+              *ngIf="sugerenciaTexto && sugerenciaTexto.length > 0"
+            >
+              {{ sugerenciaTexto.length }}/1000 caracteres
+            </div>
+
+            <!-- Botón de enviar -->
+            <button
+              class="suggestion-button"
+              [disabled]="
+                enviandoSugerencia ||
+                !sugerenciaTexto ||
+                sugerenciaTexto.trim().length === 0
+              "
+              (click)="enviarSugerencia()"
+            >
+              <span *ngIf="!enviandoSugerencia">
+                <i class="fas fa-paper-plane"></i>
+                Enviar Sugerencia
+              </span>
+              <span *ngIf="enviandoSugerencia">
+                <i class="fas fa-spinner fa-spin"></i>
+                Enviando...
+              </span>
+            </button>
+
+            <!-- Mensaje de confirmación -->
+            <div
+              *ngIf="mensajeSugerencia"
+              class="suggestion-message"
+              [ngClass]="'message-' + mensajeSugerencia.tipo"
+            >
+              <i
+                class="fas"
+                [ngClass]="{
+                  'fa-check-circle': mensajeSugerencia.tipo === 'success',
+                  'fa-exclamation-circle': mensajeSugerencia.tipo === 'error'
+                }"
+              ></i>
+              {{ mensajeSugerencia.texto }}
+            </div>
           </div>
         </div>
       </div>
@@ -322,5 +371,4 @@
       </div>
     </div>
   </div>
-
 </div>

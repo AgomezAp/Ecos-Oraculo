@@ -50,7 +50,7 @@ export class CardsComponent implements OnInit, OnDestroy {
 
   // IMPORTANT: Replace with your actual Stripe publishable key and backend URL
   private stripePublishableKey =
-    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC'; // <--- REPLACE THIS
+    'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6'; // <--- REPLACE THIS
   private backendUrl =  environment.apiUrl;
 
   constructor(

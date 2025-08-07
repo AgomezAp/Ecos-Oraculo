@@ -17,8 +17,10 @@ import { recolecta } from "./recolecta-datos";
 import { PageAnalytics } from "./page_views"; 
 import { AnalyticsUsuario } from "./analytics_usuario";
 import { ServicePopularity } from "./service_popularity";
+import sugerencia from "../routes/sugerencia";
 import Monei from "../routes/monei";
 import RAnalytics from "../routes/analytics";
+import { Sugerencia } from "./sugerencia";
 // Cargar variables de entorno
 dotenv.config();
 
@@ -40,6 +42,7 @@ class Server {
       await PageAnalytics.sync({ alter: true });
       await AnalyticsUsuario.sync({ alter: true });
       await ServicePopularity.sync({ alter: true });
+      await Sugerencia.sync({ alter: true });
       console.log("✅ Conexión a base de datos establecida correctamente");
     } catch (error) {
       console.error("❌ Error de conexión a la base de datos:", error);
@@ -78,6 +81,7 @@ class Server {
     this.app.use(Recolecta);
     this.app.use(Monei)
     this.app.use(RAnalytics)
+    this.app.use(sugerencia);
     // Health check endpoint
     this.app.get("/health", (req, res) => {
       res.json({

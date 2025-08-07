@@ -12,9 +12,11 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../environments/environmets.prod';
 import { HttpClient } from '@angular/common/http';
 import { AnalyticsService } from '../../services/analytics.service';
+import { SugerenciasService } from '../../services/sugerencias.service';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-bienvenida',
-  imports: [MatIconModule, CommonModule],
+  imports: [MatIconModule, CommonModule,FormsModule],
   templateUrl: './bienvenida.component.html',
   styleUrl: './bienvenida.component.css',
 })
@@ -26,12 +28,15 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
   visitCount = 0;
   sessionStartTime: Date = new Date();
   private apiUrl = environment.apiUrl; // Asegúrate de tener esto en tu environment
-
+  sugerenciaTexto: string = '';
+  enviandoSugerencia: boolean = false;
+  mensajeSugerencia: { texto: string; tipo: 'success' | 'error' } | null = null;
   constructor(
     private router: Router,
     private cookieService: CookieService,
     private http: HttpClient,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private sugerenciasService: SugerenciasService
   ) {}
 
   ngAfterViewInit() {
@@ -300,5 +305,58 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
   private enableAnalytics() {
     // Habilitar Google Analytics u otras herramientas
     console.log('Analytics habilitado');
+  }
+    async enviarSugerencia() {
+    // Validar input
+    if (!this.sugerenciaTexto || this.sugerenciaTexto.trim().length === 0) {
+      this.mostrarMensajeSugerencia('Por favor, escribe una sugerencia', 'error');
+      return;
+    }
+
+    if (this.sugerenciaTexto.length > 1000) {
+      this.mostrarMensajeSugerencia('La sugerencia no puede exceder 1000 caracteres', 'error');
+      return;
+    }
+
+    // Enviar sugerencia
+    this.enviandoSugerencia = true;
+    
+    try {
+      const response = await this.sugerenciasService.enviarSugerencia(this.sugerenciaTexto).toPromise();
+      
+      if (response?.success) {
+        this.mostrarMensajeSugerencia(response.message, 'success');
+        this.sugerenciaTexto = ''; // Limpiar input
+      } else {
+        this.mostrarMensajeSugerencia('Error al enviar sugerencia', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error enviando sugerencia:', error);
+      this.mostrarMensajeSugerencia(
+        typeof error === 'string' ? error : 'Error de conexión. Intenta nuevamente.',
+        'error'
+      );
+    } finally {
+      this.enviandoSugerencia = false;
+    }
+  }
+    // Mostrar mensaje de confirmación
+  private mostrarMensajeSugerencia(texto: string, tipo: 'success' | 'error') {
+    this.mensajeSugerencia = { texto, tipo };
+    
+    // Ocultar mensaje después de 4 segundos
+    setTimeout(() => {
+      this.mensajeSugerencia = null;
+    }, 4000);
+  }
+
+  // Trackear sugerencia enviada
+
+  // Manejar Enter en el input
+  onSugerenciaKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !this.enviandoSugerencia) {
+      this.enviarSugerencia();
+    }
   }
 }
