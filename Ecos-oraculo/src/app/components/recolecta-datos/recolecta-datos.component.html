@@ -102,11 +102,9 @@
 
           <!-- ✅ Nuevo checkbox para factura y noticias -->
           <div class="form-group checkbox-group">
-        
-              <span class="checkbox-text">
-                Te llegará una factura al correo electronico
-              </span>
-          
+            <span class="checkbox-text">
+              Te llegará una factura al correo electronico
+            </span>
           </div>
           <div></div>
           <div class="form-group">
@@ -235,6 +233,19 @@
               class="error-message"
               >{{ dataFormErrors["comunidad_autonoma"] }}</span
             >
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono *</label>
+            <input
+              type="tel"
+              id="telefono"
+              [(ngModel)]="userData.telefono"
+              [class.error]="hasError('telefono')"
+              placeholder="+34 123 456 789"
+            />
+            <span *ngIf="hasError('telefono')" class="error-message">
+              {{ dataFormErrors["telefono"] }}
+            </span>
           </div>
         </div>
 

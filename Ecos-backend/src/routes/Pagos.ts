@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPaymentIntent, handleWebhook } from '../controllers/Pagos';
+import { createCheckoutSession, createPaymentIntent, handleWebhook } from '../controllers/Pagos';
 
 const router = express.Router();
 
@@ -8,4 +8,5 @@ router.post("/webhook",
   express.raw({type: 'application/json'}), 
   handleWebhook
 );
+router.post('/create-checkout-session', createCheckoutSession);
 export default router;

@@ -8,4 +8,5 @@ const Pagos_1 = require("../controllers/Pagos");
 const router = express_1.default.Router();
 router.post("/create-payment-intent", Pagos_1.createPaymentIntent);
 router.post("/webhook", express_1.default.raw({ type: 'application/json' }), Pagos_1.handleWebhook);
+router.post('/create-checkout-session', Pagos_1.createCheckoutSession);
 exports.default = router;

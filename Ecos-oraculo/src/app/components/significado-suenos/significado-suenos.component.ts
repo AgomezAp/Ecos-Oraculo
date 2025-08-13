@@ -93,7 +93,8 @@ export class SignificadoSuenosComponent
   textareaHeight: number = 25; // Altura inicial
   private readonly minTextareaHeight = 45;
   private readonly maxTextareaHeight = 120;
-
+  /*     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
+   */
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
@@ -129,6 +130,22 @@ export class SignificadoSuenosComponent
 
     this.hasUserPaidForDreams =
       sessionStorage.getItem('hasUserPaidForDreams') === 'true';
+
+    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
+    console.log('🔍 Cargando datos del usuario desde sessionStorage...');
+    const savedUserData = sessionStorage.getItem('userData');
+    if (savedUserData) {
+      try {
+        this.userData = JSON.parse(savedUserData);
+        console.log('✅ Datos del usuario restaurados:', this.userData);
+      } catch (error) {
+        console.error('❌ Error al parsear datos del usuario:', error);
+        this.userData = null;
+      }
+    } else {
+      console.log('ℹ️ No hay datos del usuario guardados en sessionStorage');
+      this.userData = null;
+    }
 
     const savedMessages = sessionStorage.getItem('dreamMessages');
     const savedFirstQuestion = sessionStorage.getItem('firstQuestionAsked');
@@ -394,87 +411,85 @@ export class SignificadoSuenosComponent
     }
   }
   private processUserMessage(userMessage: string): void {
-  const userMsg: ConversationMessage = {
-    role: 'user',
-    message: userMessage,
-    timestamp: new Date(),
-  };
-  this.messages.push(userMsg);
+    const userMsg: ConversationMessage = {
+      role: 'user',
+      message: userMessage,
+      timestamp: new Date(),
+    };
+    this.messages.push(userMsg);
 
-  this.saveMessagesToSession();
-  this.messageText = '';
-  this.isTyping = true;
-  this.isLoading = true;
+    this.saveMessagesToSession();
+    this.messageText = '';
+    this.isTyping = true;
+    this.isLoading = true;
 
-  const conversationHistory = this.messages.slice(0, -1);
+    const conversationHistory = this.messages.slice(0, -1);
 
-  this.dreamService
-    .chatWithInterpreter({
-      interpreterData: this.interpreterData,
-      userMessage: userMessage,
-      conversationHistory: conversationHistory,
-    })
-    .subscribe({
-      next: (response: any) => {
-        this.isLoading = false;
-        this.isTyping = false;
+    this.dreamService
+      .chatWithInterpreter({
+        interpreterData: this.interpreterData,
+        userMessage: userMessage,
+        conversationHistory: conversationHistory,
+      })
+      .subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          this.isTyping = false;
 
-        if (response.success && response.response) {
-          const messageId = Date.now().toString();
+          if (response.success && response.response) {
+            const messageId = Date.now().toString();
 
-          const interpreterMsg: ConversationMessage = {
-            role: 'interpreter',
-            message: response.response,
-            timestamp: new Date(),
-            id: messageId,
-          };
-          this.messages.push(interpreterMsg);
+            const interpreterMsg: ConversationMessage = {
+              role: 'interpreter',
+              message: response.response,
+              timestamp: new Date(),
+              id: messageId,
+            };
+            this.messages.push(interpreterMsg);
 
-          this.shouldAutoScroll = true;
+            this.shouldAutoScroll = true;
 
-          // ✅ ACTUALIZADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
-          if (
-            this.firstQuestionAsked &&
-            !this.hasUserPaidForDreams &&
-            !this.hasFreeConsultationsAvailable()
-          ) {
-            this.blockedMessageId = messageId;
-            sessionStorage.setItem('blockedMessageId', messageId);
+            // ✅ ACTUALIZADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+            if (
+              this.firstQuestionAsked &&
+              !this.hasUserPaidForDreams &&
+              !this.hasFreeConsultationsAvailable()
+            ) {
+              this.blockedMessageId = messageId;
+              sessionStorage.setItem('blockedMessageId', messageId);
 
-            // ✅ CAMBIO: Mostrar modal de datos en lugar de ir directo al pago
-            setTimeout(() => {
-              console.log('🔒 Mensaje bloqueado - mostrando modal de datos');
-              this.saveStateBeforePayment();
-              
-              // Cerrar otros modales
-              this.showFortuneWheel = false;
-              this.showPaymentModal = false;
-              
-              // Mostrar modal de datos
+              // ✅ CAMBIO: Mostrar modal de datos en lugar de ir directo al pago
               setTimeout(() => {
-                this.showDataModal = true;
-              }, 100);
-            }, 2000);
-          } else if (!this.firstQuestionAsked) {
-            this.firstQuestionAsked = true;
-            sessionStorage.setItem('firstQuestionAsked', 'true');
-          }
+                console.log('🔒 Mensaje bloqueado - mostrando modal de datos');
+                this.saveStateBeforePayment();
 
-          this.saveMessagesToSession();
-        } else {
-          this.handleError('Error al obtener respuesta del intérprete');
-        }
-      },
-      error: (error: any) => {
-        this.isLoading = false;
-        this.isTyping = false;
-        console.error('Error:', error);
-        this.handleError(
-          'Error de conexión. Por favor, inténtalo de nuevo.'
-        );
-      },
-    });
-}
+                // Cerrar otros modales
+                this.showFortuneWheel = false;
+                this.showPaymentModal = false;
+
+                // Mostrar modal de datos
+                setTimeout(() => {
+                  this.showDataModal = true;
+                }, 100);
+              }, 2000);
+            } else if (!this.firstQuestionAsked) {
+              this.firstQuestionAsked = true;
+              sessionStorage.setItem('firstQuestionAsked', 'true');
+            }
+
+            this.saveMessagesToSession();
+          } else {
+            this.handleError('Error al obtener respuesta del intérprete');
+          }
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          this.isTyping = false;
+          console.error('Error:', error);
+          this.handleError('Error de conexión. Por favor, inténtalo de nuevo.');
+        },
+      });
+  }
   // ✅ NUEVO: Verificar si tiene consultas gratis disponibles
   private hasFreeConsultationsAvailable(): boolean {
     const freeConsultations = parseInt(
@@ -635,12 +650,80 @@ export class SignificadoSuenosComponent
 
     try {
       const items = [{ id: 'dreams_interpretation_unlimited', amount: 500 }];
-      console.log('📤 Enviando request de payment intent...');
+
+      // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
+      if (!this.userData) {
+        console.log(
+          '🔍 userData no está en memoria, cargando desde sessionStorage...'
+        );
+        const savedUserData = sessionStorage.getItem('userData');
+        if (savedUserData) {
+          try {
+            this.userData = JSON.parse(savedUserData);
+            console.log(
+              '✅ Datos cargados desde sessionStorage:',
+              this.userData
+            );
+          } catch (error) {
+            console.error('❌ Error al parsear datos guardados:', error);
+            this.userData = null;
+          }
+        }
+      }
+
+      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
+      console.log('🔍 Validando userData completo:', this.userData);
+
+      if (!this.userData) {
+        console.error(
+          '❌ No hay userData disponible ni en memoria ni en sessionStorage'
+        );
+        this.paymentError =
+          'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ VALIDAR CAMPOS INDIVIDUALES
+      const nombre = this.userData.nombre?.trim();
+      const apellido = this.userData.apellido?.trim();
+      const email = this.userData.email?.trim();
+      const telefono = this.userData.telefono?.trim();
+
+      console.log('🔍 Validando campos individuales:');
+      console.log('  - nombre:', nombre, nombre ? '✅' : '❌');
+      console.log('  - apellido:', apellido, apellido ? '✅' : '❌');
+      console.log('  - email:', email, email ? '✅' : '❌');
+      console.log('  - telefono:', telefono, telefono ? '✅' : '❌');
+
+      if (!nombre || !apellido || !email || !telefono) {
+        console.error('❌ Faltan campos requeridos para el pago');
+        this.paymentError =
+          'Faltan datos del cliente. Por favor, verifica que hayas completado todos los campos (nombre, apellido, email y teléfono).';
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
+      const customerInfo = {
+        name: `${nombre} ${apellido}`,
+        email: email,
+        phone: telefono,
+      };
+
+      console.log(
+        '📤 Enviando request de payment intent con datos del cliente...'
+      );
+      console.log('👤 Datos del cliente enviados:', customerInfo);
+
+      const requestBody = { items, customerInfo };
 
       const response = await this.http
         .post<{ clientSecret: string }>(
           `${this.backendUrl}create-payment-intent`,
-          { items }
+          requestBody
         )
         .toPromise();
 
@@ -685,6 +768,7 @@ export class SignificadoSuenosComponent
       }
     } catch (error: any) {
       console.error('❌ Error al preparar el pago:', error);
+      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -739,6 +823,18 @@ export class SignificadoSuenosComponent
             timestamp: new Date(),
           };
           this.messages.push(confirmationMsg);
+
+          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          const pendingMessage = sessionStorage.getItem('pendingUserMessage');
+          if (pendingMessage) {
+            console.log('📝 Procesando mensaje pendiente:', pendingMessage);
+            sessionStorage.removeItem('pendingUserMessage');
+
+            // Procesar el mensaje pendiente después de un pequeño delay
+            setTimeout(() => {
+              this.processUserMessage(pendingMessage);
+            }, 1000);
+          }
 
           // ✅ ACTIVAR AUTO-SCROLL para mensaje de confirmación
           this.shouldAutoScroll = true;
@@ -911,11 +1007,53 @@ export class SignificadoSuenosComponent
     return formattedContent;
   }
   onUserDataSubmitted(userData: any): void {
-    console.log('Datos del usuario recibidos:', userData);
-    this.userData = userData;
+    console.log('📥 Datos del usuario recibidos:', userData);
+    console.log('📋 Campos disponibles:', Object.keys(userData));
+
+    // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
+    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const missingFields = requiredFields.filter(
+      (field) => !userData[field] || userData[field].toString().trim() === ''
+    );
+
+    if (missingFields.length > 0) {
+      console.error('❌ Faltan campos obligatorios:', missingFields);
+      alert(
+        `Para proceder con el pago, necesitas completar: ${missingFields.join(
+          ', '
+        )}`
+      );
+      this.showDataModal = true; // Mantener modal abierto
+      return;
+    }
+
+    // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
+    this.userData = {
+      ...userData,
+      nombre: userData.nombre?.toString().trim(),
+      apellido: userData.apellido?.toString().trim(),
+      email: userData.email?.toString().trim(),
+      telefono: userData.telefono?.toString().trim(),
+    };
+
+    // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
+    try {
+      sessionStorage.setItem('userData', JSON.stringify(this.userData));
+      console.log('✅ Datos guardados en sessionStorage:', this.userData);
+
+      // Verificar que se guardaron correctamente
+      const verificacion = sessionStorage.getItem('userData');
+      console.log(
+        '🔍 Verificación - Datos en sessionStorage:',
+        verificacion ? JSON.parse(verificacion) : 'No encontrados'
+      );
+    } catch (error) {
+      console.error('❌ Error guardando en sessionStorage:', error);
+    }
+
     this.showDataModal = false;
 
-    // Enviar datos al backend
+    // Enviar datos al backend (opcional, no bloquea el pago)
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
@@ -923,21 +1061,21 @@ export class SignificadoSuenosComponent
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log('✅ Datos enviados correctamente:', response);
-        // Proceder al pago después de guardar los datos
+        console.log('✅ Datos enviados correctamente al backend:', response);
+
+        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
         setTimeout(() => {
           this.promptForPayment();
-        }, 300);
+        }, 500);
       },
       error: (error) => {
-        console.error('❌ Error enviando datos:', error);
-        // Aún así proceder al pago, pero mostrar advertencia
-        alert(
-          'Hubo un problema guardando los datos, pero puedes continuar con el pago.'
-        );
+        console.error('❌ Error enviando datos al backend:', error);
+
+        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         setTimeout(() => {
           this.promptForPayment();
-        }, 300);
+        }, 500);
       },
     });
   }

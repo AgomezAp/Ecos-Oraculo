@@ -9,13 +9,56 @@ dotenv.config();
 
 export const createPaymentIntent = async (req: Request, res: Response) => {
   try {
-    const { items } = req.body;
-    console.log("Received items:", items); // Log the incoming data
-    const paymentIntent = await createPaymentIntentModel(items);
+    const { items, customerInfo } = req.body;
+    console.log("Received items:", items);
+    console.log("Customer info:", customerInfo);
+    
+    // Validar que los datos del cliente estén presentes
+    if (!customerInfo || !customerInfo.email || !customerInfo.name || !customerInfo.phone) {
+      return res.status(400).send({ 
+        error: 'Missing customer information. Name, email, and phone are required.' 
+      });
+    }
+    
+    const paymentIntent = await createPaymentIntentModel(items, customerInfo);
     res.send({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    console.error("Stripe error details:", error); // Log the full error
+    console.error("Stripe error details:", error);
     res.status(500).send({ error: 'An error occurred while creating the payment intent' });
+  }
+};
+export const createCheckoutSession = async (req: Request, res: Response) => {
+  try {
+    const { items } = req.body;
+    const stripe = new Stripe(process.env.SECRET_KEY!);
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: items.map((item: any) => ({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: item.name || 'Product',
+          },
+          unit_amount: item.amount,
+        },
+        quantity: item.quantity || 1,
+      })),
+      mode: 'payment',
+      // Esto solicita automáticamente los datos del cliente
+      customer_creation: 'always',
+      billing_address_collection: 'required', // Solicita nombre y dirección
+      phone_number_collection: {
+        enabled: true, // Solicita teléfono
+      },
+      success_url: `${process.env.CLIENT_URL || 'http://localhost:4200'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL || 'http://localhost:4200'}/cancel`,
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).send({ error: 'Failed to create checkout session' });
   }
 };
 export const handleWebhook = async (req: express.Request, res: express.Response) => {

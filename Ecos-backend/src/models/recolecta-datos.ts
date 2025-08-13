@@ -18,6 +18,7 @@ export class recolecta extends Model{
     public comunidad_autonoma !: string;
     public importe !: number;
     public email !: string;
+    public telefono !: string;  
 }
     recolecta.init ({
         NIF: {

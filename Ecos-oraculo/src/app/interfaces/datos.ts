@@ -12,6 +12,6 @@ export interface Datos {
     comunidad_autonoma: string;
     importe: string;
     email: string;
-
+    telefono: string;
 }
 

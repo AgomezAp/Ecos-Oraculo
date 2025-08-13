@@ -117,7 +117,7 @@ export class AnimalInteriorComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-
+/* 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhl' */
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
   private backendUrl = environment.apiUrl;
@@ -131,6 +131,30 @@ export class AnimalInteriorComponent
     this.stripe = await loadStripe(this.stripePublishableKey);
     this.hasUserPaid =
       sessionStorage.getItem('hasUserPaidAnimalInterior') === 'true';
+
+    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
+    console.log(
+      '🔍 Cargando datos del usuario desde sessionStorage para animal interior...'
+    );
+    const savedUserData = sessionStorage.getItem('userData');
+    if (savedUserData) {
+      try {
+        this.userData = JSON.parse(savedUserData);
+        console.log(
+          '✅ Datos del usuario restaurados para animal interior:',
+          this.userData
+        );
+      } catch (error) {
+        console.error('❌ Error al parsear datos del usuario:', error);
+        this.userData = null;
+      }
+    } else {
+      console.log(
+        'ℹ️ No hay datos del usuario guardados en sessionStorage para animal interior'
+      );
+      this.userData = null;
+    }
+
     const savedMessages = sessionStorage.getItem('animalInteriorMessages');
     const savedFirstQuestion = sessionStorage.getItem(
       'animalInteriorFirstQuestionAsked'
@@ -149,34 +173,40 @@ export class AnimalInteriorComponent
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
         this.lastMessageCount = this.chatMessages.length;
-      } catch (error) {}
+      } catch (error) {
+        console.error('Error al restaurar mensajes de animal interior:', error);
+        // Limpiar datos corruptos
+        this.initializeWelcomeMessage();
+      }
     }
 
     if (this.chatMessages.length === 0) {
-      this.addMessage({
-        sender: 'Xamán Olivia',
-        content: `🦉 ¡Saludos, buscador! Soy Olivia, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
-
-¿Qué te gustaría explorar sobre tu espíritu animal?`,
-        timestamp: new Date(),
-        isUser: false,
-      });
-
-      // ✅ MOVER LA VERIFICACIÓN DE RULETA AQUÍ
-      if (FortuneWheelComponent.canShowWheel()) {
-        this.showAnimalWheelAfterDelay(3000);
-      } else {
-        console.log(
-          '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
-        );
-      }
+      this.initializeWelcomeMessage();
     }
 
     this.checkPaymentStatus();
 
     // ✅ TAMBIÉN VERIFICAR PARA MENSAJES RESTAURADOS
-    if (this.chatMessages.length > 1 && FortuneWheelComponent.canShowWheel()) {
+    if (this.chatMessages.length > 0 && FortuneWheelComponent.canShowWheel()) {
       this.showAnimalWheelAfterDelay(2000);
+    }
+  }
+  private initializeWelcomeMessage(): void {
+    this.addMessage({
+      sender: 'Xamán Olivia',
+      content: `🦉 ¡Saludos, buscador! Soy Olivia, tu guía espiritual del reino animal. Estoy aquí para ayudarte a descubrir y conectar con tu animal interior. 
+
+¿Qué te gustaría explorar sobre tu espíritu animal?`,
+      timestamp: new Date(),
+      isUser: false,
+    });
+
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showAnimalWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
+      );
     }
   }
   ngAfterViewChecked(): void {
@@ -287,9 +317,12 @@ export class AnimalInteriorComponent
       }
     }
 
-    // Indicar que se debe hacer scroll porque hay un mensaje nuevo
     this.shouldScrollToBottom = true;
 
+    // Procesar mensaje normalmente
+    this.processUserMessage(userMessage);
+  }
+  private processUserMessage(userMessage: string): void {
     this.addMessage({
       sender: 'Tú',
       content: userMessage,
@@ -315,7 +348,7 @@ export class AnimalInteriorComponent
 
     this.animalService.chatWithGuide(chatRequest).subscribe({
       next: (response) => {
-        // Indicar que se debe hacer scroll porque hay un mensaje nuevo
+        this.isLoading = false;
         this.shouldScrollToBottom = true;
 
         if (response.success && response.response) {
@@ -365,9 +398,9 @@ export class AnimalInteriorComponent
           });
         }
         this.saveMessagesToSession();
-        this.isLoading = false;
       },
       error: (error) => {
+        this.isLoading = false;
         this.shouldScrollToBottom = true;
         this.addMessage({
           sender: 'Xamán Olivia',
@@ -376,11 +409,10 @@ export class AnimalInteriorComponent
           timestamp: new Date(),
           isUser: false,
         });
-        this.isLoading = false;
+        this.saveMessagesToSession();
       },
     });
   }
-
   private saveStateBeforePayment(): void {
     this.saveMessagesToSession();
     sessionStorage.setItem(
@@ -416,6 +448,8 @@ export class AnimalInteriorComponent
   }
 
   async promptForPayment(): Promise<void> {
+    console.log('💳 EJECUTANDO promptForPayment() para animal interior');
+
     this.showPaymentModal = true;
     this.paymentError = null;
     this.isProcessingPayment = true;
@@ -423,20 +457,108 @@ export class AnimalInteriorComponent
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
-      } catch {}
+      } catch (error) {
+        console.log('Error destruyendo elemento anterior:', error);
+      }
       this.paymentElement = undefined;
     }
 
     try {
       const items = [{ id: 'animal_interior_unlimited', amount: 500 }];
+
+      // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
+      if (!this.userData) {
+        console.log(
+          '🔍 userData no está en memoria, cargando desde sessionStorage para animal interior...'
+        );
+        const savedUserData = sessionStorage.getItem('userData');
+        if (savedUserData) {
+          try {
+            this.userData = JSON.parse(savedUserData);
+            console.log(
+              '✅ Datos cargados desde sessionStorage para animal interior:',
+              this.userData
+            );
+          } catch (error) {
+            console.error('❌ Error al parsear datos guardados:', error);
+            this.userData = null;
+          }
+        }
+      }
+
+      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
+      console.log(
+        '🔍 Validando userData completo para animal interior:',
+        this.userData
+      );
+
+      if (!this.userData) {
+        console.error('❌ No hay userData disponible para animal interior');
+        this.paymentError =
+          'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
+      const nombre = this.userData.nombre?.toString().trim();
+      const apellido = this.userData.apellido?.toString().trim();
+      const email = this.userData.email?.toString().trim();
+      const telefono = this.userData.telefono?.toString().trim();
+
+      console.log('🔍 Validando campos individuales para animal interior:');
+      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
+      console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
+      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
+      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
+
+      if (!nombre || !apellido || !email || !telefono) {
+        console.error(
+          '❌ Faltan campos requeridos para el pago de animal interior'
+        );
+        const faltantes = [];
+        if (!nombre) faltantes.push('nombre');
+        if (!apellido) faltantes.push('apellido');
+        if (!email) faltantes.push('email');
+        if (!telefono) faltantes.push('teléfono');
+
+        this.paymentError = `Faltan datos del cliente: ${faltantes.join(
+          ', '
+        )}. Por favor, completa el formulario primero.`;
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
+      const customerInfo = {
+        name: `${nombre} ${apellido}`,
+        email: email,
+        phone: telefono,
+      };
+
+      console.log(
+        '📤 Enviando request de payment intent para animal interior con datos del cliente...'
+      );
+      console.log('👤 Datos del cliente enviados:', customerInfo);
+
+      const requestBody = { items, customerInfo };
+
       const response = await this.http
         .post<{ clientSecret: string }>(
           `${this.backendUrl}create-payment-intent`,
-          { items }
+          requestBody
         )
         .toPromise();
-      if (!response || !response.clientSecret)
-        throw new Error('Error al obtener la información de pago.');
+
+      console.log('📥 Respuesta de payment intent:', response);
+
+      if (!response || !response.clientSecret) {
+        throw new Error(
+          'Error al obtener la información de pago del servidor.'
+        );
+      }
       this.clientSecret = response.clientSecret;
 
       if (this.stripe && this.clientSecret) {
@@ -446,19 +568,32 @@ export class AnimalInteriorComponent
         });
         this.paymentElement = this.elements.create('payment');
         this.isProcessingPayment = false;
+
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container-animal'
           );
+          console.log('🎯 Contenedor encontrado:', paymentElementContainer);
+
           if (paymentElementContainer && this.paymentElement) {
+            console.log('✅ Montando payment element animal interior...');
             this.paymentElement.mount(paymentElementContainer);
           } else {
+            console.error('❌ Contenedor del elemento de pago no encontrado.');
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
           }
         }, 100);
+      } else {
+        throw new Error(
+          'Stripe.js o la clave secreta del cliente no están disponibles.'
+        );
       }
     } catch (error: any) {
-      this.paymentError = error.message || 'Error al inicializar el pago.';
+      console.error('❌ Error al preparar el pago de animal interior:', error);
+      console.error('❌ Detalles del error:', error.error || error);
+      this.paymentError =
+        error.message ||
+        'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
     }
   }
@@ -472,8 +607,10 @@ export class AnimalInteriorComponent
     ) {
       this.paymentError =
         'El sistema de pago no está inicializado correctamente.';
+      this.isProcessingPayment = false;
       return;
     }
+
     this.isProcessingPayment = true;
     this.paymentError = null;
 
@@ -486,23 +623,69 @@ export class AnimalInteriorComponent
     });
 
     if (error) {
-      this.paymentError = error.message || 'Ocurrió un error durante el pago.';
+      this.paymentError =
+        error.message || 'Ocurrió un error inesperado durante el pago.';
       this.isProcessingPayment = false;
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      this.hasUserPaid = true;
-      sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
-      this.showPaymentModal = false;
-      this.paymentElement?.destroy();
-      this.blockedMessageId = null;
-      sessionStorage.removeItem('animalInteriorBlockedMessageId');
-      this.shouldScrollToBottom = true;
-      this.addMessage({
-        sender: 'Xamán Olivia',
-        content:
-          '🦉 ✨ ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría del reino animal sin límites.',
-        timestamp: new Date(),
-        isUser: false,
-      });
+    } else if (paymentIntent) {
+      switch (paymentIntent.status) {
+        case 'succeeded':
+          console.log('¡Pago exitoso para consultas de animal interior!');
+          this.hasUserPaid = true;
+          sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
+          this.showPaymentModal = false;
+          this.paymentElement?.destroy();
+
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('animalInteriorBlockedMessageId');
+          this.shouldScrollToBottom = true;
+
+          this.addMessage({
+            sender: 'Xamán Olivia',
+            content:
+              '🦉 ✨ ¡Pago confirmado! Los espíritus animales han bendecido nuestra conexión. Ahora puedes acceder a toda la sabiduría del reino animal sin límites. ¡Que la magia ancestral te acompañe! ¿Qué aspecto de tu animal interior te gustaría explorar más profundamente?',
+            timestamp: new Date(),
+            isUser: false,
+          });
+
+          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          const pendingMessage = sessionStorage.getItem('pendingAnimalMessage');
+          if (pendingMessage) {
+            console.log(
+              '📝 Procesando mensaje animal pendiente:',
+              pendingMessage
+            );
+            sessionStorage.removeItem('pendingAnimalMessage');
+
+            // Procesar el mensaje pendiente después de un pequeño delay
+            setTimeout(() => {
+              this.processUserMessage(pendingMessage);
+            }, 1000);
+          }
+
+          this.saveMessagesToSession();
+          break;
+        case 'processing':
+          this.paymentError =
+            'El pago se está procesando. Te notificaremos cuando se complete.';
+          break;
+        case 'requires_payment_method':
+          this.paymentError =
+            'Pago fallido. Por favor, intenta con otro método de pago.';
+          this.isProcessingPayment = false;
+          break;
+        case 'requires_action':
+          this.paymentError =
+            'Se requiere una acción adicional para completar el pago.';
+          this.isProcessingPayment = false;
+          break;
+        default:
+          this.paymentError = `Estado del pago: ${paymentIntent.status}. Inténtalo de nuevo.`;
+          this.isProcessingPayment = false;
+          break;
+      }
+    } else {
+      this.paymentError = 'No se pudo determinar el estado del pago.';
+      this.isProcessingPayment = false;
     }
   }
 
@@ -650,14 +833,90 @@ export class AnimalInteriorComponent
     }
   }
   onUserDataSubmitted(userData: any): void {
-    console.log('Datos del usuario recibidos:', userData);
+    console.log('📥 Datos del usuario recibidos en animal interior:', userData);
+    console.log('📋 Campos disponibles:', Object.keys(userData));
+
+    // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
+    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const missingFields = requiredFields.filter(
+      (field) => !userData[field] || userData[field].toString().trim() === ''
+    );
+
+    if (missingFields.length > 0) {
+      console.error(
+        '❌ Faltan campos obligatorios para animal interior:',
+        missingFields
+      );
+      alert(
+        `Para proceder con el pago, necesitas completar: ${missingFields.join(
+          ', '
+        )}`
+      );
+      this.showDataModal = true; // Mantener modal abierto
+      return;
+    }
+
+    // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
+    this.userData = {
+      ...userData,
+      nombre: userData.nombre?.toString().trim(),
+      apellido: userData.apellido?.toString().trim(),
+      email: userData.email?.toString().trim(),
+      telefono: userData.telefono?.toString().trim(),
+    };
+
+    // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
+    try {
+      sessionStorage.setItem('userData', JSON.stringify(this.userData));
+      console.log(
+        '✅ Datos guardados en sessionStorage para animal interior:',
+        this.userData
+      );
+
+      // Verificar que se guardaron correctamente
+      const verificacion = sessionStorage.getItem('userData');
+      console.log(
+        '🔍 Verificación - Datos en sessionStorage para animal interior:',
+        verificacion ? JSON.parse(verificacion) : 'No encontrados'
+      );
+    } catch (error) {
+      console.error('❌ Error guardando en sessionStorage:', error);
+    }
+
     this.showDataModal = false;
 
-    setTimeout(() => {
-      this.promptForPayment();
-    }, 300);
+    // ✅ NUEVO: Enviar datos al backend como en otros componentes
+    this.sendUserDataToBackend(userData);
   }
+  private sendUserDataToBackend(userData: any): void {
+    console.log('📤 Enviando datos al backend desde animal interior...');
 
+    this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
+      next: (response) => {
+        console.log(
+          '✅ Datos enviados correctamente al backend desde animal interior:',
+          response
+        );
+
+        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
+        setTimeout(() => {
+          this.promptForPayment();
+        }, 500);
+      },
+      error: (error) => {
+        console.error(
+          '❌ Error enviando datos al backend desde animal interior:',
+          error
+        );
+
+        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        console.log('⚠️ Continuando con el pago a pesar del error del backend');
+        setTimeout(() => {
+          this.promptForPayment();
+        }, 500);
+      },
+    });
+  }
   onDataModalClosed(): void {
     this.showDataModal = false;
   }

@@ -2,7 +2,11 @@ import Stripe from 'stripe';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+interface CustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+}
 const stripe = new Stripe(process.env.SECRET_KEY!);
 const calculateOrderAmount = (items: any[]) => {
   let total = 0;
@@ -24,12 +28,49 @@ const calculateOrderAmount = (items: any[]) => {
   return Math.max(total, 100);
 };
 
-export const createPaymentIntentModel = async (items: any[]) => {
-  return await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
-    currency: "eur",
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+export const createPaymentIntentModel = async (items: any[], customerInfo: CustomerInfo) => {
+  try {
+    // Crear o buscar un cliente en Stripe
+    const customers = await stripe.customers.list({
+      email: customerInfo.email,
+      limit: 1
+    });
+
+    let customer;
+    if (customers.data.length > 0) {
+      // Cliente existente
+      customer = customers.data[0];
+      // Actualizar información si es necesario
+      await stripe.customers.update(customer.id, {
+        name: customerInfo.name,
+        phone: customerInfo.phone,
+      });
+    } else {
+      // Crear nuevo cliente
+      customer = await stripe.customers.create({
+        name: customerInfo.name,
+        email: customerInfo.email,
+        phone: customerInfo.phone,
+      });
+    }
+
+    // Crear el PaymentIntent con la información del cliente
+    return await stripe.paymentIntents.create({
+      amount: calculateOrderAmount(items),
+      currency: "eur",
+      customer: customer.id,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        customerName: customerInfo.name,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone,
+      },
+      receipt_email: customerInfo.email,
+    });
+  } catch (error) {
+    console.error('Error creating payment intent with customer info:', error);
+    throw error;
+  }
 };

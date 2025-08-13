@@ -34,13 +34,50 @@ const calculateOrderAmount = (items) => {
     // Ensure minimum amount (Stripe requires at least 50 cents in most currencies)
     return Math.max(total, 100);
 };
-const createPaymentIntentModel = (items) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield stripe.paymentIntents.create({
-        amount: calculateOrderAmount(items),
-        currency: "eur",
-        automatic_payment_methods: {
-            enabled: true,
-        },
-    });
+const createPaymentIntentModel = (items, customerInfo) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Crear o buscar un cliente en Stripe
+        const customers = yield stripe.customers.list({
+            email: customerInfo.email,
+            limit: 1
+        });
+        let customer;
+        if (customers.data.length > 0) {
+            // Cliente existente
+            customer = customers.data[0];
+            // Actualizar información si es necesario
+            yield stripe.customers.update(customer.id, {
+                name: customerInfo.name,
+                phone: customerInfo.phone,
+            });
+        }
+        else {
+            // Crear nuevo cliente
+            customer = yield stripe.customers.create({
+                name: customerInfo.name,
+                email: customerInfo.email,
+                phone: customerInfo.phone,
+            });
+        }
+        // Crear el PaymentIntent con la información del cliente
+        return yield stripe.paymentIntents.create({
+            amount: calculateOrderAmount(items),
+            currency: "eur",
+            customer: customer.id,
+            automatic_payment_methods: {
+                enabled: true,
+            },
+            metadata: {
+                customerName: customerInfo.name,
+                customerEmail: customerInfo.email,
+                customerPhone: customerInfo.phone,
+            },
+            receipt_email: customerInfo.email,
+        });
+    }
+    catch (error) {
+        console.error('Error creating payment intent with customer info:', error);
+        throw error;
+    }
 });
 exports.createPaymentIntentModel = createPaymentIntentModel;

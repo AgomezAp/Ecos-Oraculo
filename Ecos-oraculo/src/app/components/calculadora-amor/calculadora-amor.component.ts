@@ -178,6 +178,56 @@ export class CalculadoraAmorComponent
     this.hasUserPaidForLove =
       sessionStorage.getItem('hasUserPaidForLove') === 'true';
 
+    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
+    console.log(
+      '🔍 Cargando datos del usuario desde sessionStorage para amor...'
+    );
+    const savedUserData = sessionStorage.getItem('userData');
+    if (savedUserData) {
+      try {
+        this.userData = JSON.parse(savedUserData);
+        console.log(
+          '✅ Datos del usuario restaurados para amor:',
+          this.userData
+        );
+      } catch (error) {
+        console.error('❌ Error al parsear datos del usuario:', error);
+        this.userData = null;
+      }
+    } else {
+      console.log(
+        'ℹ️ No hay datos del usuario guardados en sessionStorage para amor'
+      );
+      this.userData = null;
+    }
+
+    // ✅ REFACTORIZAR: Separar carga de datos
+    this.loadLoveData();
+
+    // Verificar URL para pagos exitosos
+    this.checkPaymentStatus();
+
+    this.loadLoveExpertInfo();
+    this.subscribeToCompatibilityData();
+    console.log('🎰 Verificando ruleta del amor...');
+    console.log(
+      '- conversationHistory.length:',
+      this.conversationHistory.length
+    );
+    console.log(
+      '- FortuneWheelComponent.canShowWheel():',
+      FortuneWheelComponent.canShowWheel()
+    );
+
+    // ✅ TAMBIÉN VERIFICAR PARA MENSAJES RESTAURADOS
+    if (
+      this.conversationHistory.length > 0 &&
+      FortuneWheelComponent.canShowWheel()
+    ) {
+      this.showLoveWheelAfterDelay(2000);
+    }
+  }
+  private loadLoveData(): void {
     const savedMessages = sessionStorage.getItem('loveMessages');
     const savedFirstQuestion = sessionStorage.getItem('loveFirstQuestionAsked');
     const savedBlockedMessageId = sessionStorage.getItem(
@@ -198,36 +248,36 @@ export class CalculadoraAmorComponent
       } catch (error) {
         console.error('Error al restaurar mensajes:', error);
         this.clearSessionData();
-        this.startConversation();
+        this.initializeLoveWelcomeMessage();
       }
     } else {
-      this.startConversation();
-    }
-
-    // Verificar URL para pagos exitosos
-    this.checkPaymentStatus();
-
-    this.loadLoveExpertInfo();
-    this.subscribeToCompatibilityData();
-    console.log('🎰 Verificando ruleta del amor...');
-    console.log(
-      '- conversationHistory.length:',
-      this.conversationHistory.length
-    );
-    console.log(
-      '- FortuneWheelComponent.canShowWheel():',
-      FortuneWheelComponent.canShowWheel()
-    );
-
-    // Mostrar ruleta después de tener algunos mensajes
-    if (
-      this.conversationHistory.length > 0 &&
-      FortuneWheelComponent.canShowWheel()
-    ) {
-      this.showLoveWheelAfterDelay(3000);
+      this.initializeLoveWelcomeMessage();
     }
   }
+  private initializeLoveWelcomeMessage(): void {
+    const randomWelcome =
+      this.welcomeMessages[
+        Math.floor(Math.random() * this.welcomeMessages.length)
+      ];
 
+    const welcomeMessage: ConversationMessage = {
+      role: 'love_expert',
+      message: randomWelcome,
+      timestamp: new Date(),
+    };
+
+    this.conversationHistory.push(welcomeMessage);
+    this.hasStartedConversation = true;
+
+    // ✅ VERIFICACIÓN DE RULETA AMOROSA
+    if (FortuneWheelComponent.canShowWheel()) {
+      this.showLoveWheelAfterDelay(3000);
+    } else {
+      console.log(
+        '🚫 No se puede mostrar ruleta del amor - sin tiradas disponibles'
+      );
+    }
+  }
   private checkPaymentStatus(): void {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentIntent = urlParams.get('payment_intent');
@@ -336,18 +386,7 @@ export class CalculadoraAmorComponent
 
   startConversation(): void {
     if (this.conversationHistory.length === 0) {
-      const randomWelcome =
-        this.welcomeMessages[
-          Math.floor(Math.random() * this.welcomeMessages.length)
-        ];
-
-      const welcomeMessage: ConversationMessage = {
-        role: 'love_expert',
-        message: randomWelcome,
-        timestamp: new Date(),
-      };
-
-      this.conversationHistory.push(welcomeMessage);
+      this.initializeLoveWelcomeMessage();
     }
     this.hasStartedConversation = true;
   }
@@ -486,12 +525,25 @@ export class CalculadoraAmorComponent
         this.showFortuneWheel = false;
         this.showPaymentModal = false;
 
+        // Guardar el mensaje para procesarlo después del pago
+        sessionStorage.setItem('pendingLoveMessage', userMessage);
+
         this.saveStateBeforePayment();
-        this.showDataModal = true;
+
+        // Mostrar modal de datos con timeout
+        setTimeout(() => {
+          this.showDataModal = true;
+          console.log('📝 showDataModal establecido a:', this.showDataModal);
+        }, 100);
+
         return; // Salir aquí para no procesar el mensaje aún
       }
     }
 
+    // Procesar mensaje normalmente
+    this.processLoveUserMessage(userMessage);
+  }
+  private processLoveUserMessage(userMessage: string): void {
     this.shouldAutoScroll = true;
 
     // Agregar mensaje del usuario
@@ -646,12 +698,85 @@ export class CalculadoraAmorComponent
 
     try {
       const items = [{ id: 'love_compatibility_unlimited', amount: 500 }];
-      console.log('📤 Enviando request de payment intent para amor...');
+
+      // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
+      if (!this.userData) {
+        console.log(
+          '🔍 userData no está en memoria, cargando desde sessionStorage para amor...'
+        );
+        const savedUserData = sessionStorage.getItem('userData');
+        if (savedUserData) {
+          try {
+            this.userData = JSON.parse(savedUserData);
+            console.log(
+              '✅ Datos cargados desde sessionStorage para amor:',
+              this.userData
+            );
+          } catch (error) {
+            console.error('❌ Error al parsear datos guardados:', error);
+            this.userData = null;
+          }
+        }
+      }
+
+      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
+      console.log('🔍 Validando userData completo para amor:', this.userData);
+
+      if (!this.userData) {
+        console.error('❌ No hay userData disponible para amor');
+        this.paymentError =
+          'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
+      const nombre = this.userData.nombre?.toString().trim();
+      const apellido = this.userData.apellido?.toString().trim();
+      const email = this.userData.email?.toString().trim();
+      const telefono = this.userData.telefono?.toString().trim();
+
+      console.log('🔍 Validando campos individuales para amor:');
+      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
+      console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
+      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
+      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
+
+      if (!nombre || !apellido || !email || !telefono) {
+        console.error('❌ Faltan campos requeridos para el pago del amor');
+        const faltantes = [];
+        if (!nombre) faltantes.push('nombre');
+        if (!apellido) faltantes.push('apellido');
+        if (!email) faltantes.push('email');
+        if (!telefono) faltantes.push('teléfono');
+
+        this.paymentError = `Faltan datos del cliente: ${faltantes.join(
+          ', '
+        )}. Por favor, completa el formulario primero.`;
+        this.isProcessingPayment = false;
+        this.showDataModal = true;
+        return;
+      }
+
+      // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
+      const customerInfo = {
+        name: `${nombre} ${apellido}`,
+        email: email,
+        phone: telefono,
+      };
+
+      console.log(
+        '📤 Enviando request de payment intent para amor con datos del cliente...'
+      );
+      console.log('👤 Datos del cliente enviados:', customerInfo);
+
+      const requestBody = { items, customerInfo };
 
       const response = await this.http
         .post<{ clientSecret: string }>(
           `${this.backendUrl}create-payment-intent`,
-          { items }
+          requestBody
         )
         .toPromise();
 
@@ -703,6 +828,7 @@ export class CalculadoraAmorComponent
       }
     } catch (error: any) {
       console.error('❌ Error al preparar el pago:', error);
+      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -833,6 +959,21 @@ export class CalculadoraAmorComponent
           };
           this.conversationHistory.push(confirmationMsg);
 
+          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          const pendingMessage = sessionStorage.getItem('pendingLoveMessage');
+          if (pendingMessage) {
+            console.log(
+              '📝 Procesando mensaje de amor pendiente:',
+              pendingMessage
+            );
+            sessionStorage.removeItem('pendingLoveMessage');
+
+            // Procesar el mensaje pendiente después de un pequeño delay
+            setTimeout(() => {
+              this.processLoveUserMessage(pendingMessage);
+            }, 1000);
+          }
+
           this.shouldAutoScroll = true;
           this.saveMessagesToSession();
           break;
@@ -945,7 +1086,7 @@ export class CalculadoraAmorComponent
     this.compatibilityForm.reset();
 
     setTimeout(() => {
-      this.startConversation();
+      this.initializeLoveWelcomeMessage();
     }, 500);
   }
 
@@ -1103,14 +1244,84 @@ export class CalculadoraAmorComponent
   }
 
   onUserDataSubmitted(userData: any): void {
-    console.log('Datos del usuario recibidos:', userData);
+    console.log('📥 Datos del usuario recibidos en amor:', userData);
+    console.log('📋 Campos disponibles:', Object.keys(userData));
+
+    // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
+    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const missingFields = requiredFields.filter(
+      (field) => !userData[field] || userData[field].toString().trim() === ''
+    );
+
+    if (missingFields.length > 0) {
+      console.error('❌ Faltan campos obligatorios para amor:', missingFields);
+      alert(
+        `Para proceder con el pago, necesitas completar: ${missingFields.join(
+          ', '
+        )}`
+      );
+      this.showDataModal = true; // Mantener modal abierto
+      return;
+    }
+
+    // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
+    this.userData = {
+      ...userData,
+      nombre: userData.nombre?.toString().trim(),
+      apellido: userData.apellido?.toString().trim(),
+      email: userData.email?.toString().trim(),
+      telefono: userData.telefono?.toString().trim(),
+    };
+
+    // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
+    try {
+      sessionStorage.setItem('userData', JSON.stringify(this.userData));
+      console.log(
+        '✅ Datos guardados en sessionStorage para amor:',
+        this.userData
+      );
+
+      // Verificar que se guardaron correctamente
+      const verificacion = sessionStorage.getItem('userData');
+      console.log(
+        '🔍 Verificación - Datos en sessionStorage para amor:',
+        verificacion ? JSON.parse(verificacion) : 'No encontrados'
+      );
+    } catch (error) {
+      console.error('❌ Error guardando en sessionStorage:', error);
+    }
+
     this.showDataModal = false;
 
-    setTimeout(() => {
-      this.promptForPayment();
-    }, 300);
+    // ✅ NUEVO: Enviar datos al backend como en otros componentes
+    this.sendUserDataToBackend(userData);
   }
+  private sendUserDataToBackend(userData: any): void {
+    console.log('📤 Enviando datos al backend desde amor...');
 
+    this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
+      next: (response) => {
+        console.log(
+          '✅ Datos enviados correctamente al backend desde amor:',
+          response
+        );
+
+        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
+        setTimeout(() => {
+          this.promptForPayment();
+        }, 500);
+      },
+      error: (error) => {
+        console.error('❌ Error enviando datos al backend desde amor:', error);
+
+        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        console.log('⚠️ Continuando con el pago a pesar del error del backend');
+        setTimeout(() => {
+          this.promptForPayment();
+        }, 500);
+      },
+    });
+  }
   onDataModalClosed(): void {
     this.showDataModal = false;
   }
