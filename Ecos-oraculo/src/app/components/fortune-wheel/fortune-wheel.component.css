@@ -14,7 +14,9 @@
   padding: 20px;
   box-sizing: border-box;
 }
-
+.prize-description {
+  color: white;
+}
 .crystal-ball-container.active {
   opacity: 1;
   visibility: visible;
@@ -34,7 +36,416 @@
   );
   backdrop-filter: blur(12px);
 }
+/* ✅ Estilos para el estado de procesamiento */
+.oracle-activation.processing {
+  pointer-events: none;
+  opacity: 0.8;
+}
 
+.processing-click {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.click-loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.processing-info {
+  text-align: center;
+  color: #ffd700;
+}
+
+.processing-animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.process-icon {
+  font-size: 1.2rem;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+/* ✅ Estilos para indicadores separados */
+.dream-consultations-indicator {
+  background: rgba(138, 43, 226, 0.2);
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin-top: 5px;
+}
+
+.consultations-count {
+  color: #ba55d3;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ✅ Estilos para panel de recursos */
+.resources-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resource-icon {
+  font-size: 1.1rem;
+}
+
+.resource-text {
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ✅ Estilos para botones de acción */
+.prize-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.try-again-btn {
+  background: linear-gradient(45deg, #ff6b35, #ff8e53);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.try-again-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.continue-spinning-btn {
+  background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.continue-spinning-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+  background: linear-gradient(45deg, #45b7d1, #4ecdc4);
+}
+
+.continue-icon {
+  font-size: 1.2rem;
+  animation: bounce 2s infinite;
+}
+
+.no-more-spins-message {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.no-more-spins-message p {
+  color: #ffc107;
+  margin-bottom: 15px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* ✅ Estilos para resumen de recursos */
+.current-resources {
+  margin-top: 25px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-resources h4 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.resource-summary {
+  display: flex;
+  justify-content: space-around;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.resource-summary .resource-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 120px;
+  flex: 1;
+}
+
+.resource-summary .resource-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.resource-summary .resource-count {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #4ecdc4;
+  margin-bottom: 4px;
+}
+
+.resource-summary .resource-label {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ✅ Estilos para acciones de premio */
+.prize-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.accept-destiny-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  width: 100%;
+}
+
+.accept-destiny-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(45deg, #764ba2, #667eea);
+}
+
+/* ✅ Estilos mejorados para el estado de procesamiento */
+.oracle-activation.processing {
+  pointer-events: none;
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+.processing-click {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.click-loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.processing-info {
+  text-align: center;
+  color: #ffd700;
+  padding: 10px;
+}
+
+.processing-animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.process-icon {
+  font-size: 1.2rem;
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+.process-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ✅ Animaciones */
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ✅ Estilos adicionales para mejor UX */
+.oracle-activation:not(.disabled):not(.processing):hover {
+  transform: scale(1.05);
+}
+
+.oracle-activation.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ✅ Indicadores mejorados */
+.extra-spins-indicator {
+  background: rgba(78, 205, 196, 0.2);
+  border: 1px solid rgba(78, 205, 196, 0.4);
+  padding: 6px 12px;
+  border-radius: 15px;
+  margin-top: 8px;
+}
+
+.spins-count {
+  color: #4ecdc4;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dream-consultations-indicator {
+  background: rgba(138, 43, 226, 0.2);
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  padding: 6px 12px;
+  border-radius: 15px;
+  margin-top: 5px;
+}
+
+.consultations-count {
+  color: #ba55d3;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ✅ Mejorar información de estado */
+.wheel-status {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.status-info {
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.spin-info,
+.processing-info,
+.spinning-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.swirl-icon {
+  animation: spin 2s linear infinite;
+}
 .crystal-modal {
   position: relative;
   background: linear-gradient(
@@ -1013,7 +1424,7 @@
 }
 .spin-text,
 .spin-info,
-.spins-count{
+.spins-count {
   color: white;
 }
 .accept-destiny-btn {
@@ -1122,7 +1533,26 @@
     width: 95vw;
     max-width: 450px;
   }
+  .resource-summary {
+    flex-direction: column;
+  }
 
+  .resource-summary .resource-item {
+    min-width: unset;
+  }
+
+  .continue-spinning-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+
+  .current-resources {
+    padding: 15px;
+  }
+
+  .prize-actions {
+    gap: 10px;
+  }
   .crystal-header h2 {
     font-size: 1.4rem;
   }

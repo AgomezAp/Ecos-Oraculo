@@ -28,8 +28,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
   @Input() isVisible: boolean = false;
   @Input() prizes: Prize[] = [
     { id: '1', name: '3 Tiradas Gratis', color: '#4ecdc4', icon: '🎲' },
-    { id: '2', name: '1 Consulta Gratis', color: '#45b7d1', icon: '🔮' },
-    { id: '3', name: '2 Tiradas Extra', color: '#ffeaa7', icon: '🎯' },
+    { id: '2', name: '1 Consulta premium', color: '#45b7d1', icon: '🔮' },
     { id: '4', name: '¡Inténtalo otra vez!', color: '#ff7675', icon: '🔄' },
   ];
 
@@ -45,9 +44,10 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
   selectedPrize: Prize | null = null;
   wheelSpinning: boolean = false;
 
-  // ✅ PROPIEDADES PARA CONTROL DE SPINS
+  // ✅ CONTROL DE ESTADO MEJORADO
   canSpinWheel: boolean = true;
-  hasUsedFreeSpinToday: boolean = false;
+  isProcessingClick: boolean = false; // ✅ NUEVO: Prevenir múltiples clics
+  hasUsedDailyFreeSpIn: boolean = false;
   nextFreeSpinTime: Date | null = null;
   spinCooldownTimer: any;
 
@@ -62,15 +62,23 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
       clearInterval(this.spinCooldownTimer);
     }
   }
-
+  get currentWheelSpins(): number {
+    return this.getWheelSpinsCount();
+  }
   // ✅ MÉTODO PRINCIPAL PARA VERIFICAR SI PUEDE MOSTRAR LA RULETA
   static canShowWheel(): boolean {
-    const freeSpins = parseInt(sessionStorage.getItem('freeSpins') || '0');
-    const lastSpinDate = sessionStorage.getItem('lastSpinDate');
+    const wheelSpins = parseInt(sessionStorage.getItem('wheelSpins') || '0');
+    const lastSpinDate = sessionStorage.getItem('lastWheelSpinDate');
     const today = new Date().toDateString();
 
-    // Tiene spins extras
-    if (freeSpins > 0) {
+    console.log('🎰 Verificando disponibilidad:', {
+      wheelSpins,
+      lastSpinDate,
+      today,
+    });
+
+    // Tiene tiradas extra para la ruleta
+    if (wheelSpins > 0) {
       return true;
     }
 
@@ -90,191 +98,325 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
 
   // ✅ MÉTODO ESTÁTICO PARA VERIFICAR DESDE OTROS COMPONENTES
   static getSpinStatus(): string {
-    const freeSpins = parseInt(sessionStorage.getItem('freeSpins') || '0');
-    const lastSpinDate = sessionStorage.getItem('lastSpinDate');
+    const wheelSpins = parseInt(sessionStorage.getItem('wheelSpins') || '0');
+    const lastSpinDate = sessionStorage.getItem('lastWheelSpinDate');
     const today = new Date().toDateString();
 
-    if (freeSpins > 0) {
-      return `${freeSpins} tiradas extra disponibles`;
+    if (wheelSpins > 0) {
+      return `${wheelSpins} tiradas de ruleta disponibles`;
     }
 
     if (!lastSpinDate) {
-      return 'Tirada gratuita disponible (usuario nuevo)';
+      return 'Tirada gratuita disponible';
     }
 
     if (lastSpinDate !== today) {
-      return 'Tirada gratuita diaria disponible';
+      return 'Tirada diaria disponible';
     }
 
-    return 'Sin tiradas disponibles';
+    return 'Sin tiradas disponibles hoy';
   }
 
-  // ✅ VERIFICAR DISPONIBILIDAD DE SPINS
+  // ✅ VERIFICAR DISPONIBILIDAD DE TIRADAS
   checkSpinAvailability(): void {
-    const lastSpinDate = sessionStorage.getItem('lastSpinDate');
+    const lastSpinDate = sessionStorage.getItem('lastWheelSpinDate');
     const today = new Date().toDateString();
-    const freeSpins = parseInt(sessionStorage.getItem('freeSpins') || '0');
+    const wheelSpins = this.getWheelSpinsCount();
+
+    console.log('🔍 === VERIFICANDO DISPONIBILIDAD ===');
+    console.log('Datos para verificación:', {
+      lastSpinDate,
+      today,
+      wheelSpins,
+      hasUsedDaily: this.hasUsedDailyFreeSpIn,
+    });
 
     if (!lastSpinDate) {
-      console.log('🆕 Usuario nuevo - permitir primer giro');
+      // Usuario nuevo - primera vez
       this.canSpinWheel = true;
-      this.hasUsedFreeSpinToday = false;
+      this.hasUsedDailyFreeSpIn = false;
+      console.log('🆕 USUARIO NUEVO - Puede girar (primera vez)');
       return;
     }
 
-    // Verificar si ya giró hoy
+    // Verificar si ya usó tirada diaria hoy
     if (lastSpinDate === today) {
-      this.hasUsedFreeSpinToday = true;
-      this.canSpinWheel = freeSpins > 0; // Solo puede girar si tiene spins extras
+      this.hasUsedDailyFreeSpIn = true;
+      // Solo puede girar si tiene tiradas extra
+      this.canSpinWheel = wheelSpins > 0;
+      console.log('📅 YA USÓ TIRADA DIARIA HOY:', {
+        puedeGirar: this.canSpinWheel,
+        tirasExtra: wheelSpins,
+      });
     } else {
-      this.hasUsedFreeSpinToday = false;
-      this.canSpinWheel = true; // Nuevo día, puede usar giro gratuito
+      // Nuevo día - puede usar tirada gratuita
+      this.hasUsedDailyFreeSpIn = false;
+      this.canSpinWheel = true;
+      console.log('🌅 NUEVO DÍA - Tirada diaria disponible');
     }
 
-    // Verificar cooldown solo si no tiene spins extras
-    if (freeSpins === 0) {
-      const lastSpinTime = sessionStorage.getItem('lastSpinTime');
-      if (lastSpinTime && lastSpinDate === today) {
-        const timeSince = Date.now() - parseInt(lastSpinTime);
-        const cooldownMs = 24 * 60 * 60 * 1000;
-
-        if (timeSince < cooldownMs) {
-          this.canSpinWheel = false;
-          this.nextFreeSpinTime = new Date(parseInt(lastSpinTime) + cooldownMs);
-        }
-      }
-    }
-
-    console.log('🎰 Estado de spins:', {
+    console.log('✅ RESULTADO VERIFICACIÓN:', {
       canSpinWheel: this.canSpinWheel,
-      hasUsedFreeSpinToday: this.hasUsedFreeSpinToday,
-      freeSpins: freeSpins,
-      lastSpinDate: lastSpinDate,
-      today: today,
+      hasUsedDailyFreeSpIn: this.hasUsedDailyFreeSpIn,
+      wheelSpins: wheelSpins,
+      status: this.canSpinWheel ? 'DISPONIBLE' : 'NO DISPONIBLE',
+    });
+
+    console.log('🔍 === FIN VERIFICACIÓN DISPONIBILIDAD ===');
+  }
+
+  async spinWheel() {
+    console.log('🎰 === INICIO DE SPIN WHEEL ===');
+
+    // ✅ VALIDACIONES ESTRICTAS
+    if (this.isProcessingClick) {
+      console.log('⚠️ Ya procesando un clic...');
+      return;
+    }
+
+    if (!this.canSpinWheel || this.wheelSpinning || this.isSpinning) {
+      console.log('❌ No se puede girar la ruleta ahora', {
+        canSpinWheel: this.canSpinWheel,
+        wheelSpinning: this.wheelSpinning,
+        isSpinning: this.isSpinning,
+      });
+      return;
+    }
+
+    // ✅ BLOQUEAR INMEDIATAMENTE
+    this.isProcessingClick = true;
+    console.log('🔒 Bloqueando interfaz...');
+
+    // ✅ MOSTRAR ESTADO ANTES DEL GIRO
+    const wheelSpinsBefore = this.getWheelSpinsCount();
+    const dreamConsultationsBefore = this.getDreamConsultationsCount();
+    console.log('📊 Estado ANTES del giro:', {
+      wheelSpins: wheelSpinsBefore,
+      dreamConsultations: dreamConsultationsBefore,
+      canSpinWheel: this.canSpinWheel,
+      hasUsedDaily: this.hasUsedDailyFreeSpIn,
+    });
+
+    try {
+      // ✅ ESTADOS DE BLOQUEO
+      this.wheelSpinning = true;
+      this.isSpinning = true;
+      this.canSpinWheel = false;
+      this.selectedPrize = null;
+
+      // ✅ USAR TIRADA INMEDIATAMENTE (ESTO DISMINUYE EL CONTADOR)
+      this.handleSpinUsage();
+
+      // ✅ VERIFICAR ESTADO DESPUÉS DEL USO
+      const wheelSpinsAfter = this.getWheelSpinsCount();
+      console.log('📊 Estado DESPUÉS del uso de tirada:', {
+        antes: wheelSpinsBefore,
+        después: wheelSpinsAfter,
+        diferencia: wheelSpinsBefore - wheelSpinsAfter,
+      });
+
+      // ✅ DETERMINAR PREMIO GANADO
+      const wonPrize = this.determineWonPrize();
+      console.log('🎁 Premio determinado:', wonPrize);
+
+      // ✅ ANIMACIÓN DE ROTACIÓN
+      const minSpins = 6;
+      const maxSpins = 10;
+      const randomSpins = Math.random() * (maxSpins - minSpins) + minSpins;
+      const finalRotation = randomSpins * 360;
+
+      // Aplicar rotación gradual
+      this.currentRotation += finalRotation;
+      console.log('🔄 Rotación aplicada:', {
+        randomSpins,
+        finalRotation,
+        currentRotation: this.currentRotation,
+      });
+
+      // ✅ ESPERAR ANIMACIÓN COMPLETA
+      console.log('⏳ Esperando animación de 3 segundos...');
+      await this.waitForAnimation(3000);
+
+      // ✅ FINALIZAR ESTADOS DE ANIMACIÓN
+      this.wheelSpinning = false;
+      this.isSpinning = false;
+      this.selectedPrize = wonPrize;
+
+      console.log('🏆 Premio seleccionado final:', this.selectedPrize);
+
+      // ✅ PROCESAR PREMIO (ESTO PUEDE AGREGAR MÁS TIRADAS/CONSULTAS)
+      await this.processPrizeWon(wonPrize);
+
+      // ✅ ESTADO DESPUÉS DE PROCESAR PREMIO
+      const finalWheelSpins = this.getWheelSpinsCount();
+      const finalDreamConsultations = this.getDreamConsultationsCount();
+      console.log('📊 Estado FINAL después de procesar premio:', {
+        wheelSpins: finalWheelSpins,
+        dreamConsultations: finalDreamConsultations,
+        premio: wonPrize.name,
+      });
+
+      // ✅ ACTUALIZAR DISPONIBILIDAD BASADA EN EL ESTADO FINAL
+      this.updateSpinAvailabilityAfterPrize(wonPrize);
+
+      // ✅ EMITIR EVENTO DEL PREMIO
+      this.onPrizeWon.emit(wonPrize);
+
+      console.log('✅ Spin completado exitosamente');
+    } catch (error) {
+      console.error('❌ Error durante el spin:', error);
+
+      // ✅ RESETEAR ESTADOS EN CASO DE ERROR
+      this.wheelSpinning = false;
+      this.isSpinning = false;
+      this.selectedPrize = null;
+
+      // Restaurar disponibilidad
+      this.checkSpinAvailability();
+    } finally {
+      // ✅ LIBERAR BLOQUEO DESPUÉS DE UN DELAY
+      setTimeout(() => {
+        this.isProcessingClick = false;
+        console.log('🔓 Liberando bloqueo de interfaz');
+
+        // ✅ VERIFICACIÓN FINAL DE DISPONIBILIDAD
+        this.checkSpinAvailability();
+
+        console.log('📊 Estado FINAL FINAL:', {
+          wheelSpins: this.getWheelSpinsCount(),
+          dreamConsultations: this.getDreamConsultationsCount(),
+          canSpinWheel: this.canSpinWheel,
+          hasUsedDaily: this.hasUsedDailyFreeSpIn,
+          isProcessingClick: this.isProcessingClick,
+        });
+      }, 1000);
+    }
+
+    console.log('🎰 === FIN DE SPIN WHEEL ===');
+  }
+  private updateSpinAvailabilityAfterPrize(wonPrize: Prize): void {
+    console.log('🔄 === ACTUALIZANDO DISPONIBILIDAD POST-PREMIO ===');
+
+    const wheelSpins = this.getWheelSpinsCount();
+    const today = new Date().toDateString();
+    const lastSpinDate = sessionStorage.getItem('lastWheelSpinDate');
+
+    console.log('Estado para evaluar disponibilidad:', {
+      prizeId: wonPrize.id,
+      prizeName: wonPrize.name,
+      wheelSpins: wheelSpins,
+      hasUsedDaily: this.hasUsedDailyFreeSpIn,
+      lastSpinDate,
+      today,
+    });
+
+    // ✅ LÓGICA DE DISPONIBILIDAD
+    if (wheelSpins > 0) {
+      // Tiene tiradas extra disponibles
+      this.canSpinWheel = true;
+      console.log(
+        '✅ PUEDE SEGUIR GIRANDO - Tiradas extra disponibles:',
+        wheelSpins
+      );
+    } else if (!this.hasUsedDailyFreeSpIn) {
+      // Verificar si puede usar tirada diaria (no debería llegar aquí tras usar una)
+      this.canSpinWheel = lastSpinDate !== today;
+      console.log('🎁 Verificando tirada diaria:', {
+        canUse: this.canSpinWheel,
+        lastSpinDate,
+        today,
+      });
+    } else {
+      // Ya usó su tirada diaria y no tiene extra
+      this.canSpinWheel = false;
+      console.log('❌ SIN TIRADAS - Diaria usada y sin extras');
+    }
+
+    console.log('✅ DISPONIBILIDAD FINAL:', {
+      canSpinWheel: this.canSpinWheel,
+      wheelSpins: wheelSpins,
+      hasUsedDaily: this.hasUsedDailyFreeSpIn,
+      reasoning: this.canSpinWheel ? 'Puede girar' : 'No puede girar',
+    });
+
+    console.log('🔄 === FIN ACTUALIZACIÓN DISPONIBILIDAD ===');
+  }
+  // ✅ FUNCIÓN AUXILIAR PARA ESPERAR
+  private waitForAnimation(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
     });
   }
 
-  // ✅ GIRAR LA RULETA
-  spinWheel() {
-    if (!this.canSpinWheel || this.wheelSpinning || this.isSpinning) {
-      console.log('❌ No se puede girar la ruleta ahora');
-      return;
-    }
-
-    console.log('🎰 Iniciando giro de ruleta...');
-
-    // Bloquear inmediatamente
-    this.wheelSpinning = true;
-    this.isSpinning = true;
-    this.canSpinWheel = false;
-
-    // Manejar uso de spins
-    this.handleSpinUsage();
-
-    // Rotación aleatoria
-    const minSpins = 6;
-    const maxSpins = 10;
-    const randomSpins = Math.random() * (maxSpins - minSpins) + minSpins;
-    const finalRotation = randomSpins * 360;
-
-    // ✅ Determinar premio ganado INMEDIATAMENTE
-    const wonPrize = this.determineWonPrize();
-    console.log('🎁 Premio determinado:', wonPrize); // Debug
-
-    this.currentRotation += finalRotation;
-
-    // ✅ Animación de 3 segundos con mejor manejo
-    setTimeout(() => {
-      console.log('⏰ Finalizando animación...'); // Debug
-
-      this.wheelSpinning = false;
-      this.isSpinning = false;
-      this.selectedPrize = wonPrize; // ✅ Establecer premio
-
-      console.log('🏆 Premio seleccionado:', this.selectedPrize); // Debug
-
-      // Procesar premio
-      this.processPrizeWon(wonPrize);
-
-      // Actualizar disponibilidad
-      this.updateSpinAvailability(wonPrize);
-
-      // Emitir evento al componente padre
-      this.onPrizeWon.emit(wonPrize);
-
-      // ✅ Forzar detección de cambios
-      setTimeout(() => {
-        console.log('🔄 Estado final - selectedPrize:', this.selectedPrize);
-      }, 100);
-    }, 3000);
-  }
-  // ✅ MANEJAR USO DE SPINS
   private handleSpinUsage(): void {
-    const freeSpins = this.getFreeSpinsCount();
+    const wheelSpins = this.getWheelSpinsCount();
+    const today = new Date().toDateString();
+    const lastSpinDate = sessionStorage.getItem('lastWheelSpinDate');
 
-    if (freeSpins > 0) {
-      // Usar spin extra
-      sessionStorage.setItem('freeSpins', (freeSpins - 1).toString());
-      console.log(`🎁 Usado spin extra. Restantes: ${freeSpins - 1}`);
+    console.log('🎯 Manejando uso de tirada:', {
+      wheelSpins,
+      today,
+      lastSpinDate,
+      hasUsedDaily: this.hasUsedDailyFreeSpIn,
+    });
+
+    if (wheelSpins > 0) {
+      // ✅ USAR TIRADA EXTRA DE RULETA
+      const newCount = wheelSpins - 1;
+      sessionStorage.setItem('wheelSpins', newCount.toString());
+      console.log(
+        `🎁 Usada tirada extra de ruleta. Antes: ${wheelSpins}, Ahora: ${newCount}`
+      );
+
+      // ✅ ACTUALIZAR INMEDIATAMENTE LA DISPONIBILIDAD
+      this.checkSpinAvailability();
     } else {
-      // Usar spin diario gratuito
-      const today = new Date().toDateString();
-      sessionStorage.setItem('lastSpinDate', today);
-      sessionStorage.setItem('lastSpinTime', Date.now().toString());
-      this.hasUsedFreeSpinToday = true;
+      // ✅ USAR TIRADA DIARIA GRATUITA
+      sessionStorage.setItem('lastWheelSpinDate', today);
+      sessionStorage.setItem('lastWheelSpinTime', Date.now().toString());
+      this.hasUsedDailyFreeSpIn = true;
+      console.log('📅 Usada tirada diaria gratuita');
     }
   }
 
-  // ✅ DETERMINAR PREMIO GANADO
-  private determineWonPrize(): Prize {
-    const random = Math.random();
+  // ✅ PROCESAR PREMIO GANADO (MEJORADO)
+  private async processPrizeWon(prize: Prize): Promise<void> {
+    console.log('🎁 Procesando premio:', prize);
 
-    if (random < 0.15) {
-      return this.prizes[0]; // 15% - 3 Tiradas Gratis
-    } else if (random < 0.35) {
-      return this.prizes[1]; // 20% - 1 Consulta Gratis
-    } else if (random < 0.5) {
-      return this.prizes[2]; // 15% - 2 Tiradas Extra
-    } else {
-      return this.prizes[3]; // 50% - Inténtalo otra vez
-    }
-  }
-
-  // ✅ PROCESAR PREMIO GANADO
-  private processPrizeWon(prize: Prize): void {
     switch (prize.id) {
-      case '1': // 3 Tiradas Gratis
-        this.grantFreeSpins(3);
+      case '1': // 3 Tiradas Gratis de Ruleta
+        this.grantWheelSpins(3);
         break;
-      case '2': // 1 Consulta Gratis
-        this.grantFreeConsultation(1);
-        break;
-      case '3': // 2 Tiradas Extra
-        this.grantFreeSpins(2);
+      case '2': // 1 Consulta Gratis de Sueños
+        this.grantDreamConsultations(1);
         break;
       case '4': // Inténtalo otra vez
-        this.grantAnotherChance();
+        this.grantRetryChance();
         break;
+      default:
+        console.warn('⚠️ Premio desconocido:', prize);
     }
 
     this.savePrizeToHistory(prize);
   }
 
-  // ✅ OTORGAR SPINS GRATIS
-  private grantFreeSpins(count: number): void {
-    console.log(`✨ Otorgadas ${count} tiradas gratis`);
-    const currentSpins = this.getFreeSpinsCount();
-    sessionStorage.setItem('freeSpins', (currentSpins + count).toString());
+  // ✅ OTORGAR TIRADAS DE RULETA (SEPARADO)
+  private grantWheelSpins(count: number): void {
+    console.log(`🎰 Otorgadas ${count} tiradas de ruleta`);
+    const currentSpins = this.getWheelSpinsCount();
+    sessionStorage.setItem('wheelSpins', (currentSpins + count).toString());
   }
 
-  // ✅ OTORGAR CONSULTA GRATIS
-  private grantFreeConsultation(count: number): void {
-    console.log(`🔮 Otorgadas ${count} consultas gratis`);
+  // ✅ OTORGAR CONSULTAS DE SUEÑOS (SEPARADO)
+  private grantDreamConsultations(count: number): void {
+    console.log(`🔮 Otorgadas ${count} consultas de sueños`);
     const currentConsultations = parseInt(
-      sessionStorage.getItem('freeConsultations') || '0'
+      sessionStorage.getItem('dreamConsultations') || '0'
     );
     sessionStorage.setItem(
-      'freeConsultations',
+      'dreamConsultations',
       (currentConsultations + count).toString()
     );
 
@@ -289,10 +431,92 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ OTRA OPORTUNIDAD
-  private grantAnotherChance(): void {
-    console.log('🔄 Otra oportunidad otorgada');
-    // Se maneja en updateSpinAvailability
+  // ✅ OTORGAR OTRA OPORTUNIDAD (NUEVO)
+  private grantRetryChance(): void {
+    console.log('🔄 Otorgando otra oportunidad inmediata');
+   
+  }
+  shouldShowContinueButton(prize: Prize | null): boolean {
+    if (!prize) return false;
+
+    // Premios que otorgan tiradas extra (no cerrar modal)
+    const spinsGrantingPrizes = ['1', '4']; // Solo 3 tiradas e inténtalo otra vez
+    return spinsGrantingPrizes.includes(prize.id);
+  }
+  shouldShowCloseButton(prize: Prize | null): boolean {
+    if (!prize) return false;
+    return prize.id === '2';
+  }
+  continueSpinning(): void {
+    console.log('🔄 === CONTINUANDO SPINNING ===');
+    console.log('Estado antes de continuar:', {
+      selectedPrize: this.selectedPrize?.name,
+      wheelSpins: this.getWheelSpinsCount(),
+      canSpinWheel: this.canSpinWheel,
+      isProcessingClick: this.isProcessingClick,
+    });
+
+    // ✅ RESETEAR ESTADO PARA PERMITIR OTRA TIRADA
+    this.selectedPrize = null;
+    this.isProcessingClick = false;
+    this.wheelSpinning = false;
+    this.isSpinning = false;
+
+    // ✅ VERIFICAR DISPONIBILIDAD ACTUALIZADA
+    this.checkSpinAvailability();
+
+    console.log('Estado después de continuar:', {
+      canSpinWheel: this.canSpinWheel,
+      wheelSpins: this.getWheelSpinsCount(),
+      isProcessingClick: this.isProcessingClick,
+    });
+
+    console.log('🔄 === FIN CONTINUAR SPINNING ===');
+  }
+
+  // ✅ MÉTODOS AUXILIARES ACTUALIZADOS
+  hasFreeSpinsAvailable(): boolean {
+    return this.getWheelSpinsCount() > 0;
+  }
+
+  getWheelSpinsCount(): number {
+    return parseInt(sessionStorage.getItem('wheelSpins') || '0');
+  }
+
+  getFreeSpinsCount(): number {
+    // Mantener compatibilidad con template
+    return this.getWheelSpinsCount();
+  }
+
+  getDreamConsultationsCount(): number {
+    return parseInt(sessionStorage.getItem('dreamConsultations') || '0');
+  }
+
+  getTimeUntilNextSpin(): string {
+    if (!this.nextFreeSpinTime) return '';
+
+    const now = new Date().getTime();
+    const timeLeft = this.nextFreeSpinTime.getTime() - now;
+
+    if (timeLeft <= 0) return '';
+
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${hours}h ${minutes}m`;
+  }
+
+  // ✅ DETERMINAR PREMIO (SIN CAMBIOS)
+  private determineWonPrize(): Prize {
+    const random = Math.random();
+
+    if (random < 0.2) {
+      return this.prizes[0]; // 20% - 3 Tiradas Gratis
+    } else if (random < 0.35) {
+      return this.prizes[1]; // 15% - 1 Consulta Premium
+    } else {
+      return this.prizes[2]; // 65% - Inténtalo otra vez
+    }
   }
 
   // ✅ GUARDAR PREMIO EN HISTORIAL
@@ -306,34 +530,6 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
       claimed: true,
     });
     sessionStorage.setItem('prizeHistory', JSON.stringify(prizeHistory));
-  }
-
-  // ✅ ACTUALIZAR DISPONIBILIDAD DESPUÉS DEL GIRO
-  private updateSpinAvailability(wonPrize: Prize): void {
-    if (wonPrize.id === '4') {
-      // "Inténtalo otra vez" - permitir otro giro inmediatamente
-      console.log('🔄 Premio: Inténtalo otra vez - permitiendo otro giro');
-      this.canSpinWheel = true;
-      setTimeout(() => {
-        if (FortuneWheelComponent.canShowWheel()) {
-          // No cerramos el modal, permitimos otro giro
-          this.selectedPrize = null;
-        }
-      }, 2000);
-    } else {
-      // Para otros premios, verificar disponibilidad
-      const freeSpins = parseInt(sessionStorage.getItem('freeSpins') || '0');
-      this.canSpinWheel = freeSpins > 0;
-
-      console.log('🎁 Premio ganado. Spins restantes:', freeSpins);
-
-      if (!this.canSpinWheel) {
-        // No quedan más spins - establecer cooldown
-        this.nextFreeSpinTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        this.startSpinCooldownTimer();
-        console.log('⏰ No hay más spins. Próximo spin en 24 horas');
-      }
-    }
   }
 
   // ✅ TIMER PARA COOLDOWN
@@ -356,36 +552,6 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ MÉTODOS AUXILIARES
-  hasFreeSpinsAvailable(): boolean {
-    return this.getFreeSpinsCount() > 0;
-  }
-
-  getFreeSpinsCount(): number {
-    return parseInt(sessionStorage.getItem('freeSpins') || '0');
-  }
-
-  getTimeUntilNextSpin(): string {
-    if (!this.nextFreeSpinTime) return '';
-
-    const now = new Date().getTime();
-    const timeLeft = this.nextFreeSpinTime.getTime() - now;
-
-    if (timeLeft <= 0) return '';
-
-    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-
-    return `${hours}h ${minutes}m`;
-  }
-
-  // ✅ RECLAMAR PREMIO Y CERRAR
-  claimPrize() {
-    if (this.selectedPrize) {
-      this.closeWheel();
-    }
-  }
-
   // ✅ CERRAR RULETA
   closeWheel() {
     this.onWheelClosed.emit();
@@ -397,6 +563,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
     this.selectedPrize = null;
     this.wheelSpinning = false;
     this.isSpinning = false;
+    this.isProcessingClick = false;
   }
 
   // ✅ MÉTODO PARA CERRAR DESDE TEMPLATE

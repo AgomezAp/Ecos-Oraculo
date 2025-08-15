@@ -10,11 +10,6 @@ router.post('/api/vocational/counselor', vocationalController.chatWithCounselor)
 // Ruta para obtener información del consejero vocacional
 router.get('/api/vocational/counselor/info', vocationalController.getVocationalInfo);
 
-// Ruta para obtener preguntas de assessment vocacional
-router.get('/api/vocational/assessment/questions', vocationalController.getAssessmentQuestions);
-
-// Ruta para analizar resultados de assessment
-router.post('/api/vocational/assessment/analyze', vocationalController.analyzeAssessment);
 
 // Ruta de prueba para verificar que el servicio funciona
 router.get('/test', (req, res) => {

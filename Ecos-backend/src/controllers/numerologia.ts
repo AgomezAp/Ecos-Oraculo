@@ -29,130 +29,8 @@ export class ChatController {
     }
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
-  private generateNumerologyData(
-    birthDate?: string,
-    fullName?: string
-  ): string {
-    let numerologyInfo = "DATOS DISPONIBLES PARA ANÁLISIS:\n";
 
-    if (birthDate) {
-      const lifePathNumber = this.calculateLifePath(birthDate);
-      numerologyInfo += `- Fecha de nacimiento: ${birthDate}\n`;
-      numerologyInfo += `- Número del Camino de Vida calculado: ${lifePathNumber}\n`;
-    }
-
-    if (fullName) {
-      const destinyNumber = this.calculateDestinyNumber(fullName);
-      numerologyInfo += `- Nombre completo: ${fullName}\n`;
-      numerologyInfo += `- Número del Destino calculado: ${destinyNumber}\n`;
-    }
-
-    if (!birthDate && !fullName) {
-      numerologyInfo +=
-        "- Sin datos específicos proporcionados (solicitar información)\n";
-    }
-
-    return numerologyInfo;
-  }
-
-  // Método para calcular el número del camino de vida
-  private calculateLifePath(dateStr: string): number {
-    try {
-      // Asume formato DD/MM/YYYY o similar
-      const numbers = dateStr.replace(/\D/g, "");
-      const sum = numbers
-        .split("")
-        .reduce((acc, digit) => acc + parseInt(digit), 0);
-      return this.reduceToSingleDigit(sum);
-    } catch {
-      return 0; // Si hay error en el cálculo
-    }
-  }
-  private calculateDestinyNumber(name: string): number {
-    const letterValues: { [key: string]: number } = {
-      A: 1,
-      B: 2,
-      C: 3,
-      D: 4,
-      E: 5,
-      F: 6,
-      G: 7,
-      H: 8,
-      I: 9,
-      J: 1,
-      K: 2,
-      L: 3,
-      M: 4,
-      N: 5,
-      O: 6,
-      P: 7,
-      Q: 8,
-      R: 9,
-      S: 1,
-      T: 2,
-      U: 3,
-      V: 4,
-      W: 5,
-      X: 6,
-      Y: 7,
-      Z: 8,
-    };
-
-    const sum = name
-      .toUpperCase()
-      .replace(/[^A-Z]/g, "")
-      .split("")
-      .reduce((acc, letter) => {
-        return acc + (letterValues[letter] || 0);
-      }, 0);
-
-    return this.reduceToSingleDigit(sum);
-  }
-  private validateNumerologyRequest(
-    numerologyData: NumerologyData,
-    userMessage: string
-  ): void {
-    if (!numerologyData) {
-      const error: ApiError = new Error("Datos del numerólogo requeridos");
-      error.statusCode = 400;
-      error.code = "MISSING_NUMEROLOGY_DATA";
-      throw error;
-    }
-
-    if (
-      !userMessage ||
-      typeof userMessage !== "string" ||
-      userMessage.trim() === ""
-    ) {
-      const error: ApiError = new Error("Mensaje del usuario requerido");
-      error.statusCode = 400;
-      error.code = "MISSING_USER_MESSAGE";
-      throw error;
-    }
-
-    if (userMessage.length > 1200) {
-      const error: ApiError = new Error(
-        "El mensaje es demasiado largo (máximo 1200 caracteres)"
-      );
-      error.statusCode = 400;
-      error.code = "MESSAGE_TOO_LONG";
-      throw error;
-    }
-  }
-  // Método para reducir a dígito único
-  private reduceToSingleDigit(num: number): number {
-    while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
-      num = num
-        .toString()
-        .split("")
-        .reduce((acc, digit) => acc + parseInt(digit), 0);
-    }
-    return num;
-  }
   private createNumerologyContext(
-    numerology: NumerologyData,
-    birthDate?: string,
-    fullName?: string,
     history?: Array<{ role: string; message: string }>
   ): string {
     const conversationContext =
@@ -162,9 +40,7 @@ export class ChatController {
             .join("\n")}\n`
         : "";
 
-    const personalData = this.generateNumerologyData(birthDate, fullName);
-
-  return `Eres Maestra Sofia, una numeróloga ancestral y guardiana de los números sagrados. Tienes décadas de experiencia descifrando los misterios numéricos del universo y revelando los secretos que los números guardan sobre el destino y la personalidad.
+    return `Eres Maestra Sofia, una numeróloga ancestral y guardiana de los números sagrados. Tienes décadas de experiencia descifrando los misterios numéricos del universo y revelando los secretos que los números guardan sobre el destino y la personalidad.
 
 TU IDENTIDAD NUMEROLÓGICA:
 - Nombre: Maestra Sofia, la Guardiana de los Números Sagrados
@@ -207,7 +83,7 @@ ITALIANO:
 - "Guarda cosa vedo nei tuoi numeri..."
 - "La tua vibrazione numerica rivela..."
 
-${personalData}
+
 
 CÓMO DEBES COMPORTARTE:
 
@@ -386,9 +262,6 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
         conversationHistory,
       }: NumerologyRequest = req.body;
 
-      // Validar entrada
-      this.validateNumerologyRequest(numerologyData, userMessage);
-
       // Intentar generar respuesta con fallback
       const response = await this.generateWithFallback(
         numerologyData,
@@ -439,13 +312,7 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
         });
 
         // Crear prompt con variaciones según el intento
-        const contextPrompt = this.createNumerologyContext(
-          numerologyData,
-          birthDate,
-          fullName,
-          conversationHistory
-        );
-
+        const contextPrompt = this.createNumerologyContext(conversationHistory);
         let fullPrompt: string;
 
         if (attempt === 1) {
@@ -498,14 +365,7 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
   ): string {
     // Respuestas dinámicas basadas en los datos disponibles
     if (birthDate && fullName) {
-      const lifePath = this.calculateLifePath(birthDate);
-      const destiny = this.calculateDestinyNumber(fullName);
-
       return `¡Hola! Me da mucho gusto conocerte. Aunque hay una pequeña interferencia en las vibraciones cósmicas, puedo decirte que tus números principales son fascinantes:
-
-**Tu Camino de Vida es ${lifePath}**, lo que significa que tienes un propósito especial en esta vida. Este número revela tu misión principal y las lecciones que vienes a aprender.
-
-**Tu Número del Destino es ${destiny}**, que representa tu potencial máximo y hacia dónde te diriges naturalmente.
 
 Los números están tratando de decirme algo más sobre ti, pero necesito un momento para que las energías se estabilicen. ¿Te gustaría que profundicemos en algún aspecto específico de tu perfil numerológico?
 
@@ -513,23 +373,9 @@ Los números están tratando de decirme algo más sobre ti, pero necesito un mom
     }
 
     if (birthDate) {
-      const lifePath = this.calculateLifePath(birthDate);
-
-      return `¡Hola! Las vibraciones numéricas están un poco dispersas en este momento, pero puedo ver que tu **Camino de Vida es ${lifePath}**.
-
-Este número es súper especial porque representa tu propósito principal en esta vida. Para darte una lectura más completa, me encantaría conocer tu nombre completo.
-
-¿Qué aspecto de tu perfil numerológico te gustaría explorar más? ¿O hay alguna pregunta específica sobre los números que tengas en mente?`;
     }
 
     if (fullName) {
-      const destiny = this.calculateDestinyNumber(fullName);
-
-      return `¡Hola! Me encanta poder ayudarte con los números. Aunque las energías están un poco revueltas, puedo ver que tu **Número del Destino es ${destiny}**.
-
-Este número habla de tu potencial máximo y tu dirección natural en la vida. Para una lectura más completa, me encantaría conocer tu fecha de nacimiento.
-
-¿Hay algo específico sobre los números que te gustaría saber? ¿O alguna situación en tu vida donde sientes que los números podrían guiarte?`;
     }
 
     // Respuesta general cuando no hay datos específicos

@@ -1,5 +1,6 @@
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -48,7 +49,7 @@ import {
   styleUrl: './significado-suenos.component.css',
 })
 export class SignificadoSuenosComponent
-  implements OnInit, OnDestroy, AfterViewChecked
+  implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
 {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -65,10 +66,25 @@ export class SignificadoSuenosComponent
 
   showFortuneWheel: boolean = false;
   wheelPrizes: Prize[] = [
-    { id: '1', name: '3 Tiradas Gratis', color: '#4ecdc4', icon: '🎲' },
-    { id: '2', name: '1 Consulta Gratis', color: '#45b7d1', icon: '🔮' },
-    { id: '3', name: '2 Tiradas Extra', color: '#ffeaa7', icon: '🎯' },
-    { id: '4', name: '¡Inténtalo otra vez!', color: '#ff7675', icon: '🔄' },
+    {
+      id: '1',
+      name: '3 Interpretaciones Oníricas Gratis',
+      color: '#4ecdc4',
+      icon: '🌙',
+    },
+    {
+      id: '2',
+      name: '1 Análisis de Sueños Premium',
+      color: '#45b7d1',
+      icon: '✨',
+    },
+    // ✅ ELIMINADO: { id: '3', name: '2 Consultas Oníricas Extra', color: '#ffeaa7', icon: '🔮' },
+    {
+      id: '4',
+      name: '¡Inténtalo de nuevo!',
+      color: '#ff7675',
+      icon: '🔄',
+    },
   ];
   private wheelTimer: any;
 
@@ -116,9 +132,12 @@ export class SignificadoSuenosComponent
 
   constructor(
     private dreamService: InterpretadorSuenosService,
-    private http: HttpClient
+    private http: HttpClient,
+    private elRef: ElementRef<HTMLElement>
   ) {}
-
+  ngAfterViewInit(): void {
+    this.setVideosSpeed(0.66); // 0.5 = más lento, 1 = normal
+  }
   async ngOnInit(): Promise<void> {
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
@@ -175,7 +194,16 @@ export class SignificadoSuenosComponent
     // ✅ NUEVO: Verificar URL para pagos exitosos
     this.checkPaymentStatus();
   }
-  // ...existing code...
+
+  private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
 
   showWheelAfterDelay(delayMs: number = 3000): void {
     if (this.wheelTimer) {
@@ -202,20 +230,101 @@ export class SignificadoSuenosComponent
   }
 
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio ganado:', prize);
+    console.log('🎉 Premio onírico ganado:', prize);
 
     // Mostrar mensaje del intérprete sobre el premio
     const prizeMessage: ConversationMessage = {
       role: 'interpreter',
-      message: `🎉 ¡Las energías cósmicas te han bendecido! Has ganado: **${prize.name}** ${prize.icon}\n\nEste regalo del universo ha sido activado para ti. Los misterios de los sueños se revelan ante ti con mayor claridad. ¡Que la fortuna te acompañe en tus próximas consultas!`,
+      message: `🌙 ¡Las energías cósmicas te han bendecido! Has ganado: **${prize.name}** ${prize.icon}\n\nEste regalo del universo onírico ha sido activado para ti. Los misterios de los sueños se revelan ante ti con mayor claridad. ¡Que la fortuna te acompañe en tus próximas interpretaciones!`,
       timestamp: new Date(),
     };
 
     this.messages.push(prizeMessage);
     this.shouldAutoScroll = true;
     this.saveMessagesToSession();
-  }
 
+    // Procesar el premio
+    this.processDreamPrize(prize);
+  }
+  private processDreamPrize(prize: Prize): void {
+    switch (prize.id) {
+      case '1': // 3 Interpretaciones Gratis
+        this.addFreeDreamConsultations(3);
+        break;
+      case '2': // 1 Análisis Premium - ACCESO COMPLETO
+        console.log('✨ Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaidForDreams = true;
+        sessionStorage.setItem('hasUserPaidForDreams', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('blockedMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium de sueños');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: ConversationMessage = {
+          role: 'interpreter',
+          message:
+            '✨ **¡Has desbloqueado el acceso Premium completo!** ✨\n\nLos misterios del mundo onírico han sonreído sobre ti de manera extraordinaria. Ahora tienes acceso ilimitado a toda la sabiduría de los sueños. Puedes consultar sobre interpretaciones, simbolismos oníricos y todos los secretos del subconsciente cuantas veces desees.\n\n🌙 *Las puertas del reino de los sueños se han abierto completamente para ti* 🌙',
+          timestamp: new Date(),
+        };
+        this.messages.push(premiumMessage);
+        this.shouldAutoScroll = true;
+        this.saveMessagesToSession();
+        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
+      case '4': // Otra oportunidad
+        console.log('🔄 Otra oportunidad onírica concedida');
+        break;
+      default:
+        console.warn('⚠️ Premio onírico desconocido:', prize);
+    }
+  }
+  private addFreeDreamConsultations(count: number): void {
+    const current = parseInt(
+      sessionStorage.getItem('freeDreamConsultations') || '0'
+    );
+    const newTotal = current + count;
+    sessionStorage.setItem('freeDreamConsultations', newTotal.toString());
+    console.log(
+      `🎁 Agregadas ${count} consultas de sueños. Total: ${newTotal}`
+    );
+
+    // Si había un mensaje bloqueado, desbloquearlo
+    if (this.blockedMessageId && !this.hasUserPaidForDreams) {
+      this.blockedMessageId = null;
+      sessionStorage.removeItem('blockedMessageId');
+      console.log('🔓 Mensaje onírico desbloqueado con consulta gratuita');
+    }
+  }
+  openDataModalForPayment(): void {
+    console.log('🔓 Abriendo modal de datos para desbloquear mensaje onírico');
+
+    // Cerrar otros modales que puedan estar abiertos
+    this.showFortuneWheel = false;
+    this.showPaymentModal = false;
+
+    // Guardar el estado antes de proceder
+    this.saveStateBeforePayment();
+
+    // Abrir el modal de recolecta de datos
+    setTimeout(() => {
+      this.showDataModal = true;
+      console.log('📝 Modal de datos abierto para desbloqueo onírico');
+    }, 100);
+  }
+  getDreamConsultationsCount(): number {
+    const freeDreamConsultations = parseInt(
+      sessionStorage.getItem('freeDreamConsultations') || '0'
+    );
+    const legacyFreeConsultations = parseInt(
+      sessionStorage.getItem('freeConsultations') || '0'
+    );
+
+    return freeDreamConsultations + legacyFreeConsultations;
+  }
   // Cerrar la ruleta
   onWheelClosed(): void {
     this.showFortuneWheel = false;

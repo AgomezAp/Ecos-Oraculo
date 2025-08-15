@@ -1,5 +1,5 @@
-import Stripe from 'stripe';
-import dotenv from 'dotenv';
+import Stripe from "stripe";
+import dotenv from "dotenv";
 
 dotenv.config();
 interface CustomerInfo {
@@ -10,30 +10,33 @@ interface CustomerInfo {
 const stripe = new Stripe(process.env.SECRET_KEY!);
 const calculateOrderAmount = (items: any[]) => {
   let total = 0;
-  
+
   if (!items || !items.length) {
     console.log("Warning: Empty items array");
     return 1000; // Default amount in cents (e.g., $10.00)
   }
-  
+
   items.forEach((item: any) => {
-    if (item && typeof item.amount === 'number') {
+    if (item && typeof item.amount === "number") {
       total += item.amount;
     } else {
       console.log("Warning: Item without valid amount", item);
     }
   });
-  
+
   // Ensure minimum amount (Stripe requires at least 50 cents in most currencies)
   return Math.max(total, 100);
 };
 
-export const createPaymentIntentModel = async (items: any[], customerInfo: CustomerInfo) => {
+export const createPaymentIntentModel = async (
+  items: any[],
+  customerInfo: CustomerInfo
+) => {
   try {
     // Crear o buscar un cliente en Stripe
     const customers = await stripe.customers.list({
       email: customerInfo.email,
-      limit: 1
+      limit: 1,
     });
 
     let customer;
@@ -59,9 +62,7 @@ export const createPaymentIntentModel = async (items: any[], customerInfo: Custo
       amount: calculateOrderAmount(items),
       currency: "eur",
       customer: customer.id,
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      payment_method_types: ["card"],
       metadata: {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
@@ -70,7 +71,7 @@ export const createPaymentIntentModel = async (items: any[], customerInfo: Custo
       receipt_email: customerInfo.email,
     });
   } catch (error) {
-    console.error('Error creating payment intent with customer info:', error);
+    console.error("Error creating payment intent with customer info:", error);
     throw error;
   }
 };

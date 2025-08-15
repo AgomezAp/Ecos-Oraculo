@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -106,7 +107,7 @@ interface AnalysisResult {
   styleUrl: './mapa-vocacional.component.css',
 })
 export class MapaVocacionalComponent
-  implements OnInit, OnDestroy, AfterViewChecked
+  implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
 {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
@@ -159,14 +160,8 @@ export class MapaVocacionalComponent
       icon: '✨',
     },
     {
-      id: '3',
-      name: '2 Consultas Vocacionales Extra',
-      color: '#ffeaa7',
-      icon: '🌟',
-    },
-    {
       id: '4',
-      name: '¡Tu vocación dice: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🔄',
     },
@@ -193,9 +188,21 @@ export class MapaVocacionalComponent
 
   constructor(
     private vocationalService: MapaVocacionalService,
-    private http: HttpClient
+    private http: HttpClient,
+    private elRef: ElementRef<HTMLElement>
   ) {}
-
+  ngAfterViewInit(): void {
+    this.setVideosSpeed(0.67); // 0.5 = más lento, 1 = normal
+  }
+  private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
   async ngOnInit(): Promise<void> {
     // AGREGADO - Inicializar Stripe
     try {
@@ -765,15 +772,36 @@ export class MapaVocacionalComponent
       case '1': // 3 Sesiones Gratis
         this.addFreeVocationalConsultations(3);
         break;
-      case '2': // 1 Análisis Premium
-        this.addFreeVocationalConsultations(1);
+      case '2': // 1 Análisis Premium - ACCESO COMPLETO
+        console.log('✨ Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaidForVocational = true;
+        sessionStorage.setItem('hasUserPaidForVocational', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('vocationalBlockedMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium vocacional');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: ChatMessage = {
+          sender: this.counselorInfo.name,
+          content:
+            '✨ **¡Has desbloqueado el acceso Premium completo!** ✨\n\nEl destino profesional ha sonreído sobre ti de manera extraordinaria. Ahora tienes acceso ilimitado a toda mi experiencia en orientación vocacional. Puedes consultar sobre tu vocación, evaluaciones profesionales y todos los aspectos de tu futuro laboral cuantas veces desees.\n\n🎯 *Las puertas de tu camino profesional se han abierto completamente* 🎯',
+          timestamp: new Date(),
+          isUser: false,
+        };
+        this.chatMessages.push(premiumMessage);
+        this.shouldAutoScroll = true;
+        this.saveMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeVocationalConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad vocacional concedida');
         break;
+      default:
+        console.warn('⚠️ Premio vocacional desconocido:', prize);
     }
   }
 

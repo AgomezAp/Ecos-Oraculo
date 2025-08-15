@@ -115,14 +115,8 @@ export class CalculadoraAmorComponent
       icon: '💖',
     },
     {
-      id: '3',
-      name: '2 Consultas Románticas Extra',
-      color: '#ff6347',
-      icon: '💝',
-    },
-    {
       id: '4',
-      name: '¡El amor dice: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#dc143c',
       icon: '💘',
     },
@@ -339,7 +333,22 @@ export class CalculadoraAmorComponent
         });
     }
   }
+  openDataModalForPayment(): void {
+    console.log('🔓 Abriendo modal de datos para desbloquear mensaje');
 
+    // Cerrar otros modales que puedan estar abiertos
+    this.showFortuneWheel = false;
+    this.showPaymentModal = false;
+
+    // Guardar el estado antes de proceder
+    this.saveStateBeforePayment();
+
+    // Abrir el modal de recolecta de datos
+    setTimeout(() => {
+      this.showDataModal = true;
+      console.log('📝 Modal de datos abierto para desbloqueo');
+    }, 100);
+  }
   ngAfterViewChecked(): void {
     if (
       this.shouldAutoScroll &&
@@ -736,12 +745,12 @@ export class CalculadoraAmorComponent
       const apellido = this.userData.apellido?.toString().trim();
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
-
+/* 
       console.log('🔍 Validando campos individuales para amor:');
       console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
       console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
       console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
+      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌'); */
 
       if (!nombre || !apellido || !email || !telefono) {
         console.error('❌ Faltan campos requeridos para el pago del amor');
@@ -1378,12 +1387,12 @@ export class CalculadoraAmorComponent
       case '2': // 1 Análisis Premium
         this.addFreeLoveConsultations(1);
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeLoveConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad amorosa concedida');
         break;
+      default:
+        console.warn('⚠️ Premio amoroso desconocido:', prize);
     }
   }
 

@@ -36,8 +36,9 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
     private cookieService: CookieService,
     private http: HttpClient,
     private analyticsService: AnalyticsService,
-    private sugerenciasService: SugerenciasService
-  ) {}
+    private sugerenciasService: SugerenciasService,
+    private elRef: ElementRef<HTMLElement>
+    ) {}
 
   ngAfterViewInit() {
     this.startVideo();
@@ -68,7 +69,18 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
         });
       }
     });
+      this.setVideosSpeed(0.7);
   }
+   private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
+
   ngOnInit() {
     this.sessionStartTime = new Date();
     this.initializeCookies();

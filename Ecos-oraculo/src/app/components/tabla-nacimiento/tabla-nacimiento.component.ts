@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   Inject,
@@ -81,7 +82,7 @@ interface AstrologerInfo {
   styleUrl: './tabla-nacimiento.component.css',
 })
 export class TablaNacimientoComponent
-  implements OnInit, AfterViewChecked, OnDestroy
+  implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit
 {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
@@ -128,14 +129,8 @@ export class TablaNacimientoComponent
       icon: '✨',
     },
     {
-      id: '3',
-      name: '2 Consultas Celestiales Extra',
-      color: '#ffeaa7',
-      icon: '🌙',
-    },
-    {
       id: '4',
-      name: '¡Las estrellas dicen: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🔮',
     },
@@ -152,7 +147,7 @@ export class TablaNacimientoComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-
+  /* pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC */
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
   private backendUrl = environment.apiUrl;
@@ -161,9 +156,22 @@ export class TablaNacimientoComponent
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     @Optional() public dialogRef: MatDialogRef<TablaNacimientoComponent>,
     private http: HttpClient,
-    private tablaNacimientoService: TablaNacimientoService
+    private tablaNacimientoService: TablaNacimientoService,
+    private elRef: ElementRef<HTMLElement>
   ) {}
+  ngAfterViewInit(): void {
+    this.setVideosSpeed(0.6); // 0.5 = más lento, 1 = normal
+  }
 
+  private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
   async ngOnInit(): Promise<void> {
     // AGREGADO - Inicializar Stripe
     try {
@@ -350,7 +358,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         });
     }
   }
-
   sendMessage(): void {
     if (this.currentMessage?.trim() && !this.isLoading) {
       const userMessage = this.currentMessage.trim();
@@ -1158,18 +1165,38 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       case '1': // 3 Lecturas Astrales
         this.addFreeBirthChartConsultations(3);
         break;
-      case '2': // 1 Análisis Premium
-        this.addFreeBirthChartConsultations(1);
+      case '2': // 1 Análisis Premium - ACCESO COMPLETO
+        console.log('🌟 Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaid = true;
+        sessionStorage.setItem('hasUserPaidBirthChart', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('birthChartBlockedMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: Message = {
+          sender: 'Maestra Emma',
+          content:
+            '🌟 **¡Has desbloqueado el acceso Premium completo!** 🌟\n\nLas configuraciones celestiales han sonreído sobre ti de manera extraordinaria. Ahora tienes acceso ilimitado a toda mi sabiduría sobre cartas natales. Puedes consultar sobre tu configuración astral, planetas, casas y todos los misterios celestiales cuantas veces desees.\n\n✨ *El universo ha abierto todas sus puertas para ti* ✨',
+          timestamp: new Date(),
+          isUser: false,
+        };
+        this.messages.push(premiumMessage);
+        this.shouldScrollToBottom = true;
+        this.saveMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeBirthChartConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad celestial concedida');
         break;
+      default:
+        console.warn('⚠️ Premio celestial desconocido:', prize);
     }
   }
-
   private addFreeBirthChartConsultations(count: number): void {
     const current = parseInt(
       sessionStorage.getItem('freeBirthChartConsultations') || '0'

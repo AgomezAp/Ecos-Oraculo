@@ -834,8 +834,14 @@
     filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
     margin-left: 65px;
   }
+  .description {
+    font-size: 1.6rem;
+    margin: 0.5rem 0;
+    font-weight: 700;
+    font-family: "El Messiri", sans-serif;
+  }
   .main-title {
-    font-size: 2.5rem;
+    font-size: 3.4rem;
     font-family: "Berkshire Swash", cursive;
   }
   .service-icon {

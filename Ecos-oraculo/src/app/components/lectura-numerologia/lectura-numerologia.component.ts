@@ -1,5 +1,6 @@
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   Inject,
@@ -67,7 +68,7 @@ interface ConversationMessage {
   styleUrl: './lectura-numerologia.component.css',
 })
 export class LecturaNumerologiaComponent
-  implements OnInit, OnDestroy, AfterViewChecked
+  implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
 {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -112,14 +113,8 @@ export class LecturaNumerologiaComponent
       icon: '✨',
     },
     {
-      id: '3',
-      name: '2 Consultas Numerológicas Extra',
-      color: '#ffeaa7',
-      icon: '🌟',
-    },
-    {
       id: '4',
-      name: '¡Los números dicen: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🔄',
     },
@@ -162,9 +157,21 @@ export class LecturaNumerologiaComponent
     @Optional() public dialogRef: MatDialogRef<LecturaNumerologiaComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private numerologyService: NumerologiaService,
-    private http: HttpClient
+    private http: HttpClient,
+    private elRef: ElementRef<HTMLElement>
   ) {}
-
+  ngAfterViewInit(): void {
+    this.setVideosSpeed(0.67); // 0.5 = más lento, 1 = normal
+  }
+  private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
   async ngOnInit(): Promise<void> {
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
@@ -308,15 +315,37 @@ export class LecturaNumerologiaComponent
       case '1': // 3 Lecturas Gratis
         this.addFreeNumerologyConsultations(3);
         break;
-      case '2': // 1 Análisis Premium
-        this.addFreeNumerologyConsultations(1);
+      case '2': // 1 Análisis Premium - ACCESO COMPLETO
+        console.log('✨ Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaidForNumerology = true;
+        sessionStorage.setItem('hasUserPaidForNumerology', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('numerologyBlockedMessageId');
+          console.log(
+            '🔓 Mensaje desbloqueado con acceso premium numerológico'
+          );
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: ConversationMessage = {
+          role: 'numerologist',
+          message:
+            '✨ **¡Has desbloqueado el acceso Premium completo!** ✨\n\nLos números sagrados han conspirado a tu favor de manera extraordinaria. Ahora tienes acceso ilimitado a toda la sabiduría numerológica. Puedes consultar sobre tu camino de vida, números del destino, compatibilidades numéricas y todos los misterios de la numerología cuantas veces desees.\n\n🔢 *El universo numérico ha revelado todos sus secretos para ti* 🔢',
+          timestamp: new Date(),
+        };
+        this.messages.push(premiumMessage);
+        this.shouldAutoScroll = true;
+        this.saveMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeNumerologyConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad numerológica concedida');
         break;
+      default:
+        console.warn('⚠️ Premio numerológico desconocido:', prize);
     }
   }
   private addFreeNumerologyConsultations(count: number): void {
@@ -1179,13 +1208,15 @@ export class LecturaNumerologiaComponent
 
     const prizeMessage: ConversationMessage = {
       role: 'numerologist',
-      message: `🔢 ¡Los números sagrados te han bendecido! Has ganado: **${prize.name}** ${prize.icon}`,
+      message: `🔢 ¡Los números sagrados te han bendecido! Has ganado: **${prize.name}** ${prize.icon}\n\nLas vibraciones numéricas del universo han decidido favorecerte con este regalo cósmico. La energía de los números antiguos fluye a través de ti, revelando secretos más profundos de tu destino numerológico. ¡Que la sabiduría de los números te guíe!`,
       timestamp: new Date(),
     };
 
     this.messages.push(prizeMessage);
     this.shouldAutoScroll = true;
     this.saveMessagesToSession();
+
+    this.processNumerologyPrize(prize);
   }
 
   showWheelAfterDelay(delayMs: number = 3000): void {

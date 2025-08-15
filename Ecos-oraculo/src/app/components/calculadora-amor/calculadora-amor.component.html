@@ -91,6 +91,9 @@
               <mat-icon>lock</mat-icon>
               <p>Contenido bloqueado</p>
               <small>Realiza el pago para ver esta respuesta completa</small>
+              <button class="unlock-button" (click)="openDataModalForPayment()">
+                Desbloquear por $5.00
+              </button>
             </div>
           </div>
         </div>
@@ -205,7 +208,7 @@
   *ngIf="showPaymentModal"
   class="payment-modal-overlay"
   (click)="cancelPayment()"
- >
+>
   <div class="payment-modal" (click)="$event.stopPropagation()">
     <div class="payment-header">
       <h3>💕 Acceso Completo a Lecturas de Amor</h3>

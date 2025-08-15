@@ -16,8 +16,6 @@ class ZodiacController {
         this.chatWithAstrologer = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const { zodiacData, userMessage, birthDate, fullName, birthTime, birthPlace, conversationHistory, } = req.body;
-                // Validar entrada
-                this.validateZodiacRequest(zodiacData, userMessage);
                 // Obtener el modelo Gemini
                 const model = this.genAI.getGenerativeModel({
                     model: "gemini-2.5-flash",
@@ -28,8 +26,7 @@ class ZodiacController {
                         maxOutputTokens: 800,
                     },
                 });
-                // Crear el prompt contextualizado
-                const contextPrompt = this.createZodiacContext(zodiacData, birthDate, fullName, birthTime, birthPlace, conversationHistory);
+                const contextPrompt = this.createZodiacContext(conversationHistory);
                 const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del astrólogo (completa tu análisis):`;
                 console.log(`Generando lectura astrológica...`);
                 // Generar contenido con Gemini
@@ -82,101 +79,12 @@ class ZodiacController {
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     }
-    generateZodiacData(birthDate, fullName, birthTime, birthPlace) {
-        let zodiacInfo = "DATOS DISPONIBLES PARA ANÁLISIS ASTROLÓGICO:\n";
-        if (birthDate) {
-            const zodiacSign = this.calculateZodiacSign(birthDate);
-            zodiacInfo += `- Fecha de nacimiento: ${birthDate}\n`;
-            zodiacInfo += `- Signo zodiacal calculado: ${zodiacSign}\n`;
-        }
-        if (fullName) {
-            zodiacInfo += `- Nombre completo: ${fullName}\n`;
-        }
-        if (birthTime) {
-            zodiacInfo += `- Hora de nacimiento: ${birthTime}\n`;
-        }
-        if (birthPlace) {
-            zodiacInfo += `- Lugar de nacimiento: ${birthPlace}\n`;
-        }
-        if (!birthDate && !fullName) {
-            zodiacInfo +=
-                "- Sin datos específicos proporcionados (solicitar información)\n";
-        }
-        return zodiacInfo;
-    }
-    calculateZodiacSign(dateStr) {
-        try {
-            // Parsear fecha (asume formato DD/MM/YYYY o similar)
-            const parts = dateStr.split(/[-\/]/);
-            let day, month;
-            if (parts.length >= 3) {
-                // Asume DD/MM/YYYY
-                day = parseInt(parts[0]);
-                month = parseInt(parts[1]);
-            }
-            else {
-                return "Fecha inválida";
-            }
-            // Determinar signo zodiacal
-            if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
-                return "Aries";
-            if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
-                return "Tauro";
-            if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
-                return "Géminis";
-            if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
-                return "Cáncer";
-            if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
-                return "Leo";
-            if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
-                return "Virgo";
-            if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
-                return "Libra";
-            if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
-                return "Escorpio";
-            if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
-                return "Sagitario";
-            if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
-                return "Capricornio";
-            if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
-                return "Acuario";
-            if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
-                return "Piscis";
-            return "Fecha inválida";
-        }
-        catch (_a) {
-            return "Error en cálculo";
-        }
-    }
-    validateZodiacRequest(zodiacData, userMessage) {
-        if (!zodiacData) {
-            const error = new Error("Datos del astrólogo requeridos");
-            error.statusCode = 400;
-            error.code = "MISSING_ZODIAC_DATA";
-            throw error;
-        }
-        if (!userMessage ||
-            typeof userMessage !== "string" ||
-            userMessage.trim() === "") {
-            const error = new Error("Mensaje del usuario requerido");
-            error.statusCode = 400;
-            error.code = "MISSING_USER_MESSAGE";
-            throw error;
-        }
-        if (userMessage.length > 1200) {
-            const error = new Error("El mensaje es demasiado largo (máximo 1200 caracteres)");
-            error.statusCode = 400;
-            error.code = "MESSAGE_TOO_LONG";
-            throw error;
-        }
-    }
-    createZodiacContext(zodiac, birthDate, fullName, birthTime, birthPlace, history) {
+    createZodiacContext(history) {
         const conversationContext = history && history.length > 0
             ? `\n\nCONVERSACIÓN PREVIA:\n${history
                 .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
                 .join("\n")}\n`
             : "";
-        const astrologicalData = this.generateZodiacData(birthDate, fullName, birthTime, birthPlace);
         return `Eres Maestra Carla, una astróloga ancestral y guardiana de los secretos zodiacales. Tienes décadas de experiencia descifrando los misterios del cosmos y revelando los secretos que las estrellas guardan sobre el destino y la personalidad.
 
 TU IDENTIDAD ASTROLÓGICA:
@@ -219,8 +127,6 @@ ITALIANO:
 - "Le stelle mi stanno dicendo..."
 - "Il cosmo ha qualcosa di bello da dirti..."
 - "Il tuo segno zodiacale rivela..."
-
-${astrologicalData}
 
 CÓMO DEBES COMPORTARTE:
 

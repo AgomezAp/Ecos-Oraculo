@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -61,7 +62,7 @@ interface ChatMessage {
   styleUrl: './animal-interior.component.css',
 })
 export class AnimalInteriorComponent
-  implements OnInit, OnDestroy, AfterViewChecked
+  implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
 {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
@@ -93,14 +94,8 @@ export class AnimalInteriorComponent
     },
     { id: '2', name: '1 Guía Animal Premium', color: '#45b7d1', icon: '🦋' },
     {
-      id: '3',
-      name: '2 Consultas Espirituales Extra',
-      color: '#ffeaa7',
-      icon: '🐺',
-    },
-    {
       id: '4',
-      name: '¡Los espíritus dicen: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🌙',
     },
@@ -117,7 +112,7 @@ export class AnimalInteriorComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-/* 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhl' */
+  /* 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhl' */
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
   private backendUrl = environment.apiUrl;
@@ -126,6 +121,14 @@ export class AnimalInteriorComponent
     private animalService: AnimalInteriorService,
     private http: HttpClient
   ) {}
+  @ViewChild('backgroundVideo') backgroundVideo!: ElementRef<HTMLVideoElement>;
+
+  ngAfterViewInit(): void {
+    // Ajusta la velocidad del video de fondo (0.5 = la mitad de velocidad)
+    if (this.backgroundVideo && this.backgroundVideo.nativeElement) {
+      this.backgroundVideo.nativeElement.playbackRate = 0.6;
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     this.stripe = await loadStripe(this.stripePublishableKey);
@@ -506,13 +509,6 @@ export class AnimalInteriorComponent
       const apellido = this.userData.apellido?.toString().trim();
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
-
-      console.log('🔍 Validando campos individuales para animal interior:');
-      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
-      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
-
       if (!nombre || !apellido || !email || !telefono) {
         console.error(
           '❌ Faltan campos requeridos para el pago de animal interior'
@@ -996,15 +992,36 @@ export class AnimalInteriorComponent
       case '1': // 3 Conexiones Espirituales
         this.addFreeAnimalConsultations(3);
         break;
-      case '2': // 1 Guía Premium
-        this.addFreeAnimalConsultations(1);
+      case '2': // 1 Guía Premium - ACCESO COMPLETO
+        console.log('🦋 Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaid = true;
+        sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('animalInteriorBlockedMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium animal');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: ChatMessage = {
+          sender: 'Xamán Olivia',
+          content:
+            '🦋 **¡Has desbloqueado el acceso Premium completo!** 🦋\n\nLos espíritus animales han sonreído sobre ti de manera extraordinaria. Ahora tienes acceso ilimitado a toda la sabiduría del reino animal. Puedes consultar sobre tu animal interior, conexiones espirituales y todos los misterios ancestrales cuantas veces desees.\n\n✨ *Los guardianes del reino animal han abierto todas sus puertas para ti* ✨',
+          timestamp: new Date(),
+          isUser: false,
+        };
+        this.chatMessages.push(premiumMessage);
+        this.shouldScrollToBottom = true;
+        this.saveMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeAnimalConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad espiritual concedida');
         break;
+      default:
+        console.warn('⚠️ Premio animal desconocido:', prize);
     }
   }
   private addFreeAnimalConsultations(count: number): void {

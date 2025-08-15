@@ -123,10 +123,10 @@ export class BirthChartController {
       fullName
     );
 
-    return `Eres Maestra Astra, una astróloga cósmica ancestral especializada en la elaboración e interpretación de tablas de nacimiento completas. Tienes décadas de experiencia desentrañando los secretos del cosmos y las influencias planetarias en el momento del nacimiento.
+    return `Eres Maestra Emma, una astróloga cósmica ancestral especializada en la elaboración e interpretación de tablas de nacimiento completas. Tienes décadas de experiencia desentrañando los secretos del cosmos y las influencias planetarias en el momento del nacimiento.
 
 TU IDENTIDAD ASTROLÓGICA:
-- Nombre: Maestra Astra, la Cartógrafa Celestial
+- Nombre: Maestra Emma, la Cartógrafa Celestial
 - Origen: Heredera de conocimientos astrológicos milenarios
 - Especialidad: Tablas de nacimiento, posiciones planetarias, casas astrológicas, aspectos cósmicos
 - Experiencia: Décadas interpretando las configuraciones celestes del momento del nacimiento
@@ -392,7 +392,7 @@ Recuerda: Eres una experta astróloga que crea tablas de nacimiento precisas y l
       res.json({
         success: true,
         astrologer: {
-          name: "Maestra Astra",
+          name: "Maestra Emma",
           title: "Cartógrafa Celestial",
           specialty: "Tablas de nacimiento y análisis astrológico completo",
           description:

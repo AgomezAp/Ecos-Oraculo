@@ -59,13 +59,7 @@ export class VocationalController {
     res: Response
   ): Promise<void> => {
     try {
-      const {
-        vocationalData,
-        userMessage,
-        personalInfo,
-        assessmentAnswers,
-        conversationHistory,
-      }: VocationalRequest = req.body;
+      const { vocationalData, userMessage }: VocationalRequest = req.body;
 
       // Validar entrada
       this.validateVocationalRequest(vocationalData, userMessage);
@@ -74,7 +68,7 @@ export class VocationalController {
       const model = this.genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         generationConfig: {
-          temperature:1.5, // Balance entre creatividad y precisión para orientación vocacional
+          temperature: 1.5, // Balance entre creatividad y precisión para orientación vocacional
           topP: 0.5,
           maxOutputTokens: 400,
         },
@@ -82,10 +76,7 @@ export class VocationalController {
 
       // Crear el prompt contextualizado
       const contextPrompt = this.createVocationalContext(
-        vocationalData,
-        personalInfo,
-        assessmentAnswers,
-        conversationHistory
+        req.body.conversationHistory
       );
       const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del consejero vocacional:`;
 
@@ -119,9 +110,6 @@ export class VocationalController {
 
   // Método para crear contexto vocacional
   private createVocationalContext(
-    vocational: VocationalData,
-    personalInfo?: any,
-    assessmentAnswers?: any[],
     history?: Array<{ role: string; message: string }>
   ): string {
     const conversationContext =
@@ -131,11 +119,6 @@ export class VocationalController {
             .join("\n")}\n`
         : "";
 
-    const personalData = this.generatePersonalProfile(
-      personalInfo,
-      assessmentAnswers
-    );
-
     return `Eres Dra. Valeria, un consejero vocacional experto con décadas de experiencia ayudando a personas a descubrir su verdadera vocación y propósito profesional. Combinas psicología vocacional, análisis de personalidad y conocimiento del mercado laboral.
 
 TU IDENTIDAD PROFESIONAL:
@@ -144,7 +127,7 @@ TU IDENTIDAD PROFESIONAL:
 - Especialidad: Mapas vocacionales, assessment de intereses, orientación profesional personalizada
 - Experiencia: Décadas guiando personas hacia carreras fulfillantes
 
-${personalData}
+
 
 METODOLOGÍA DE ORIENTACIÓN VOCACIONAL:
 
@@ -228,398 +211,6 @@ EJEMPLOS DE INICIO:
 ${conversationContext}
 
 Recuerda: Eres un guía experto que ayuda a las personas a descubrir su vocación auténtica a través de un proceso reflexivo, práctico y basado en evidencia. Tu objetivo es empoderar, no decidir por ellos.`;
-  }
-
-  // Método para generar perfil personal
-  private generatePersonalProfile(
-    personalInfo?: any,
-    assessmentAnswers?: any[]
-  ): string {
-    let profile = "PERFIL DEL CONSULTANTE:\n";
-
-    if (personalInfo) {
-      profile += `- Edad: ${personalInfo.age || "No especificada"}\n`;
-      profile += `- Educación actual: ${
-        personalInfo.currentEducation || "No especificada"
-      }\n`;
-      profile += `- Experiencia laboral: ${
-        personalInfo.workExperience || "No especificada"
-      }\n`;
-      profile += `- Intereses declarados: ${
-        personalInfo.interests?.join(", ") || "No especificados"
-      }\n`;
-    }
-
-    if (assessmentAnswers && assessmentAnswers.length > 0) {
-      profile += "\nRESPUESTAS DE ASSESSMENT:\n";
-      assessmentAnswers.forEach((answer, index) => {
-        profile += `${index + 1}. ${answer.question}\n   Respuesta: ${
-          answer.answer
-        }\n   Categoría: ${answer.category}\n`;
-      });
-
-      // Análizar patrones
-      const categories = assessmentAnswers.map((a) => a.category);
-      const categoryCount = categories.reduce((acc, cat) => {
-        acc[cat] = (acc[cat] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-      profile += "\nPATRONES IDENTIFICADOS:\n";
-      Object.entries(categoryCount).forEach(([category, count]) => {
-        profile += `- ${category}: ${count} respuestas relacionadas\n`;
-      });
-    }
-
-    if (
-      !personalInfo &&
-      (!assessmentAnswers || assessmentAnswers.length === 0)
-    ) {
-      profile +=
-        "- Sin datos de assessment previo (realizar evaluación inicial)\n";
-    }
-
-    return profile;
-  }
-
-  // Método para obtener preguntas de assessment
-  public getAssessmentQuestions = async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
-    try {
-      const questions = [
-        {
-          id: 1,
-          question: "¿Qué tipo de actividades te resultan más energizantes?",
-          options: [
-            {
-              value: "trabajar_con_personas",
-              label: "Trabajar con personas y ayudar a otros",
-              category: "social",
-            },
-            {
-              value: "resolver_problemas",
-              label: "Resolver problemas complejos y analizar datos",
-              category: "investigativo",
-            },
-            {
-              value: "crear_diseñar",
-              label: "Crear, diseñar o expresarme artísticamente",
-              category: "artístico",
-            },
-            {
-              value: "liderar_organizar",
-              label: "Liderar equipos y organizar proyectos",
-              category: "emprendedor",
-            },
-          ],
-        },
-        {
-          id: 2,
-          question:
-            "¿En qué tipo de ambiente te sientes más cómodo trabajando?",
-          options: [
-            {
-              value: "estructurado",
-              label: "Ambiente estructurado con reglas claras",
-              category: "convencional",
-            },
-            {
-              value: "dinamico",
-              label: "Ambiente dinámico y cambiante",
-              category: "emprendedor",
-            },
-            {
-              value: "colaborativo",
-              label: "Ambiente colaborativo y de equipo",
-              category: "social",
-            },
-            {
-              value: "independiente",
-              label: "Trabajo independiente y autónomo",
-              category: "realista",
-            },
-          ],
-        },
-        {
-          id: 3,
-          question: "¿Qué te motiva más en el trabajo?",
-          options: [
-            {
-              value: "ayudar_otros",
-              label: "Ayudar a otros y hacer una diferencia social",
-              category: "social",
-            },
-            {
-              value: "desafios_intelectuales",
-              label: "Desafíos intelectuales y aprendizaje continuo",
-              category: "investigativo",
-            },
-            {
-              value: "reconocimiento",
-              label: "Reconocimiento y avance profesional",
-              category: "emprendedor",
-            },
-            {
-              value: "estabilidad",
-              label: "Estabilidad y seguridad laboral",
-              category: "convencional",
-            },
-          ],
-        },
-        {
-          id: 4,
-          question: "¿Cómo prefieres trabajar con información?",
-          options: [
-            {
-              value: "analizar_datos",
-              label: "Analizar datos y encontrar patrones",
-              category: "investigativo",
-            },
-            {
-              value: "presentar_ideas",
-              label: "Presentar ideas y comunicar conceptos",
-              category: "social",
-            },
-            {
-              value: "crear_contenido",
-              label: "Crear contenido original y expresivo",
-              category: "artístico",
-            },
-            {
-              value: "organizar_sistemas",
-              label: "Organizar sistemas y procesos",
-              category: "convencional",
-            },
-          ],
-        },
-        {
-          id: 5,
-          question: "¿Qué tipo de impacto quieres tener?",
-          options: [
-            {
-              value: "impacto_social",
-              label: "Impacto social y comunitario",
-              category: "social",
-            },
-            {
-              value: "avance_cientifico",
-              label: "Avance científico o tecnológico",
-              category: "investigativo",
-            },
-            {
-              value: "innovacion_creativa",
-              label: "Innovación creativa y cultural",
-              category: "artístico",
-            },
-            {
-              value: "crecimiento_economico",
-              label: "Crecimiento económico y empresarial",
-              category: "emprendedor",
-            },
-          ],
-        },
-      ];
-
-      res.json({
-        success: true,
-        questions,
-        instructions:
-          "Responde cada pregunta seleccionando la opción que mejor te represente. No hay respuestas correctas o incorrectas.",
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      this.handleError(error, res);
-    }
-  };
-
-  // Método para analizar resultados de assessment
-  public analyzeAssessment = async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
-    try {
-      const { answers } = req.body;
-
-      if (!answers || !Array.isArray(answers)) {
-        throw new Error("Respuestas de assessment requeridas");
-      }
-
-      // Contar categorías
-      const categoryCount = answers.reduce((acc, answer) => {
-        const category = answer.category;
-        acc[category] = (acc[category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-      // Determinar perfil dominante - CORRECCIÓN AQUÍ
-      const sortedCategories = Object.entries(categoryCount)
-        .sort(([, a], [, b]) => (b as number) - (a as number)) // ← Agregar type assertion
-        .map(([category, count]) => ({
-          category,
-          count: count as number, // ← Agregar type assertion
-          percentage: ((count as number) / answers.length) * 100,
-        }));
-
-      const vocationalProfile = this.getVocationalProfile(
-        sortedCategories[0].category
-      );
-
-      res.json({
-        success: true,
-        analysis: {
-          profileDistribution: sortedCategories,
-          dominantProfile: vocationalProfile,
-          recommendations: this.getCareerRecommendations(
-            sortedCategories[0].category
-          ),
-        },
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      this.handleError(error, res);
-    }
-  };
-
-  // Obtener perfil vocacional
-  private getVocationalProfile(category: string): any {
-    const profiles: Record<string, any> = {
-      social: {
-        name: "Perfil Social",
-        description: "Te motiva ayudar, enseñar y trabajar con personas",
-        characteristics: [
-          "Empático",
-          "Comunicativo",
-          "Colaborativo",
-          "Orientado al servicio",
-        ],
-        workEnvironments: [
-          "Educación",
-          "Salud",
-          "Servicios sociales",
-          "Recursos humanos",
-        ],
-      },
-      investigativo: {
-        name: "Perfil Investigativo",
-        description: "Te atrae resolver problemas, investigar y analizar",
-        characteristics: [
-          "Analítico",
-          "Curioso",
-          "Metódico",
-          "Orientado a datos",
-        ],
-        workEnvironments: [
-          "Ciencia",
-          "Tecnología",
-          "Investigación",
-          "Ingeniería",
-        ],
-      },
-      artístico: {
-        name: "Perfil Artístico",
-        description: "Te motiva crear, diseñar y expresarte creativamente",
-        characteristics: ["Creativo", "Original", "Expresivo", "Innovador"],
-        workEnvironments: ["Artes", "Diseño", "Medios", "Entretenimiento"],
-      },
-      emprendedor: {
-        name: "Perfil Emprendedor",
-        description: "Te atrae liderar, persuadir y dirigir proyectos",
-        characteristics: [
-          "Líder",
-          "Ambicioso",
-          "Persuasivo",
-          "Orientado a resultados",
-        ],
-        workEnvironments: ["Negocios", "Ventas", "Gerencia", "Emprendimiento"],
-      },
-      convencional: {
-        name: "Perfil Convencional",
-        description: "Te motiva organizar, administrar y trabajar con datos",
-        characteristics: ["Organizado", "Detallista", "Eficiente", "Confiable"],
-        workEnvironments: [
-          "Administración",
-          "Finanzas",
-          "Contabilidad",
-          "Operaciones",
-        ],
-      },
-      realista: {
-        name: "Perfil Realista",
-        description: "Te atrae trabajar con herramientas, máquinas y objetos",
-        characteristics: [
-          "Práctico",
-          "Técnico",
-          "Independiente",
-          "Orientado a resultados",
-        ],
-        workEnvironments: [
-          "Ingeniería",
-          "Construcción",
-          "Agricultura",
-          "Oficios especializados",
-        ],
-      },
-    };
-
-    return profiles[category] || profiles.social;
-  }
-
-  // Obtener recomendaciones de carrera
-  private getCareerRecommendations(category: string): string[] {
-    const recommendations: Record<string, string[]> = {
-      social: [
-        "Psicología y Terapia",
-        "Educación y Docencia",
-        "Trabajo Social",
-        "Recursos Humanos",
-        "Enfermería y Salud",
-        "Orientación Vocacional",
-      ],
-      investigativo: [
-        "Ingeniería en sus diversas ramas",
-        "Medicina e Investigación Médica",
-        "Ciencias de la Computación",
-        "Investigación Científica",
-        "Análisis de Datos",
-        "Arquitectura",
-      ],
-      artístico: [
-        "Diseño Gráfico y Web",
-        "Arquitectura y Diseño de Interiores",
-        "Comunicación Social y Periodismo",
-        "Artes Visuales y Escénicas",
-        "Marketing Creativo",
-        "Producción Audiovisual",
-      ],
-      emprendedor: [
-        "Administración de Empresas",
-        "Marketing y Ventas",
-        "Finanzas y Banca",
-        "Derecho Empresarial",
-        "Comercio Internacional",
-        "Consultoría",
-      ],
-      convencional: [
-        "Contabilidad y Auditoría",
-        "Administración Pública",
-        "Gestión de Operaciones",
-        "Sistemas de Información",
-        "Logística y Cadena de Suministro",
-        "Finanzas",
-      ],
-      realista: [
-        "Ingeniería Mecánica y Civil",
-        "Arquitectura",
-        "Agricultura y Veterinaria",
-        "Tecnología Industrial",
-        "Oficios Especializados",
-        "Ciencias Ambientales",
-      ],
-    };
-
-    return recommendations[category] || recommendations.social;
   }
 
   // Método para asegurar respuesta completa

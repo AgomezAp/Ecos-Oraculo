@@ -15,7 +15,7 @@ class LoveCalculatorController {
     constructor() {
         this.chatWithLoveExpert = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const { loveCalculatorData, userMessage, person1Name, person1BirthDate, person2Name, person2BirthDate, conversationHistory, } = req.body;
+                const { loveCalculatorData, userMessage, } = req.body;
                 this.validateLoveCalculatorRequest(loveCalculatorData, userMessage);
                 const model = this.genAI.getGenerativeModel({
                     model: "gemini-2.5-flash",
@@ -26,7 +26,7 @@ class LoveCalculatorController {
                         maxOutputTokens: 800,
                     },
                 });
-                const contextPrompt = this.createLoveCalculatorContext(loveCalculatorData, person1Name, person1BirthDate, person2Name, person2BirthDate, conversationHistory);
+                const contextPrompt = this.createLoveCalculatorContext(req.body.conversationHistory);
                 const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del experto en amor (completa tu análisis):`;
                 console.log(`Generando análisis de compatibilidad amorosa...`);
                 const result = yield model.generateContent(fullPrompt);
@@ -76,129 +76,6 @@ class LoveCalculatorController {
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     }
-    generateLoveData(person1Name, person1BirthDate, person2Name, person2BirthDate) {
-        let loveInfo = "DATOS DISPONIBLES PARA ANÁLISIS DE COMPATIBILIDAD:\n";
-        if (person1Name && person1BirthDate) {
-            const person1LifePath = this.calculateLifePath(person1BirthDate);
-            const person1Destiny = this.calculateDestinyNumber(person1Name);
-            loveInfo += `PERSONA 1:\n`;
-            loveInfo += `- Nombre: ${person1Name}\n`;
-            loveInfo += `- Fecha de nacimiento: ${person1BirthDate}\n`;
-            loveInfo += `- Número del Camino de Vida: ${person1LifePath}\n`;
-            loveInfo += `- Número del Destino: ${person1Destiny}\n`;
-        }
-        if (person2Name && person2BirthDate) {
-            const person2LifePath = this.calculateLifePath(person2BirthDate);
-            const person2Destiny = this.calculateDestinyNumber(person2Name);
-            loveInfo += `PERSONA 2:\n`;
-            loveInfo += `- Nombre: ${person2Name}\n`;
-            loveInfo += `- Fecha de nacimiento: ${person2BirthDate}\n`;
-            loveInfo += `- Número del Camino de Vida: ${person2LifePath}\n`;
-            loveInfo += `- Número del Destino: ${person2Destiny}\n`;
-        }
-        if (person1Name && person1BirthDate && person2Name && person2BirthDate) {
-            const compatibilityScore = this.calculateCompatibilityScore(person1Name, person1BirthDate, person2Name, person2BirthDate);
-            loveInfo += `ANÁLISIS DE COMPATIBILIDAD:\n`;
-            loveInfo += `- Puntuación de compatibilidad: ${compatibilityScore}%\n`;
-        }
-        if (!person1Name ||
-            !person1BirthDate ||
-            !person2Name ||
-            !person2BirthDate) {
-            loveInfo +=
-                "- Datos incompletos (necesarios para análisis completo de compatibilidad)\n";
-        }
-        return loveInfo;
-    }
-    calculateLifePath(dateStr) {
-        try {
-            const numbers = dateStr.replace(/\D/g, "");
-            const sum = numbers
-                .split("")
-                .reduce((acc, digit) => acc + parseInt(digit), 0);
-            return this.reduceToSingleDigit(sum);
-        }
-        catch (_a) {
-            return 0;
-        }
-    }
-    calculateDestinyNumber(name) {
-        const letterValues = {
-            A: 1,
-            B: 2,
-            C: 3,
-            D: 4,
-            E: 5,
-            F: 6,
-            G: 7,
-            H: 8,
-            I: 9,
-            J: 1,
-            K: 2,
-            L: 3,
-            M: 4,
-            N: 5,
-            O: 6,
-            P: 7,
-            Q: 8,
-            R: 9,
-            S: 1,
-            T: 2,
-            U: 3,
-            V: 4,
-            W: 5,
-            X: 6,
-            Y: 7,
-            Z: 8,
-        };
-        const sum = name
-            .toUpperCase()
-            .replace(/[^A-Z]/g, "")
-            .split("")
-            .reduce((acc, letter) => {
-            return acc + (letterValues[letter] || 0);
-        }, 0);
-        return this.reduceToSingleDigit(sum);
-    }
-    calculateCompatibilityScore(name1, date1, name2, date2) {
-        const lifePath1 = this.calculateLifePath(date1);
-        const lifePath2 = this.calculateLifePath(date2);
-        const destiny1 = this.calculateDestinyNumber(name1);
-        const destiny2 = this.calculateDestinyNumber(name2);
-        // Algoritmo de compatibilidad basado en numerología
-        let score = 50; // Base
-        // Compatibilidad de caminos de vida
-        const lifePathDiff = Math.abs(lifePath1 - lifePath2);
-        if (lifePathDiff === 0)
-            score += 25;
-        else if (lifePathDiff <= 2)
-            score += 15;
-        else if (lifePathDiff <= 4)
-            score += 5;
-        // Compatibilidad de destinos
-        const destinyDiff = Math.abs(destiny1 - destiny2);
-        if (destinyDiff === 0)
-            score += 25;
-        else if (destinyDiff <= 2)
-            score += 15;
-        else if (destinyDiff <= 4)
-            score += 5;
-        // Números complementarios especiales
-        if ((lifePath1 + lifePath2) % 9 === 0)
-            score += 10;
-        if ((destiny1 + destiny2) % 11 === 0)
-            score += 10;
-        return Math.min(100, Math.max(0, score));
-    }
-    reduceToSingleDigit(num) {
-        while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
-            num = num
-                .toString()
-                .split("")
-                .reduce((acc, digit) => acc + parseInt(digit), 0);
-        }
-        return num;
-    }
     validateLoveCalculatorRequest(loveCalculatorData, userMessage) {
         if (!loveCalculatorData) {
             const error = new Error("Datos del experto en amor requeridos");
@@ -221,13 +98,12 @@ class LoveCalculatorController {
             throw error;
         }
     }
-    createLoveCalculatorContext(loveCalculator, person1Name, person1BirthDate, person2Name, person2BirthDate, history) {
+    createLoveCalculatorContext(history) {
         const conversationContext = history && history.length > 0
             ? `\n\nCONVERSACIÓN PREVIA:\n${history
                 .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
                 .join("\n")}\n`
             : "";
-        const loveData = this.generateLoveData(person1Name, person1BirthDate, person2Name, person2BirthDate);
         return `Eres Maestra Valentina, una experta en compatibilidad amorosa y relaciones basada en numerología del amor. Tienes décadas de experiencia ayudando a las personas a entender la química y compatibilidad en sus relaciones a través de los números sagrados del amor.
 
 TU IDENTIDAD COMO EXPERTA EN AMOR:
@@ -271,7 +147,6 @@ ITALIANO:
 - "Che bella connessione vedo qui!"
 - "La compatibilità tra voi è..."
 
-${loveData}
 
 CÓMO DEBES COMPORTARTE:
 

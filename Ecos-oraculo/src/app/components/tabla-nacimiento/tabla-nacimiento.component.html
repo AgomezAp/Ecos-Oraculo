@@ -64,8 +64,7 @@
         class="message"
         [ngClass]="{
           'user-message': message.isUser,
-          'astrologer-message': !message.isUser,
-          'blocked-message': isMessageBlocked(message)
+          'astrologer-message': !message.isUser
         }"
       >
         <div class="message-avatar" *ngIf="!message.isUser">
@@ -76,13 +75,9 @@
           />
         </div>
 
-        <div
-          class="message-content"
-          [ngClass]="{ 'blurred-content': isMessageBlocked(message) }"
-        >
+        <div class="message-content">
           <div class="message-text">
             <div [innerHTML]="formatMessage(message.content)"></div>
-            <!-- Mover la hora DENTRO del message-text -->
             <span
               class="message-time"
               *ngIf="!message.isUser || message.isUser"
@@ -98,18 +93,6 @@
             src="/Visitante.webp"
             alt="Usuario Avatar"
           />
-        </div>
-
-        <!-- Overlay de pago para mensajes bloqueados -->
-        <div *ngIf="isMessageBlocked(message)" class="message-payment-overlay">
-          <div class="payment-prompt">
-            <span class="lock-icon">🔒</span>
-            <p>¡Sabiduría celestial premium!</p>
-            <p>Desbloquea lecturas ilimitadas de tu carta natal</p>
-            <button class="unlock-button" (click)="promptForPayment()">
-              Desbloquear por $5.00
-            </button>
-          </div>
         </div>
       </div>
 

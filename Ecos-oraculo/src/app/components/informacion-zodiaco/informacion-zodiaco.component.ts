@@ -126,15 +126,10 @@ export class InformacionZodiacoComponent
       icon: '🔮',
     },
     { id: '2', name: '1 Lectura Astral Premium', color: '#45b7d1', icon: '✨' },
-    {
-      id: '3',
-      name: '2 Consultas Zodiacales Extra',
-      color: '#ffeaa7',
-      icon: '🌟',
-    },
+
     {
       id: '4',
-      name: '¡Los astros dicen: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🌙',
     },
@@ -142,7 +137,7 @@ export class InformacionZodiacoComponent
   private wheelTimer: any;
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
-/*   private stripePublishableKey =
+  /*   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6'; */
   // Configuración de Stripe
   private stripePublishableKey =
@@ -397,15 +392,35 @@ export class InformacionZodiacoComponent
       case '1': // 3 Consultas Gratis
         this.addFreeAstrologyConsultations(3);
         break;
-      case '2': // 1 Lectura Premium
-        this.addFreeAstrologyConsultations(1);
+      case '2': // 1 Lectura Premium - ACCESO COMPLETO
+        console.log('✨ Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaidForAstrology = true;
+        sessionStorage.setItem('hasUserPaidForAstrology', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('blockedAstrologyMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium astral');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage = {
+          isUser: false,
+          content:
+            '✨ **¡Has desbloqueado el acceso Premium completo!** ✨\n\nLas estrellas han conspirado a tu favor de manera extraordinaria. Ahora tienes acceso ilimitado a toda la sabiduría astral. Puedes consultar sobre signos zodiacales, compatibilidades, predicciones astrológicas y todos los misterios celestiales cuantas veces desees.\n\n🌟 *Los astros han abierto todas sus puertas cósmicas para ti* 🌟',
+          timestamp: new Date(),
+        };
+        this.messages.push(premiumMessage);
+        this.shouldAutoScroll = true;
+        this.saveMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeAstrologyConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad astral concedida');
         break;
+      default:
+        console.warn('⚠️ Premio astral desconocido:', prize);
     }
   }
   private addFreeAstrologyConsultations(count: number): void {

@@ -1,5 +1,6 @@
 import {
   AfterViewChecked,
+  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -80,7 +81,7 @@ interface ZodiacAnimal {
   styleUrl: './zodiaco-chino.component.css',
 })
 export class ZodiacoChinoComponent
-  implements OnInit, AfterViewChecked, OnDestroy
+  implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit
 {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
 
@@ -112,15 +113,10 @@ export class ZodiacoChinoComponent
       color: '#45b7d1',
       icon: '✨',
     },
-    {
-      id: '3',
-      name: '2 Consultas Astrológicas Extra',
-      color: '#ffeaa7',
-      icon: '🌟',
-    },
+    // ✅ ELIMINADO: { id: '3', name: '2 Consultas Astrológicas Extra', color: '#ffeaa7', icon: '🌟' },
     {
       id: '4',
-      name: '¡Los astros dicen: otra oportunidad!',
+      name: '¡Inténtalo de nuevo!',
       color: '#ff7675',
       icon: '🌙',
     },
@@ -140,6 +136,7 @@ export class ZodiacoChinoComponent
   //Datos para enviar
   showDataModal: boolean = false;
   userData: any = null;
+  /*  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC */
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
@@ -148,7 +145,8 @@ export class ZodiacoChinoComponent
   constructor(
     private fb: FormBuilder,
     private zodiacoChinoService: ZodiacoChinoService,
-    private http: HttpClient
+    private http: HttpClient,
+    private elRef: ElementRef<HTMLElement>
   ) {
     // Configuración del formulario para horóscopo
     this.userForm = this.fb.group({
@@ -163,7 +161,18 @@ export class ZodiacoChinoComponent
       ],
     });
   }
-
+  ngAfterViewInit(): void {
+    this.setVideosSpeed(0.7); // 0.5 = más lento, 1 = normal
+  }
+  private setVideosSpeed(rate: number): void {
+    const host = this.elRef.nativeElement;
+    const videos = host.querySelectorAll<HTMLVideoElement>('video');
+    videos.forEach((v) => {
+      const apply = () => (v.playbackRate = rate);
+      if (v.readyState >= 1) apply();
+      else v.addEventListener('loadedmetadata', apply, { once: true });
+    });
+  }
   async ngOnInit(): Promise<void> {
     // Inicializar Stripe
     try {
@@ -466,12 +475,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
 
-      console.log('🔍 Validando campos individuales para horóscopo:');
-      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
-      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
-
       if (!nombre || !apellido || !email || !telefono) {
         console.error('❌ Faltan campos requeridos para el pago del horóscopo');
         const faltantes = [];
@@ -725,7 +728,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       const formData = this.userForm.value;
 
       // Calcular animal del zodiaco
-      this.calculateZodiacAnimal(formData.birthYear, formData.birthDate);
 
       const initialMessage =
         formData.initialQuestion ||
@@ -782,7 +784,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     if (this.currentMessage.trim() && !this.isLoading) {
       const message = this.currentMessage.trim();
 
-      // ✅ NUEVA LÓGICA: Verificar consultas horoscópicas gratuitas ANTES de verificar pago
+      // ✅ LÓGICA ACTUALIZADA: Verificar acceso premium O consultas gratuitas
       if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
         // Verificar si tiene consultas horoscópicas gratis disponibles
         if (this.hasFreeHoroscopeConsultationsAvailable()) {
@@ -790,9 +792,9 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           this.useFreeHoroscopeConsultation();
           // Continuar con el mensaje sin bloquear
         } else {
-          // Si no tiene consultas gratis, mostrar modal de datos
+          // Si no tiene consultas gratis NI acceso premium, mostrar modal de datos
           console.log(
-            '💳 No hay consultas horoscópicas gratis - mostrando modal de datos'
+            '💳 No hay consultas horoscópicas gratis ni acceso premium - mostrando modal de datos'
           );
 
           // Cerrar otros modales primero
@@ -849,11 +851,11 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
 
           this.addMessage('master', response.response, messageId);
 
-          // ✅ LÓGICA MODIFICADA: Solo bloquear si no tiene consultas gratis Y no ha pagado
+          // ✅ LÓGICA ACTUALIZADA: Solo bloquear si NO tiene acceso premium Y no tiene consultas gratis
           if (
             this.firstQuestionAsked &&
-            !this.hasUserPaidForHoroscope &&
-            !this.hasFreeHoroscopeConsultationsAvailable()
+            !this.hasUserPaidForHoroscope && // No tiene acceso premium
+            !this.hasFreeHoroscopeConsultationsAvailable() // No tiene consultas gratis
           ) {
             this.blockedMessageId = messageId;
             sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
@@ -892,100 +894,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         );
       },
     });
-  }
-  // Calcular animal del zodiaco chino (mantenido para compatibilidad)
-  calculateZodiacAnimal(birthYear: number, birthDate?: string): void {
-    if (birthYear) {
-      const animal = this.getChineseZodiacAnimal(birthYear);
-      const element = this.getChineseElement(birthYear);
-      const symbol = this.getAnimalSymbol(animal);
-      const traits = this.getAnimalTraits(animal);
-
-      this.zodiacAnimal = {
-        animal,
-        element,
-        year: birthYear,
-        symbol,
-        traits,
-      };
-    }
-  }
-
-  // Obtener animal del zodiaco chino (mantenido para compatibilidad)
-  private getChineseZodiacAnimal(year: number): string {
-    const animals = [
-      'Mono',
-      'Gallo',
-      'Perro',
-      'Cerdo',
-      'Rata',
-      'Buey',
-      'Tigre',
-      'Conejo',
-      'Dragón',
-      'Serpiente',
-      'Caballo',
-      'Cabra',
-    ];
-
-    const index = (year - 4) % 12;
-    return animals[index < 0 ? index + 12 : index];
-  }
-
-  // Obtener elemento chino (mantenido para compatibilidad)
-  private getChineseElement(year: number): string {
-    const elements = [
-      'Metal',
-      'Metal',
-      'Agua',
-      'Agua',
-      'Madera',
-      'Madera',
-      'Fuego',
-      'Fuego',
-      'Tierra',
-      'Tierra',
-    ];
-    const index = year % 10;
-    return elements[index];
-  }
-
-  // Obtener símbolo del animal (mantenido para compatibilidad)
-  private getAnimalSymbol(animal: string): string {
-    const symbols: { [key: string]: string } = {
-      Rata: '🐭',
-      Buey: '🐂',
-      Tigre: '🐅',
-      Conejo: '🐰',
-      Dragón: '🐲',
-      Serpiente: '🐍',
-      Caballo: '🐴',
-      Cabra: '🐐',
-      Mono: '🐵',
-      Gallo: '🐓',
-      Perro: '🐕',
-      Cerdo: '🐷',
-    };
-    return symbols[animal] || '🐾';
-  }
-
-  // Obtener características del animal (mantenido para compatibilidad)
-  private getAnimalTraits(animal: string): string[] {
-    const traits: { [key: string]: string[] } = {
-      Rata: ['Inteligente', 'Adaptable', 'Encantador', 'Ambicioso'],
-      Buey: ['Trabajador', 'Confiable', 'Fuerte', 'Determinado'],
-      Tigre: ['Valiente', 'Competitivo', 'Impredecible', 'Carismático'],
-      Conejo: ['Gentil', 'Sensible', 'Compasivo', 'Elegante'],
-      Dragón: ['Poderoso', 'Afortunado', 'Carismático', 'Ambicioso'],
-      Serpiente: ['Sabio', 'Intuitivo', 'Misterioso', 'Sofisticado'],
-      Caballo: ['Libre', 'Energético', 'Independiente', 'Aventurero'],
-      Cabra: ['Creativo', 'Compasivo', 'Gentil', 'Pacífico'],
-      Mono: ['Ingenioso', 'Inteligente', 'Flexible', 'Divertido'],
-      Gallo: ['Organizado', 'Valiente', 'Honesto', 'Trabajador'],
-      Perro: ['Leal', 'Honesto', 'Justo', 'Confiable'],
-      Cerdo: ['Generoso', 'Optimista', 'Honesto', 'Compasivo'],
-    };
-    return traits[animal] || ['Único', 'Especial'];
   }
 
   // Manejar tecla Enter
@@ -1390,15 +1298,35 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       case '1': // 3 Lecturas Horoscópicas
         this.addFreeHoroscopeConsultations(3);
         break;
-      case '2': // 1 Análisis Premium
-        this.addFreeHoroscopeConsultations(1);
+      case '2': // 1 Análisis Premium - ACCESO COMPLETO
+        console.log('🌟 Premio Premium ganado - Acceso ilimitado concedido');
+        this.hasUserPaidForHoroscope = true;
+        sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
+
+        // Desbloquear cualquier mensaje bloqueado
+        if (this.blockedMessageId) {
+          this.blockedMessageId = null;
+          sessionStorage.removeItem('horoscopeBlockedMessageId');
+          console.log('🔓 Mensaje desbloqueado con acceso premium');
+        }
+
+        // Agregar mensaje especial para este premio
+        const premiumMessage: ChatMessage = {
+          role: 'master',
+          message:
+            '🌟 **¡Has desbloqueado el acceso Premium completo!** 🌟\n\nLos astros han sonreído sobre ti de manera extraordinaria. Ahora tienes acceso ilimitado a toda mi sabiduría astrológica. Puedes consultar sobre tu horóscopo, compatibilidad, predicciones y todos los misterios celestiales cuantas veces desees.\n\n✨ *El universo ha abierto todas sus puertas para ti* ✨',
+          timestamp: new Date().toISOString(),
+        };
+        this.conversationHistory.push(premiumMessage);
+        this.shouldScrollToBottom = true;
+        this.saveHoroscopeMessagesToSession();
         break;
-      case '3': // 2 Consultas Extra
-        this.addFreeHoroscopeConsultations(2);
-        break;
+      // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
         console.log('🔄 Otra oportunidad horoscópica concedida');
         break;
+      default:
+        console.warn('⚠️ Premio horoscópico desconocido:', prize);
     }
   }
 

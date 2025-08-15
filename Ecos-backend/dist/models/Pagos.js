@@ -24,7 +24,7 @@ const calculateOrderAmount = (items) => {
         return 1000; // Default amount in cents (e.g., $10.00)
     }
     items.forEach((item) => {
-        if (item && typeof item.amount === 'number') {
+        if (item && typeof item.amount === "number") {
             total += item.amount;
         }
         else {
@@ -39,7 +39,7 @@ const createPaymentIntentModel = (items, customerInfo) => __awaiter(void 0, void
         // Crear o buscar un cliente en Stripe
         const customers = yield stripe.customers.list({
             email: customerInfo.email,
-            limit: 1
+            limit: 1,
         });
         let customer;
         if (customers.data.length > 0) {
@@ -64,9 +64,7 @@ const createPaymentIntentModel = (items, customerInfo) => __awaiter(void 0, void
             amount: calculateOrderAmount(items),
             currency: "eur",
             customer: customer.id,
-            automatic_payment_methods: {
-                enabled: true,
-            },
+            payment_method_types: ["card"],
             metadata: {
                 customerName: customerInfo.name,
                 customerEmail: customerInfo.email,
@@ -76,7 +74,7 @@ const createPaymentIntentModel = (items, customerInfo) => __awaiter(void 0, void
         });
     }
     catch (error) {
-        console.error('Error creating payment intent with customer info:', error);
+        console.error("Error creating payment intent with customer info:", error);
         throw error;
     }
 });
