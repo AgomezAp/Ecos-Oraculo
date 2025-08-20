@@ -11,11 +11,11 @@
       </div>
 
       <form class="data-form" (ngSubmit)="submitUserData()">
-        <!-- Datos de identificación -->
+        <!-- Datos de identificación 
         <div class="form-section">
           <h4>Datos de Identificación</h4>
           <div class="form-row">
-            <div class="form-group">
+           <div class="form-group">
               <label for="nif">NIE/DNI:</label>
               <input
                 type="text"
@@ -28,9 +28,9 @@
               <span *ngIf="hasError('NIF')" class="error-message">{{
                 dataFormErrors["NIF"]
               }}</span>
-            </div>
+            </div> 
 
-            <div class="form-group">
+         <!--    <div class="form-group">
               <label for="pasaporte">Número de Pasaporte:</label>
               <input
                 type="text"
@@ -43,9 +43,9 @@
               <span *ngIf="hasError('numero_pasapote')" class="error-message">{{
                 dataFormErrors["numero_pasapote"]
               }}</span>
-            </div>
+            </div> 
           </div>
-        </div>
+        </div>-->
 
         <!-- Datos personales -->
         <div class="form-section">
@@ -106,8 +106,21 @@
               Te llegará una factura al correo electronico
             </span>
           </div>
-          <div></div>
           <div class="form-group">
+            <label for="telefono">Teléfono *</label>
+            <input
+              type="tel"
+              id="telefono"
+              [(ngModel)]="userData.telefono"
+              [class.error]="hasError('telefono')"
+              placeholder="+34 123 456 789"
+            />
+            <span *ngIf="hasError('telefono')" class="error-message">
+              {{ dataFormErrors["telefono"] }}
+            </span>
+          </div>
+          <div></div>
+          <!--  <div class="form-group">
             <label for="pais">País *:</label>
             <select
               id="pais"
@@ -124,12 +137,12 @@
             <span *ngIf="hasError('pais')" class="error-message">{{
               dataFormErrors["pais"]
             }}</span>
-          </div>
+          </div> -->
         </div>
-
-        <!-- Datos de dirección -->
+<!-- 
+        <!-- Datos de dirección
         <div class="form-section">
-          <h4>Dirección</h4>
+          <!--    <h4>Dirección</h4>
           <div class="form-group">
             <label for="direccion">Dirección completa *:</label>
             <input
@@ -147,7 +160,7 @@
           </div>
 
           <div class="form-row">
-            <div class="form-group">
+            <!--   <div class="form-group">
               <label for="calle">Calle:</label>
               <input
                 type="text"
@@ -160,9 +173,9 @@
               <span *ngIf="hasError('calle')" class="error-message">{{
                 dataFormErrors["calle"]
               }}</span>
-            </div>
+            </div> -->
 
-            <div class="form-group">
+            <!--  <div class="form-group">
               <label for="codigo_postal">Código Postal *:</label>
               <input
                 type="text"
@@ -179,7 +192,7 @@
             </div>
           </div>
 
-          <div class="form-row">
+          <!--   <div class="form-row">
             <div class="form-group">
               <label for="ciudad">Ciudad *:</label>
               <input
@@ -210,9 +223,9 @@
                 dataFormErrors["provincia"]
               }}</span>
             </div>
-          </div>
+          </div> -->
 
-          <div class="form-group">
+          <!--     <div class="form-group">
             <label for="comunidad_autonoma">Comunidad Autónoma:</label>
             <select
               id="comunidad_autonoma"
@@ -233,22 +246,9 @@
               class="error-message"
               >{{ dataFormErrors["comunidad_autonoma"] }}</span
             >
-          </div>
-          <div class="form-group">
-            <label for="telefono">Teléfono *</label>
-            <input
-              type="tel"
-              id="telefono"
-              [(ngModel)]="userData.telefono"
-              [class.error]="hasError('telefono')"
-              placeholder="+34 123 456 789"
-            />
-            <span *ngIf="hasError('telefono')" class="error-message">
-              {{ dataFormErrors["telefono"] }}
-            </span>
-          </div>
+          </div> 
         </div>
-
+ --> 
         <!-- Importe -->
         <div class="form-section">
           <h4>Información del Pago</h4>
@@ -291,7 +291,7 @@
             <a
               routerLink="/terminos-condiciones"
               target="_blank"
-              href="terminos-y-condiciones"
+              href="terminos-condiciones-ecos"
               (click)="$event.stopPropagation()"
             >
               Términos y Condiciones

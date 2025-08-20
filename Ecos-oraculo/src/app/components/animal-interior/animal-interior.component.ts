@@ -88,7 +88,7 @@ export class AnimalInteriorComponent
   animalPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Conexiones Espirituales Gratis',
+      name: '3 Tiradas de la ruleta animal',
       color: '#4ecdc4',
       icon: '🦉',
     },

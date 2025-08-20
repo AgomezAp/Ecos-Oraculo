@@ -15,6 +15,8 @@ import { AdditionalInfoComponent } from './components/tarot/additional-info/addi
 import { ParticlesComponent } from './shared/particles/particles.component';
 import { AgradecimientoComponent } from './components/tarot/agradecimiento/agradecimiento.component';
 import { TerminosCondicionesComponent } from './components/tarot/terminos-condiciones/terminos-condiciones.component';
+import { TerminosCondicionesEcos } from './components/terminos-condiciones/terminos-condiciones.component';
+import { CookiesComponent } from './components/cookies/cookies.component';
 
 export const routes: Routes = [
   {
@@ -90,4 +92,12 @@ export const routes: Routes = [
     path: 'terminos-y-condiciones',
     component: TerminosCondicionesComponent,
   },
+  {
+    path:'terminos-condiciones-ecos',
+    component: TerminosCondicionesEcos
+  },
+  {
+    path:'politicas-cookies',
+    component:CookiesComponent
+  }
 ];

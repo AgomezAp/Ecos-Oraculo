@@ -132,26 +132,13 @@ export class RecolectaDatosComponent {
       isValid = false;
     }
 
-    // Validar país
-    if (!this.userData.pais || !this.userData.pais.toString().trim()) {
-      this.dataFormErrors['pais'] = 'Selecciona tu país';
-      isValid = false;
-    }
+    // ❌ COMENTADO - Validar país
+    // if (!this.userData.pais || !this.userData.pais.toString().trim()) {
+    //   this.dataFormErrors['pais'] = 'Selecciona tu país';
+    //   isValid = false;
+    // }
 
-    // ✅ VALIDAR TELÉFONO - CORREGIDO
-    console.log('🔍 Validando teléfono:', {
-      valor: this.userData.telefono,
-      tipo: typeof this.userData.telefono,
-      esString: typeof this.userData.telefono === 'string',
-      estaVacio: !this.userData.telefono,
-      trimmed: this.userData.telefono
-        ? this.userData.telefono.toString().trim()
-        : 'N/A',
-      longitud: this.userData.telefono
-        ? this.userData.telefono.toString().trim().length
-        : 0,
-    });
-
+    // ✅ Validar teléfono
     if (!this.userData.telefono || !this.userData.telefono.toString().trim()) {
       this.dataFormErrors['telefono'] = 'El teléfono es obligatorio';
       console.log('❌ Teléfono vacío o no existe');
@@ -171,43 +158,33 @@ export class RecolectaDatosComponent {
       );
     }
 
-    // Validar dirección
-    if (
-      !this.userData.direccion ||
-      !this.userData.direccion.toString().trim()
-    ) {
-      this.dataFormErrors['direccion'] = 'La dirección es obligatoria';
-      isValid = false;
-    }
+    // ❌ COMENTADO - Validar dirección
+    // if (!this.userData.direccion || !this.userData.direccion.toString().trim()) {
+    //   this.dataFormErrors['direccion'] = 'La dirección es obligatoria';
+    //   isValid = false;
+    // }
 
-    // Validar código postal
-    if (
-      !this.userData.codigo_postal ||
-      !this.userData.codigo_postal.toString().trim()
-    ) {
-      this.dataFormErrors['codigo_postal'] = 'El código postal es obligatorio';
-      isValid = false;
-    }
+    // ❌ COMENTADO - Validar código postal
+    // if (!this.userData.codigo_postal || !this.userData.codigo_postal.toString().trim()) {
+    //   this.dataFormErrors['codigo_postal'] = 'El código postal es obligatorio';
+    //   isValid = false;
+    // }
 
-    // Validar ciudad
-    if (!this.userData.ciudad || !this.userData.ciudad.toString().trim()) {
-      this.dataFormErrors['ciudad'] = 'La ciudad es obligatoria';
-      isValid = false;
-    }
+    // ❌ COMENTADO - Validar ciudad
+    // if (!this.userData.ciudad || !this.userData.ciudad.toString().trim()) {
+    //   this.dataFormErrors['ciudad'] = 'La ciudad es obligatoria';
+    //   isValid = false;
+    // }
 
-    // Validar NIF o Pasaporte (al menos uno)
-    const nif = this.userData.NIF ? this.userData.NIF.toString().trim() : '';
-    const pasaporte = this.userData.numero_pasapote
-      ? this.userData.numero_pasapote.toString().trim()
-      : '';
-
-    if (!nif && !pasaporte) {
-      this.dataFormErrors['NIF'] =
-        'Debes proporcionar NIF o número de pasaporte';
-      this.dataFormErrors['numero_pasapote'] =
-        'Debes proporcionar NIF o número de pasaporte';
-      isValid = false;
-    }
+    // ❌ COMENTADO - Validar NIF o Pasaporte
+    // const nif = this.userData.NIF ? this.userData.NIF.toString().trim() : '';
+    // const pasaporte = this.userData.numero_pasapote ? this.userData.numero_pasapote.toString().trim() : '';
+    //
+    // if (!nif && !pasaporte) {
+    //   this.dataFormErrors['NIF'] = 'Debes proporcionar NIF o número de pasaporte';
+    //   this.dataFormErrors['numero_pasapote'] = 'Debes proporcionar NIF o número de pasaporte';
+    //   isValid = false;
+    // }
 
     console.log('🔍 Resultado de validación:', {
       isValid,
@@ -256,6 +233,22 @@ export class RecolectaDatosComponent {
     try {
       // ✅ LIMPIAR Y NORMALIZAR DATOS ANTES DE ENVIAR
       const datosToSend: Datos = {
+        NIF: '', // ❌ Campo comentado - enviar vacío
+        numero_pasapote: '', // ❌ Campo comentado - enviar vacío
+        pais: '', // ❌ Campo comentado - enviar vacío
+        nombre: (this.userData.nombre || '').toString().trim(),
+        apellido: (this.userData.apellido || '').toString().trim(),
+        direccion: '', // ❌ Campo comentado - enviar vacío
+        calle: '', // ❌ Campo comentado - enviar vacío
+        codigo_postal: '', // ❌ Campo comentado - enviar vacío
+        ciudad: '', // ❌ Campo comentado - enviar vacío
+        provincia: '', // ❌ Campo comentado - enviar vacío
+        comunidad_autonoma: '', // ❌ Campo comentado - enviar vacío
+        importe: this.userData.importe || 5.0,
+        email: (this.userData.email || '').toString().trim(),
+        telefono: (this.userData.telefono || '').toString().trim(),
+      };
+      /*    const datosToSend: Datos = {
         NIF: (this.userData.NIF || '').toString().trim(),
         numero_pasapote: (this.userData.numero_pasapote || '')
           .toString()
@@ -274,7 +267,7 @@ export class RecolectaDatosComponent {
         importe: this.userData.importe || 5.0,
         email: (this.userData.email || '').toString().trim(),
         telefono: (this.userData.telefono || '').toString().trim(), // ✅ ASEGURAR que telefono sea string
-      };
+      }; */
 
       console.log('📤 Datos a enviar (limpios):', datosToSend); // DEBUG
       console.log('📞 Teléfono específico:', {

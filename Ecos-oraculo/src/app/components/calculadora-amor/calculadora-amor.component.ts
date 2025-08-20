@@ -104,7 +104,7 @@ export class CalculadoraAmorComponent
   lovePrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Lecturas Amorosas Gratis',
+      name: '3 Tiradas de la ruleta amorosa',
       color: '#ff69b4',
       icon: '💕',
     },

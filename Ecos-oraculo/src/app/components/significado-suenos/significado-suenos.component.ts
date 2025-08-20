@@ -68,7 +68,7 @@ export class SignificadoSuenosComponent
   wheelPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Interpretaciones Oníricas Gratis',
+      name: '3 Tiradas más',
       color: '#4ecdc4',
       icon: '🌙',
     },
@@ -110,7 +110,8 @@ export class SignificadoSuenosComponent
   private readonly minTextareaHeight = 45;
   private readonly maxTextareaHeight = 120;
   /*     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
-   */
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   // Configuración de Stripe
   private stripePublishableKey =
     'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';

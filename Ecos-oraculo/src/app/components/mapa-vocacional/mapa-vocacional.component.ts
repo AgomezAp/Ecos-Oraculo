@@ -149,7 +149,7 @@ export class MapaVocacionalComponent
   vocationalPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Sesiones de Orientación Gratis',
+      name: '3 tiradas de la ruleta vocacional',
       color: '#4ecdc4',
       icon: '🎯',
     },

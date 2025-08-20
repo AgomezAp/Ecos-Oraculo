@@ -118,7 +118,7 @@ export class TablaNacimientoComponent
   birthChartPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Lecturas Astrales Gratis',
+      name: '3 tiradas de la ruleta natal',
       color: '#4ecdc4',
       icon: '🌟',
     },

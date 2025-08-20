@@ -102,7 +102,7 @@ export class LecturaNumerologiaComponent
   numerologyPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Lecturas Numerológicas Gratis',
+      name: '3 tiradas de la ruleta numerológica',
       color: '#4ecdc4',
       icon: '🔢',
     },

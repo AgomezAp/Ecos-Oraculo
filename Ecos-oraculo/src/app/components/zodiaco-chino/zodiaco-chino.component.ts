@@ -103,7 +103,7 @@ export class ZodiacoChinoComponent
   horoscopePrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Lecturas Horoscópicas Gratis',
+      name: '3 Tiradas de la ruleta zodiacal',
       color: '#4ecdc4',
       icon: '🔮',
     },

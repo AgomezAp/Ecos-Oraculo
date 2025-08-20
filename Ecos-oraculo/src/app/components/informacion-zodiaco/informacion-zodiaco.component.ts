@@ -121,7 +121,7 @@ export class InformacionZodiacoComponent
   astralPrizes: Prize[] = [
     {
       id: '1',
-      name: '3 Consultas Astrales Gratis',
+      name: '3 tiradas de la ruleta astral',
       color: '#4ecdc4',
       icon: '🔮',
     },

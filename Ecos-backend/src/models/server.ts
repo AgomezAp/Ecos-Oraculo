@@ -39,7 +39,7 @@ class Server {
   async DBconnect() {
     try {
       await recolecta.sync({ alter: true });
-      await PageAnalytics.sync({ alter: true }); 
+      await PageAnalytics.sync({ alter: true });
       await AnalyticsUsuario.sync({ alter: true });
       await ServicePopularity.sync({ alter: true });
       await Sugerencia.sync({ alter: true });
