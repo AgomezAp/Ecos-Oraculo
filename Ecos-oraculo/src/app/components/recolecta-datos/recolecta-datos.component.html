@@ -1,17 +1,64 @@
-<div class="data-modal-overlay">
-  <div class="data-modal">
-    <div class="data-header">
-      <h3>📝 Completa tus datos para continuar</h3>
-      <button (click)="cancelDataModal()" class="close-data-button">✕</button>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=GT-K5QNXGSM"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "GT-K5QNXGSM");
+    </script>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-NM5V9XQ2");
+    </script>
+    <!-- End Google Tag Manager -->
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NM5V9XQ2"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="data-modal-overlay">
+      <div class="data-modal">
+        <div class="data-header">
+          <h3>📝 Completa tus datos para continuar</h3>
+          <button (click)="cancelDataModal()" class="close-data-button">
+            ✕
+          </button>
+        </div>
 
-    <div class="data-content">
-      <div class="data-info">
-        <p>Para proceder con el pago, necesitamos algunos datos:</p>
-      </div>
+        <div class="data-content">
+          <div class="data-info">
+            <p>Para proceder con el pago, necesitamos algunos datos:</p>
+          </div>
 
-      <form class="data-form" (ngSubmit)="submitUserData()">
-        <!-- Datos de identificación 
+          <form class="data-form" (ngSubmit)="submitUserData()">
+            <!-- Datos de identificación 
         <div class="form-section">
           <h4>Datos de Identificación</h4>
           <div class="form-row">
@@ -47,80 +94,80 @@
           </div>
         </div>-->
 
-        <!-- Datos personales -->
-        <div class="form-section">
-          <h4>Datos Personales</h4>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nombre">Nombre *:</label>
-              <input
-                type="text"
-                id="nombre"
-                [(ngModel)]="userData.nombre"
-                name="nombre"
-                placeholder="Tu nombre"
-                required
-                [class.error]="hasError('nombre')"
-              />
-              <span *ngIf="hasError('nombre')" class="error-message">{{
-                dataFormErrors["nombre"]
-              }}</span>
-            </div>
+            <!-- Datos personales -->
+            <div class="form-section">
+              <h4>Datos Personales</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nombre">Nombre *:</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    [(ngModel)]="userData.nombre"
+                    name="nombre"
+                    placeholder="Tu nombre"
+                    required
+                    [class.error]="hasError('nombre')"
+                  />
+                  <span *ngIf="hasError('nombre')" class="error-message">{{
+                    dataFormErrors["nombre"]
+                  }}</span>
+                </div>
 
-            <div class="form-group">
-              <label for="apellido">Apellido *:</label>
-              <input
-                type="text"
-                id="apellido"
-                [(ngModel)]="userData.apellido"
-                name="apellido"
-                placeholder="Tu apellido"
-                required
-                [class.error]="hasError('apellido')"
-              />
-              <span *ngIf="hasError('apellido')" class="error-message">{{
-                dataFormErrors["apellido"]
-              }}</span>
-            </div>
-          </div>
+                <div class="form-group">
+                  <label for="apellido">Apellido *:</label>
+                  <input
+                    type="text"
+                    id="apellido"
+                    [(ngModel)]="userData.apellido"
+                    name="apellido"
+                    placeholder="Tu apellido"
+                    required
+                    [class.error]="hasError('apellido')"
+                  />
+                  <span *ngIf="hasError('apellido')" class="error-message">{{
+                    dataFormErrors["apellido"]
+                  }}</span>
+                </div>
+              </div>
 
-          <div class="form-group">
-            <label for="email">Email *:</label>
-            <input
-              type="email"
-              id="email"
-              [(ngModel)]="userData.email"
-              name="email"
-              placeholder="tu@email.com"
-              required
-              [class.error]="hasError('email')"
-            />
-            <span *ngIf="hasError('email')" class="error-message">{{
-              dataFormErrors["email"]
-            }}</span>
-          </div>
+              <div class="form-group">
+                <label for="email">Email *:</label>
+                <input
+                  type="email"
+                  id="email"
+                  [(ngModel)]="userData.email"
+                  name="email"
+                  placeholder="tu@email.com"
+                  required
+                  [class.error]="hasError('email')"
+                />
+                <span *ngIf="hasError('email')" class="error-message">{{
+                  dataFormErrors["email"]
+                }}</span>
+              </div>
 
-          <!-- ✅ Nuevo checkbox para factura y noticias -->
-          <div class="form-group checkbox-group">
-            <span class="checkbox-text">
-              Te llegará una factura al correo electronico
-            </span>
-          </div>
-          <div class="form-group">
-            <label for="telefono">Teléfono *</label>
-            <input
-              type="tel"
-              id="telefono"
-              [(ngModel)]="userData.telefono"
-              [class.error]="hasError('telefono')"
-              placeholder="+34 123 456 789"
-            />
-            <span *ngIf="hasError('telefono')" class="error-message">
-              {{ dataFormErrors["telefono"] }}
-            </span>
-          </div>
-          <div></div>
-          <!--  <div class="form-group">
+              <!-- ✅ Nuevo checkbox para factura y noticias -->
+              <div class="form-group checkbox-group">
+                <span class="checkbox-text">
+                  Te llegará una factura al correo electronico
+                </span>
+              </div>
+              <div class="form-group">
+                <label for="telefono">Teléfono *</label>
+                <input
+                  type="tel"
+                  id="telefono"
+                  [(ngModel)]="userData.telefono"
+                  [class.error]="hasError('telefono')"
+                  placeholder="+34 123 456 789"
+                />
+                <span *ngIf="hasError('telefono')" class="error-message">
+                  {{ dataFormErrors["telefono"] }}
+                </span>
+              </div>
+              <div></div>
+              <!--  <div class="form-group">
             <label for="pais">País *:</label>
             <select
               id="pais"
@@ -138,8 +185,8 @@
               dataFormErrors["pais"]
             }}</span>
           </div> -->
-        </div>
-<!-- 
+            </div>
+            <!-- 
         <!-- Datos de dirección
         <div class="form-section">
           <!--    <h4>Dirección</h4>
@@ -225,7 +272,7 @@
             </div>
           </div> -->
 
-          <!--     <div class="form-group">
+            <!--     <div class="form-group">
             <label for="comunidad_autonoma">Comunidad Autónoma:</label>
             <select
               id="comunidad_autonoma"
@@ -248,96 +295,100 @@
             >
           </div> 
         </div>
- --> 
-        <!-- Importe -->
-        <div class="form-section">
-          <h4>Información del Pago</h4>
-          <div class="form-group">
-            <label for="importe">Importe:</label>
-            <input
-              type="number"
-              id="importe"
-              [(ngModel)]="userData.importe"
-              name="importe"
-              step="0.01"
-              placeholder="5.00"
-              readonly
-              value="5.00"
-            />
-            <small>Interpretaciones ilimitadas de sueños</small>
-          </div>
-        </div>
+ -->
+            <!-- Importe -->
+            <div class="form-section">
+              <h4>Información del Pago</h4>
+              <div class="form-group">
+                <label for="importe">Importe:</label>
+                <input
+                  type="number"
+                  id="importe"
+                  [(ngModel)]="userData.importe"
+                  name="importe"
+                  step="0.01"
+                  placeholder="5.00"
+                  readonly
+                  value="5.00"
+                />
+                <small>Interpretaciones ilimitadas de sueños</small>
+              </div>
+            </div>
 
-        <div
-          *ngIf="dataFormErrors['general']"
-          class="error-message general-error"
-        >
-          {{ dataFormErrors["general"] }}
-        </div>
-
-        <div *ngIf="isValidatingData" class="data-loading">
-          <div class="loading-spinner"></div>
-          <p>Validando datos...</p>
-        </div>
-        <div class="form-group" style="margin: 16px 0">
-          <label>
-            <input
-              type="checkbox"
-              [(ngModel)]="aceptaTerminos"
-              name="aceptaTerminos"
-              required
-            />
-            Acepto los
-            <a
-              routerLink="/terminos-condiciones"
-              target="_blank"
-              href="terminos-condiciones-ecos"
-              (click)="$event.stopPropagation()"
+            <div
+              *ngIf="dataFormErrors['general']"
+              class="error-message general-error"
             >
-              Términos y Condiciones
-            </a>
-            *
-          </label>
+              {{ dataFormErrors["general"] }}
+            </div>
 
-          <label>
-            <input
-              type="checkbox"
-              [(ngModel)]="datosVeridicos"
-              name="datosVeridicos"
-              required
-            />
-            Confirmo que los datos proporcionados son verídicos y completos
-          </label>
+            <div *ngIf="isValidatingData" class="data-loading">
+              <div class="loading-spinner"></div>
+              <p>Validando datos...</p>
+            </div>
+            <div class="form-group" style="margin: 16px 0">
+              <label>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="aceptaTerminos"
+                  name="aceptaTerminos"
+                  required
+                />
+                Acepto los
+                <a
+                  routerLink="/terminos-condiciones"
+                  target="_blank"
+                  href="terminos-condiciones-ecos"
+                  (click)="$event.stopPropagation()"
+                >
+                  Términos y Condiciones
+                </a>
+                *
+              </label>
 
-          <!-- ✅ Mensajes de error corregidos -->
-          <span *ngIf="showDatosVeridicosError" class="error-message">
-            Debes confirmar que los datos introducidos son verídicos
-          </span>
-          <span *ngIf="showTerminosError" class="error-message">
-            Debes aceptar los Términos y Condiciones
-          </span>
+              <label>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="datosVeridicos"
+                  name="datosVeridicos"
+                  required
+                />
+                Confirmo que los datos proporcionados son verídicos y completos
+              </label>
+
+              <!-- ✅ Mensajes de error corregidos -->
+              <span *ngIf="showDatosVeridicosError" class="error-message">
+                Debes confirmar que los datos introducidos son verídicos
+              </span>
+              <span *ngIf="showTerminosError" class="error-message">
+                Debes aceptar los Términos y Condiciones
+              </span>
+            </div>
+
+            <div class="data-actions">
+              <button
+                type="button"
+                (click)="cancelDataModal()"
+                class="cancel-button"
+                [disabled]="isValidatingData"
+              >
+                Cancelar
+              </button>
+              <!-- ✅ Botón corregido - solo type="submit", sin (click) -->
+              <button
+                type="submit"
+                [disabled]="
+                  isValidatingData || !aceptaTerminos || !datosVeridicos
+                "
+                class="continue-button"
+              >
+                <span *ngIf="!isValidatingData">Continuar al Pago</span>
+                <span *ngIf="isValidatingData">Procesando...</span>
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div class="data-actions">
-          <button
-            type="button"
-            (click)="cancelDataModal()"
-            class="cancel-button"
-            [disabled]="isValidatingData"
-          >
-            Cancelar
-          </button>
-          <!-- ✅ Botón corregido - solo type="submit", sin (click) -->
-          <button
-            type="submit"
-            [disabled]="isValidatingData || !aceptaTerminos || !datosVeridicos"
-            class="continue-button"
-          >
-            <span *ngIf="!isValidatingData">Continuar al Pago</span>
-            <span *ngIf="isValidatingData">Procesando...</span>
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
-  </div>
-</div>
+  </body>
+</html>
