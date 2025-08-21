@@ -65,7 +65,7 @@ export const routes: Routes = [
     component: CalculadoraAmorComponent,
   },
   {
-    path: 'lectura-tarot',
+    path: 'lectura-oraculo',
     component: WelcomeComponent,
   },
   {
