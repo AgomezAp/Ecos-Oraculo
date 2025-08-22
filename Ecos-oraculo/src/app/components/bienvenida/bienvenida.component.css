@@ -584,7 +584,19 @@
   );
   border-color: #e6683c;
 }
-
+.social-link.tiktok:hover {
+  background: linear-gradient(
+    45deg,
+    #000000 0%,
+    #69c9d0 35%,
+    #ee1d52 65%,
+    #69c9d0 90%
+  );
+  border-color: #69c9d0;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(105, 201, 208, 0.15), inset 0 0 10px rgba(238, 29, 82, 0.06);
+  transform: translateY(-2px);
+}
 .social-link.facebook:hover {
   background: #1877f2;
   border-color: #1877f2;
