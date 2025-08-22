@@ -214,6 +214,7 @@
                 </button>
                 <button
                   class="send-button"
+                  id="send-button"
                   (click)="sendMessage()"
                   [disabled]="!currentMessage.trim() || isLoading"
                   title="Enviar mensaje"

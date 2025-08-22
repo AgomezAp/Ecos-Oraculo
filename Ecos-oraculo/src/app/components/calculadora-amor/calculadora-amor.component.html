@@ -237,6 +237,7 @@
             <button
               mat-fab
               class="send-button"
+              id="send-button"
               (click)="sendMessage()"
               [disabled]="!canSendMessage() || isLoading"
               matTooltip="Enviar mensaje"

@@ -222,6 +222,7 @@
                 </button>
                 <button
                   class="send-button"
+                  id="send-button"
                   (click)="sendMessage()"
                   [disabled]="isLoading || !messageText.trim()"
                 >
