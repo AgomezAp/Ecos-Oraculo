@@ -114,7 +114,7 @@ export class SignificadoSuenosComponent
   */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51ROf7JKaf976EMQYuG2XY0OwKWFcea33O5WxIDBKEeoTDqyOUgqmizQ2knrH6MCnJlIoDQ95HJrRhJaL0jjpULHj00sCSWkBw6';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   interpreterData: DreamInterpreterData = {
@@ -759,7 +759,7 @@ export class SignificadoSuenosComponent
     }
 
     try {
-      const items = [{ id: 'dreams_interpretation_unlimited', amount: 500 }];
+      const items = [{ id: 'dreams_interpretation_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

@@ -588,7 +588,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     }
 
     try {
-      const items = [{ id: 'birth_chart_unlimited', amount: 500 }];
+      const items = [{ id: 'birth_chart_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

@@ -713,7 +713,7 @@ export class LecturaNumerologiaComponent
     }
 
     try {
-      const items = [{ id: 'numerology_reading_unlimited', amount: 500 }];
+      const items = [{ id: 'numerology_reading_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

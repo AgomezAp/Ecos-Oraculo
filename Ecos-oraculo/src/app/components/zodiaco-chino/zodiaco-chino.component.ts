@@ -432,7 +432,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     }
 
     try {
-      const items = [{ id: 'horoscope_reading_unlimited', amount: 500 }];
+      const items = [{ id: 'horoscope_reading_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

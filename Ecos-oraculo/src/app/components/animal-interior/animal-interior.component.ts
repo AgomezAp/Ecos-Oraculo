@@ -467,7 +467,7 @@ export class AnimalInteriorComponent
     }
 
     try {
-      const items = [{ id: 'animal_interior_unlimited', amount: 500 }];
+      const items = [{ id: 'animal_interior_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

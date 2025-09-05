@@ -565,7 +565,7 @@ export class MapaVocacionalComponent
     }
 
     try {
-      const items = [{ id: 'vocational_counseling_unlimited', amount: 500 }];
+      const items = [{ id: 'vocational_counseling_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

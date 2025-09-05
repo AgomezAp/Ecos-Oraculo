@@ -706,7 +706,7 @@ export class CalculadoraAmorComponent
     }
 
     try {
-      const items = [{ id: 'love_compatibility_unlimited', amount: 500 }];
+      const items = [{ id: 'love_compatibility_unlimited', amount: 800 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
