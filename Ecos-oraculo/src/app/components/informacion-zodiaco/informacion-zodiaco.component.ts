@@ -736,7 +736,7 @@ export class InformacionZodiacoComponent
     }
 
     try {
-      const items = [{ id: 'astrology_consultation_unlimited', amount: 800 }];
+      const items = [{ id: 'astrology_consultation_unlimited', amount: 400 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

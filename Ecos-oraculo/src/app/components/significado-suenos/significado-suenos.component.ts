@@ -759,7 +759,7 @@ export class SignificadoSuenosComponent
     }
 
     try {
-      const items = [{ id: 'dreams_interpretation_unlimited', amount: 800 }];
+      const items = [{ id: 'dreams_interpretation_unlimited', amount: 400 }];
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {

@@ -228,7 +228,7 @@ export class CardsComponent implements OnInit, OnDestroy {
     this.paymentElement?.destroy();
 
     try {
-      const items = [{ id: 'tarot_reading_description', amount: 800 }]; // Example: 5.00 EUR
+      const items = [{ id: 'tarot_reading_description', amount: 400 }]; // Example: 5.00 EUR
 
       const response = await this.http
         .post<{ clientSecret: string }>(
