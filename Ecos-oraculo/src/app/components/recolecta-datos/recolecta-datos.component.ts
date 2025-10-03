@@ -28,7 +28,7 @@ export class RecolectaDatosComponent {
     ciudad: '',
     provincia: '',
     comunidad_autonoma: '',
-    importe: 8.0,
+    importe: 4.0,
     email: '',
     telefono: '',
   };
