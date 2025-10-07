@@ -6,6 +6,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -13,13 +14,29 @@ import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { TextPlugin } from 'gsap/TextPlugin';
+import {
+  Stripe,
+  StripeElements,
+  StripePaymentElement,
+  loadStripe,
+} from '@stripe/stripe-js';
 import { CardService } from '../../../services/tarot/card.service';
 import { ParticlesComponent } from '../../../shared/particles/particles.component';
+import { RecolectaDatosComponent } from '../../recolecta-datos/recolecta-datos.component';
+import { environment } from '../../../environments/environmets.prod';
 
 gsap.registerPlugin(Draggable, MotionPathPlugin, TextPlugin);
+interface Card {
+  id: number;
+  name: string;
+  src: string;
+  revealed: boolean;
+  selected: boolean;
+  descriptions?: string[]; // ✅ PLURAL y ARRAY
+}
 @Component({
   selector: 'app-cards',
-  imports: [CommonModule, ParticlesComponent],
+  imports: [CommonModule, ParticlesComponent, RecolectaDatosComponent],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.css',
   animations: [
@@ -29,63 +46,103 @@ gsap.registerPlugin(Draggable, MotionPathPlugin, TextPlugin);
     ]),
   ],
 })
-/**
- * Maneja la selección de una carta cuando se hace clic en ella.
- *
- * Este método realiza las siguientes acciones:
- * 1. Verifica si ya se han seleccionado 3 cartas o si la carta ya está seleccionada.
- * 2. Actualiza el z-index de la carta seleccionada para mostrarla encima.
- * 3. Añade la clase "selected" a la carta y aplica una transición de estilo.
- * 4. Calcula y ajusta la posición de la carta seleccionada de manera responsive.
- * 5. Añade la carta seleccionada al array `selectedCards`.
- * 6. Cambia la imagen de fondo de la carta seleccionada después de un breve retraso.
- * 7. Si se han seleccionado 3 cartas, ajusta la posición final de las cartas seleccionadas,
- *    guarda las cartas seleccionadas en el servicio y navega a la página de descripción.
- *
- * @param {Event} event - El evento de clic que desencadena la selección de la carta.
- */
 export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
-  cards: any[] = [];
-  selectedCards: { src: string; name: string; descriptions: string[] }[] = [];
+  cards: Card[] = [];
+  selectedCards: Card[] = [];
+  showDataModal: boolean = false;
+  userData: any = null;
+
   private theme: string = '';
   private isAnimating: boolean = false;
   private isInitialAnimationComplete: boolean = false;
   private cardElements: HTMLElement[] = [];
   private timeline: gsap.core.Timeline | null = null;
 
+  // Datos para enviar
+
+  // Stripe and Payment Modal Properties
+  showPaymentModal: boolean = false;
+  stripe: Stripe | null = null;
+  elements: StripeElements | undefined;
+  paymentElement: StripePaymentElement | undefined;
+  clientSecret: string | null = null;
+  isProcessingPayment: boolean = false;
+  paymentError: string | null = null;
+  // Stripe configuration
+  private stripePublishableKey =
+    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+  private backendUrl = environment.apiUrl;
+
+  constructor(
+    private cardService: CardService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private http: HttpClient
+  ) {}
+
+  async ngOnInit(): Promise<void> {
+    console.log('🔧 Inicializando componente de cartas...');
+    console.log('🔗 Backend URL:', this.backendUrl);
+
+    // ✅ CARGAR STRIPE
+    try {
+      this.stripe = await loadStripe(this.stripePublishableKey);
+      console.log('✅ Stripe cargado correctamente');
+    } catch (error) {
+      console.error('❌ Error cargando Stripe:', error);
+      this.paymentError = 'No se pudo cargar el sistema de pago.';
+    }
+
+    // ✅ CARGAR DATOS DEL USUARIO DESDE sessionStorage
+    const savedUserData = sessionStorage.getItem('userData');
+    if (savedUserData) {
+      try {
+        this.userData = JSON.parse(savedUserData);
+        console.log('✅ Datos del usuario cargados:', this.userData);
+      } catch (error) {
+        console.error('❌ Error parseando userData:', error);
+        this.userData = null;
+      }
+    }
+
+    // Inicializar cartas
+    this.initializeCards();
+  }
+
+  ngOnDestroy(): void {
+    if (this.paymentElement) {
+      try {
+        this.paymentElement.destroy();
+      } catch (error) {
+        console.log('Error destruyendo payment element:', error);
+      }
+      this.paymentElement = undefined;
+    }
+  }
+
   // Dimensiones responsive de las cartas
   private getCardDimensions() {
     const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
 
-    // Escala basada en el viewport
     let cardWidth, cardHeight;
 
     if (viewportWidth <= 480) {
-      // Móviles pequeños
       cardWidth = Math.min(90, viewportWidth * 0.22);
       cardHeight = cardWidth * 1.55;
     } else if (viewportWidth <= 768) {
-      // Tablets y móviles grandes
       cardWidth = Math.min(110, viewportWidth * 0.14);
       cardHeight = cardWidth * 1.55;
     } else if (viewportWidth <= 1366) {
-      // Laptops pequeñas
       cardWidth = Math.min(140, viewportWidth * 0.1);
       cardHeight = cardWidth * 1.55;
     } else {
-      // Pantallas grandes
       cardWidth = Math.min(150, viewportWidth * 0.08);
       cardHeight = cardWidth * 1.55;
     }
 
     return { width: cardWidth, height: cardHeight };
   }
-  volverAlInicio() {
-    // Si usas Angular Router:
-    this.router.navigate(['/']);
-  }
-  // Dimensiones para los slots (más pequeñas que las cartas del abanico)
+
   private getSlotDimensions() {
     const cardDims = this.getCardDimensions();
     return {
@@ -94,26 +151,35 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  // Dimensiones de las cartas cuando están EN los slots
   private getCardInSlotDimensions() {
-    const slotDims = this.getSlotDimensions();
-    return {
-      width: slotDims.width * 1.13,
-      height: slotDims.height * 1.13,
-    };
+    const viewportWidth = window.innerWidth;
+
+    let width, height;
+
+    if (viewportWidth <= 375) {
+      // Móviles muy pequeños
+      width = 90;
+      height = 135;
+    } else if (viewportWidth <= 480) {
+      // Móviles pequeños
+      width = 90;
+      height = 150;
+    } else if (viewportWidth <= 768) {
+      // Tablets
+      width = 90;
+      height = 150;
+    } else {
+      // Desktop
+      const slotDims = this.getSlotDimensions();
+      width = slotDims.width * 1.13;
+      height = slotDims.height * 1.13;
+    }
+
+    return { width, height };
   }
 
-  constructor(
-    private cardService: CardService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
-
-  ngOnInit(): void {
-    this.route.params.subscribe((params) => {
-      this.theme = params['theme'];
-      this.initializeCards();
-    });
+  volverAlInicio() {
+    this.router.navigate(['/']);
   }
 
   private animateHeader(): void {
@@ -153,6 +219,12 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initializeCards(): void {
     this.cardService.clearSelectedCards();
+    this.selectedCards = [];
+    const cardContainer = document.getElementById('cardContainer');
+    if (cardContainer) {
+      cardContainer.innerHTML = '';
+    }
+    this.cardElements = [];
     this.cards = this.cardService.getCardsByTheme(this.theme);
   }
 
@@ -164,12 +236,9 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Calcular el centro dinámicamente basado en el viewport
     const centerX = viewportWidth / 2;
-    // El centro Y se ajusta según el tamaño de la pantalla
-    const centerY = viewportHeight * 0.38; // 50% desde arriba funciona bien para la mayoría
+    const centerY = viewportHeight * 0.38;
 
-    // Radio adaptativo
     let radius;
     if (viewportWidth <= 480) {
       radius = Math.min(viewportWidth * 0.35, 140);
@@ -187,7 +256,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.timeline = gsap.timeline({
       onComplete: () => {
-        // HABILITAR EVENTOS CUANDO TERMINE LA ANIMACIÓN
         this.isInitialAnimationComplete = true;
         this.cardElements.forEach((card) => {
           card.style.pointerEvents = 'auto';
@@ -234,7 +302,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       card.style.zIndex = String(i + 10);
     }
 
-    // Actualizar los tamaños de los slots dinámicamente
     this.updateSlotSizes();
   }
 
@@ -261,8 +328,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     card.style.backgroundImage = "url('/card-back.webp')";
     card.style.backgroundSize = 'cover';
     card.style.backgroundPosition = 'center';
-
-    // DESHABILITAR EVENTOS INICIALMENTE
     card.style.pointerEvents = 'none';
 
     card.dataset['src'] = cardData.src;
@@ -271,11 +336,41 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     card.dataset['index'] = String(index);
     card.dataset['originalIndex'] = String(index);
 
+    // ✅ AGREGAR EVENTOS DE HOVER AQUÍ (en el método que SÍ se usa)
+    card.addEventListener('mouseenter', () => {
+      if (
+        !card.classList.contains('selected') &&
+        this.isInitialAnimationComplete
+      ) {
+        gsap.to(card, {
+          scale: 1.05,
+          y: -10,
+          duration: 0.3,
+          ease: 'power2.out',
+          overwrite: true,
+        });
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      if (
+        !card.classList.contains('selected') &&
+        this.isInitialAnimationComplete
+      ) {
+        gsap.to(card, {
+          scale: 1,
+          y: 0,
+          duration: 0.3,
+          ease: 'power2.out',
+          overwrite: true,
+        });
+      }
+    });
+
     card.addEventListener('click', () => this.selectCard(card));
 
     return card;
   }
-
   private selectCard(card: HTMLElement): void {
     if (
       this.selectedCards.length >= 3 ||
@@ -298,7 +393,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     slot.classList.add('filled');
 
-    // Obtener las dimensiones actuales
     const cardInSlotDims = this.getCardInSlotDimensions();
     const slotRect = slot.getBoundingClientRect();
     const containerRect = document
@@ -310,7 +404,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // Calcular la posición final relativa al contenedor
     const targetX =
       slotRect.left +
       slotRect.width / 2 -
@@ -330,7 +423,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     });
 
-    // Guardar la posición actual para calcular el scale correcto
     const currentWidth = parseFloat(card.style.width);
     const scaleRatio = cardInSlotDims.width / currentWidth;
 
@@ -367,10 +459,16 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.addSlotGlow(slot);
 
+    // ✅ CREAR OBJETO COMPLETO QUE CUMPLE CON LA INTERFACE Card
+    const cardId = parseInt(card.dataset['originalIndex'] || '0');
+
     this.selectedCards.push({
+      id: cardId,
       src: card.dataset['src'] || '',
       name: card.dataset['name'] || '',
       descriptions: card.dataset['descriptions']?.split('.,') || [],
+      revealed: true,
+      selected: true,
     });
 
     this.updateCounter();
@@ -429,106 +527,296 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private checkCompletion(): void {
     if (this.selectedCards.length === 3) {
+      // Guardar las cartas seleccionadas
+      this.cardService.setSelectedCards(this.selectedCards);
+
+      // Mostrar modal de datos después de 1.5 segundos
       setTimeout(() => {
-        this.completeSelection();
+        this.showDataModal = true;
       }, 1500);
     }
   }
 
-  private completeSelection(): void {
-    this.cardService.setSelectedCards(this.selectedCards);
+  // ========== MÉTODOS DE PAGO ==========
 
-    const overlay = document.getElementById('transitionOverlay');
-    if (!overlay) {
-      this.router.navigate(['/descripcion-cartas']);
+  async handlePaymentSubmit(): Promise<void> {
+    if (!this.stripe || !this.elements || !this.paymentElement) {
+      this.paymentError = 'El sistema de pago no está listo';
       return;
     }
 
-    const finalTimeline = gsap.timeline();
+    this.isProcessingPayment = true;
+    this.paymentError = null;
 
-    // Primero desvanecer las cartas no seleccionadas
-    const unselectedCards = document.querySelectorAll('.card:not(.selected)');
-    finalTimeline.to(unselectedCards, {
-      opacity: 0,
-      scale: 0.8,
-      y: 50,
-      stagger: 0.02,
-      duration: 0.5,
-      ease: 'power2.in',
+    const { error, paymentIntent } = await this.stripe.confirmPayment({
+      elements: this.elements,
+      confirmParams: {
+        return_url: window.location.origin + window.location.pathname,
+      },
+      redirect: 'if_required',
     });
 
-    // NUEVA ANIMACIÓN MEJORADA PARA CARTAS SELECCIONADAS
-    const selectedCards = document.querySelectorAll('.card.selected');
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    if (error) {
+      this.paymentError = error.message || 'Error procesando el pago';
+      this.isProcessingPayment = false;
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      console.log('✅ Pago exitoso!');
 
-    // Calcular dimensiones finales más grandes para el centro
-    const finalCardWidth = Math.min(120, window.innerWidth * 0.08);
-    const finalCardHeight = finalCardWidth * 1.4;
-    const cardSpacing = finalCardWidth + 20; // Espacio entre cartas
+      // ✅ CAMBIAR ESTADO
+      this.isProcessingPayment = false;
 
-    // Mover cartas al centro de la pantalla en línea horizontal
-    selectedCards.forEach((card, index) => {
-      const htmlCard = card as HTMLElement;
-
-      finalTimeline.to(
-        htmlCard,
-        {
-          left:
-            centerX - cardSpacing + index * cardSpacing - finalCardWidth / 2,
-          top: centerY - finalCardHeight / 2 - 50, // Un poco más arriba del centro
-          width: finalCardWidth,
-          height: finalCardHeight,
-          scale: 1,
-          rotation: 0, // Sin rotación para mejor visibilidad
-          zIndex: 2000 + index,
-          duration: 1.2,
-          ease: 'power3.inOut',
-        },
-        index === 0 ? '-=0.2' : '-=0.8'
-      );
-    });
-
-    // Añadir brillo dorado
-    finalTimeline.to('.card.selected', {
-      boxShadow:
-        '0 0 50px rgba(255, 215, 0, 0.9), 0 0 100px rgba(255, 215, 0, 0.5)',
-      duration: 1.5,
-    });
-
-    // Pausa para que el usuario vea las cartas
-    finalTimeline.to({}, { duration: 1.5 });
-
-    // Activar overlay de transición
-    finalTimeline.to(overlay, {
-      opacity: 1,
-      duration: 0.8,
-      ease: 'power2.inOut',
-    });
-
-    // Animación final de salida hacia arriba
-    finalTimeline.to('.card.selected', {
-      y: '-=200', // Mover hacia arriba
-      scale: 0.8,
-      opacity: 0.8,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'power2.in',
-    });
-
-    // Desvanecimiento final
-    finalTimeline.to('.card.selected', {
-      opacity: 0,
-      scale: 0,
-      stagger: 0.05,
-      duration: 0.4,
-      ease: 'power2.in',
-    });
-
-    finalTimeline.call(() => {
-      this.router.navigate(['/descripcion-cartas']);
-    });
+      // ✅ NAVEGAR CON ANIMACIÓN
+      setTimeout(() => {
+        this.fadeOutAndNavigate();
+      }, 800); // Dar tiempo para que el usuario vea el éxito
+    }
   }
+  cancelPayment(): void {
+    this.showPaymentModal = false;
+    this.clientSecret = null;
+
+    if (this.paymentElement) {
+      try {
+        this.paymentElement.destroy();
+      } catch (error) {
+        console.log('Error destruyendo payment element:', error);
+      }
+      this.paymentElement = undefined;
+    }
+
+    this.isProcessingPayment = false;
+    this.paymentError = null;
+  }
+
+  private fadeOutAndNavigate(): void {
+    const cardContainer = document.getElementById('cardContainer');
+    const paymentModalOverlay = document.querySelector(
+      '.payment-modal-overlay'
+    ) as HTMLElement;
+
+    // Fade out del modal de pago
+    if (paymentModalOverlay) {
+      paymentModalOverlay.style.opacity = '0';
+      paymentModalOverlay.style.transition = 'opacity 0.5s ease-out';
+    }
+
+    // Destruir elemento de pago
+    if (this.paymentElement) {
+      try {
+        this.paymentElement.destroy();
+      } catch (error) {
+        console.log('Error al destruir elemento de pago:', error);
+      } finally {
+        this.paymentElement = undefined;
+      }
+    }
+
+    // Fade out de las cartas y navegar
+    if (cardContainer) {
+      cardContainer.classList.add('fade-out');
+      cardContainer.addEventListener(
+        'animationend',
+        () => {
+          this.router.navigate(['/descripcion-cartas']);
+        },
+        { once: true }
+      );
+    } else {
+      // Fallback si no encuentra el contenedor
+      setTimeout(() => {
+        this.router.navigate(['/descripcion-cartas']);
+      }, 500);
+    }
+  }
+
+  onUserDataSubmitted(userData: any): void {
+    console.log('📥 Datos recibidos del formulario:', userData);
+    console.log('📋 Campos disponibles:', Object.keys(userData));
+
+    // ✅ VALIDAR CAMPOS OBLIGATORIOS
+    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const missingFields = requiredFields.filter(
+      (field) => !userData[field] || !userData[field].toString().trim()
+    );
+
+    if (missingFields.length > 0) {
+      console.error('❌ Faltan campos obligatorios:', missingFields);
+      alert(`Completa estos campos: ${missingFields.join(', ')}`);
+      this.showDataModal = true;
+      return;
+    }
+
+    // ✅ GUARDAR DATOS
+    this.userData = {
+      ...userData,
+      nombre: userData.nombre.toString().trim(),
+      apellido: userData.apellido.toString().trim(),
+      email: userData.email.toString().trim(),
+      telefono: userData.telefono.toString().trim(),
+    };
+
+    // ✅ GUARDAR EN sessionStorage
+    try {
+      sessionStorage.setItem('userData', JSON.stringify(this.userData));
+      console.log('✅ Datos guardados en sessionStorage');
+    } catch (error) {
+      console.error('❌ Error guardando en sessionStorage:', error);
+    }
+
+    this.showDataModal = false;
+
+    // ✅ ENVIAR AL BACKEND (opcional)
+    this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
+      next: (response) =>
+        console.log('✅ Datos enviados al backend:', response),
+      error: (error) => console.error('⚠️ Error enviando datos:', error),
+    });
+
+    // ✅ ABRIR MODAL DE PAGO
+    setTimeout(() => {
+      this.promptForPayment();
+    }, 500);
+  }
+
+  async promptForPayment(): Promise<void> {
+    console.log('💳 === INICIANDO PROCESO DE PAGO ===');
+
+    this.showPaymentModal = true;
+    this.paymentError = null;
+    this.isProcessingPayment = true;
+
+    // Destruir elemento anterior
+    if (this.paymentElement) {
+      try {
+        this.paymentElement.destroy();
+      } catch (error) {
+        console.log('⚠️ Error destruyendo elemento anterior:', error);
+      }
+      this.paymentElement = undefined;
+    }
+
+    try {
+      // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
+      if (!this.userData) {
+        console.log('🔍 Cargando userData desde sessionStorage...');
+        const savedUserData = sessionStorage.getItem('userData');
+        if (savedUserData) {
+          this.userData = JSON.parse(savedUserData);
+          console.log('✅ userData cargado:', this.userData);
+        }
+      }
+
+      // ✅ VALIDAR QUE EXISTAN LOS DATOS
+      if (!this.userData) {
+        throw new Error('No se encontraron los datos del cliente');
+      }
+
+      // ✅ EXTRAER Y VALIDAR CAMPOS
+      const nombre = this.userData.nombre?.toString().trim();
+      const apellido = this.userData.apellido?.toString().trim();
+      const email = this.userData.email?.toString().trim();
+      const telefono = this.userData.telefono?.toString().trim();
+
+      console.log('🔍 Campos validados:');
+      console.log('  ✓ nombre:', nombre);
+      console.log('  ✓ apellido:', apellido);
+      console.log('  ✓ email:', email);
+      console.log('  ✓ telefono:', telefono);
+
+      if (!nombre || !apellido || !email || !telefono) {
+        throw new Error('Faltan campos obligatorios del cliente');
+      }
+
+      // ✅ CREAR customerInfo (SOLO 3 CAMPOS)
+      const customerInfo = {
+        name: `${nombre} ${apellido}`,
+        email: email,
+        phone: telefono,
+      };
+
+      console.log('👤 customerInfo creado:', customerInfo);
+
+      // ✅ CREAR PAYLOAD
+      const items = [{ id: 'tarot_reading_description', amount: 400 }];
+      const requestBody = { items, customerInfo };
+
+      console.log('📦 Payload completo:', JSON.stringify(requestBody, null, 2));
+      console.log('📍 Enviando a:', `${this.backendUrl}create-payment-intent`);
+
+      // ✅ HACER PETICIÓN
+      const response = await this.http
+        .post<{ clientSecret: string }>(
+          `${this.backendUrl}create-payment-intent`,
+          requestBody,
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .toPromise();
+
+      console.log('✅ Respuesta del servidor:', response);
+
+      if (!response || !response.clientSecret) {
+        throw new Error('No se recibió clientSecret del servidor');
+      }
+
+      this.clientSecret = response.clientSecret;
+      console.log(
+        '🔑 clientSecret obtenido:',
+        this.clientSecret.substring(0, 20) + '...'
+      );
+
+      // ✅ CREAR STRIPE ELEMENTS
+      if (!this.stripe) {
+        throw new Error('Stripe no está inicializado');
+      }
+
+      this.elements = this.stripe.elements({
+        clientSecret: this.clientSecret,
+        appearance: { theme: 'stripe' },
+      });
+
+      this.paymentElement = this.elements.create('payment');
+      console.log('✅ Payment element creado');
+
+      // ✅ CAMBIAR ESTADO ANTES DE MONTAR
+      this.isProcessingPayment = false;
+
+      // ✅ MONTAR EL ELEMENTO
+      setTimeout(() => {
+        const container = document.getElementById('payment-element-container');
+        console.log(
+          '🎯 Buscando contenedor...',
+          container ? 'ENCONTRADO ✅' : 'NO ENCONTRADO ❌'
+        );
+
+        if (container && this.paymentElement) {
+          this.paymentElement.mount(container);
+          console.log('✅ Payment element montado exitosamente');
+        } else {
+          console.error('❌ No se pudo montar el payment element');
+          this.paymentError = 'No se pudo cargar el formulario de pago';
+        }
+      }, 150);
+    } catch (error: any) {
+      console.error('❌ === ERROR EN PROCESO DE PAGO ===');
+      console.error('❌ Error completo:', error);
+      console.error('❌ Status:', error.status);
+      console.error('❌ Message:', error.message);
+      console.error('❌ Error details:', error.error);
+
+      this.paymentError =
+        error.error?.error || error.message || 'Error al inicializar el pago';
+      this.isProcessingPayment = false;
+    }
+  }
+
+  onDataModalClosed(): void {
+    this.showDataModal = false;
+  }
+
+  // ========== MÉTODOS AUXILIARES ==========
+
   private resetSelection(): void {
     if (this.isAnimating) return;
 
@@ -598,7 +886,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private handleResize = (): void => {
-    // Actualizar dimensiones de slots
     this.updateSlotSizes();
 
     if (this.cardElements.length > 0 && !this.isAnimating) {
@@ -643,7 +930,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-      // Actualizar posiciones de cartas seleccionadas
       const selectedCards = document.querySelectorAll('.card.selected');
       selectedCards.forEach((card: Element, index) => {
         const htmlCard = card as HTMLElement;
@@ -770,23 +1056,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.resetSelection();
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.timeline) {
-      this.timeline.kill();
-    }
-
-    this.cardElements.forEach((card) => {
-      gsap.killTweensOf(card);
-    });
-
-    window.removeEventListener('resize', this.handleResize);
-
-    const cardContainer = document.getElementById('cardContainer');
-    if (cardContainer) {
-      cardContainer.innerHTML = '';
-    }
   }
 
   public initialize(): void {
