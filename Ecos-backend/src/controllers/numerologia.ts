@@ -302,9 +302,9 @@ Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO 
 
         // Obtener el modelo Gemini con configuración ajustada según el intento
         const model = this.genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.0-flash",
           generationConfig: {
-            temperature: 1.6 + attempt * 0.1, // Aumentar temperatura en cada intento
+            temperature: 1.2 + attempt * 0.1, // Aumentar temperatura en cada intento
             topK: 40,
             topP: 1,
             maxOutputTokens: 400,

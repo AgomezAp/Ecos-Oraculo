@@ -159,32 +159,42 @@ export class RecolectaDatosComponent {
     }
 
     // ❌ COMENTADO - Validar dirección
-    // if (!this.userData.direccion || !this.userData.direccion.toString().trim()) {
-    //   this.dataFormErrors['direccion'] = 'La dirección es obligatoria';
-    //   isValid = false;
-    // }
+    if (
+      !this.userData.direccion ||
+      !this.userData.direccion.toString().trim()
+    ) {
+      this.dataFormErrors['direccion'] = 'La dirección es obligatoria';
+      isValid = false;
+    }
 
     // ❌ COMENTADO - Validar código postal
-    // if (!this.userData.codigo_postal || !this.userData.codigo_postal.toString().trim()) {
-    //   this.dataFormErrors['codigo_postal'] = 'El código postal es obligatorio';
-    //   isValid = false;
-    // }
+    if (
+      !this.userData.codigo_postal ||
+      !this.userData.codigo_postal.toString().trim()
+    ) {
+      this.dataFormErrors['codigo_postal'] = 'El código postal es obligatorio';
+      isValid = false;
+    }
 
     // ❌ COMENTADO - Validar ciudad
-    // if (!this.userData.ciudad || !this.userData.ciudad.toString().trim()) {
-    //   this.dataFormErrors['ciudad'] = 'La ciudad es obligatoria';
-    //   isValid = false;
-    // }
+    if (!this.userData.ciudad || !this.userData.ciudad.toString().trim()) {
+      this.dataFormErrors['ciudad'] = 'La ciudad es obligatoria';
+      isValid = false;
+    }
 
     // ❌ COMENTADO - Validar NIF o Pasaporte
-    // const nif = this.userData.NIF ? this.userData.NIF.toString().trim() : '';
-    // const pasaporte = this.userData.numero_pasapote ? this.userData.numero_pasapote.toString().trim() : '';
-    //
-    // if (!nif && !pasaporte) {
-    //   this.dataFormErrors['NIF'] = 'Debes proporcionar NIF o número de pasaporte';
-    //   this.dataFormErrors['numero_pasapote'] = 'Debes proporcionar NIF o número de pasaporte';
-    //   isValid = false;
-    // }
+    const nif = this.userData.NIF ? this.userData.NIF.toString().trim() : '';
+    const pasaporte = this.userData.numero_pasapote
+      ? this.userData.numero_pasapote.toString().trim()
+      : '';
+
+    if (!nif && !pasaporte) {
+      this.dataFormErrors['NIF'] =
+        'Debes proporcionar NIF o número de pasaporte';
+      this.dataFormErrors['numero_pasapote'] =
+        'Debes proporcionar NIF o número de pasaporte';
+      isValid = false;
+    }
 
     console.log('🔍 Resultado de validación:', {
       isValid,
@@ -232,7 +242,7 @@ export class RecolectaDatosComponent {
 
     try {
       // ✅ LIMPIAR Y NORMALIZAR DATOS ANTES DE ENVIAR
-      const datosToSend: Datos = {
+      /*    const datosToSend: Datos = {
         NIF: '', // ❌ Campo comentado - enviar vacío
         numero_pasapote: '', // ❌ Campo comentado - enviar vacío
         pais: '', // ❌ Campo comentado - enviar vacío
@@ -247,8 +257,8 @@ export class RecolectaDatosComponent {
         importe: this.userData.importe || 5.0,
         email: (this.userData.email || '').toString().trim(),
         telefono: (this.userData.telefono || '').toString().trim(),
-      };
-      /*    const datosToSend: Datos = {
+      }; */
+      const datosToSend: Datos = {
         NIF: (this.userData.NIF || '').toString().trim(),
         numero_pasapote: (this.userData.numero_pasapote || '')
           .toString()
@@ -267,7 +277,7 @@ export class RecolectaDatosComponent {
         importe: this.userData.importe || 5.0,
         email: (this.userData.email || '').toString().trim(),
         telefono: (this.userData.telefono || '').toString().trim(), // ✅ ASEGURAR que telefono sea string
-      }; */
+      };
 
       console.log('📤 Datos a enviar (limpios):', datosToSend); // DEBUG
       console.log('📞 Teléfono específico:', {
