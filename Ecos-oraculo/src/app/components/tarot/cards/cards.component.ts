@@ -1,5 +1,3 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import {
   animate,
   state,
@@ -7,21 +5,21 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import {
-  Stripe,
-  StripeElements,
-  StripePaymentElement,
-  loadStripe,
-} from '@stripe/stripe-js';
-import { ParticlesComponent } from '../../../shared/particles/particles.component';
 import { CommonModule } from '@angular/common';
-import { CardService } from '../../../services/tarot/card.service';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RecolectaDatosComponent } from '../../recolecta-datos/recolecta-datos.component';
-import { environment } from '../../../environments/environmets.prod';
+
+import { gsap } from 'gsap';
+import { Draggable } from 'gsap/Draggable';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+import { TextPlugin } from 'gsap/TextPlugin';
+import { CardService } from '../../../services/tarot/card.service';
+import { ParticlesComponent } from '../../../shared/particles/particles.component';
+
+gsap.registerPlugin(Draggable, MotionPathPlugin, TextPlugin);
 @Component({
   selector: 'app-cards',
-  imports: [CommonModule, RecolectaDatosComponent],
+  imports: [CommonModule, ParticlesComponent],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.css',
   animations: [
@@ -31,393 +29,769 @@ import { environment } from '../../../environments/environmets.prod';
     ]),
   ],
 })
-export class CardsComponent implements OnInit, OnDestroy {
+/**
+ * Maneja la selección de una carta cuando se hace clic en ella.
+ *
+ * Este método realiza las siguientes acciones:
+ * 1. Verifica si ya se han seleccionado 3 cartas o si la carta ya está seleccionada.
+ * 2. Actualiza el z-index de la carta seleccionada para mostrarla encima.
+ * 3. Añade la clase "selected" a la carta y aplica una transición de estilo.
+ * 4. Calcula y ajusta la posición de la carta seleccionada de manera responsive.
+ * 5. Añade la carta seleccionada al array `selectedCards`.
+ * 6. Cambia la imagen de fondo de la carta seleccionada después de un breve retraso.
+ * 7. Si se han seleccionado 3 cartas, ajusta la posición final de las cartas seleccionadas,
+ *    guarda las cartas seleccionadas en el servicio y navega a la página de descripción.
+ *
+ * @param {Event} event - El evento de clic que desencadena la selección de la carta.
+ */
+export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   cards: any[] = [];
   selectedCards: { src: string; name: string; descriptions: string[] }[] = [];
   private theme: string = '';
-  //Datos para enviar
-  showDataModal: boolean = false;
-  userData: any = null;
+  private isAnimating: boolean = false;
+  private isInitialAnimationComplete: boolean = false;
+  private cardElements: HTMLElement[] = [];
+  private timeline: gsap.core.Timeline | null = null;
 
-  // Stripe and Payment Modal Properties
-  showPaymentModal: boolean = false;
-  stripe: Stripe | null = null;
-  elements: StripeElements | undefined;
-  paymentElement: StripePaymentElement | undefined;
-  clientSecret: string | null = null;
-  isProcessingPayment: boolean = false;
-  paymentError: string | null = null;
+  // Dimensiones responsive de las cartas
+  private getCardDimensions() {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-  // IMPORTANT: Replace with your actual Stripe publishable key and backend URL
-  private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL'; // <--- REPLACE THIS
-  private backendUrl =  environment.apiUrl;
+    // Escala basada en el viewport
+    let cardWidth, cardHeight;
+
+    if (viewportWidth <= 480) {
+      // Móviles pequeños
+      cardWidth = Math.min(90, viewportWidth * 0.22);
+      cardHeight = cardWidth * 1.55;
+    } else if (viewportWidth <= 768) {
+      // Tablets y móviles grandes
+      cardWidth = Math.min(110, viewportWidth * 0.14);
+      cardHeight = cardWidth * 1.55;
+    } else if (viewportWidth <= 1366) {
+      // Laptops pequeñas
+      cardWidth = Math.min(140, viewportWidth * 0.1);
+      cardHeight = cardWidth * 1.55;
+    } else {
+      // Pantallas grandes
+      cardWidth = Math.min(150, viewportWidth * 0.08);
+      cardHeight = cardWidth * 1.55;
+    }
+
+    return { width: cardWidth, height: cardHeight };
+  }
+  volverAlInicio() {
+    // Si usas Angular Router:
+    this.router.navigate(['/']);
+  }
+  // Dimensiones para los slots (más pequeñas que las cartas del abanico)
+  private getSlotDimensions() {
+    const cardDims = this.getCardDimensions();
+    return {
+      width: cardDims.width * 0.83,
+      height: cardDims.height * 0.88,
+    };
+  }
+
+  // Dimensiones de las cartas cuando están EN los slots
+  private getCardInSlotDimensions() {
+    const slotDims = this.getSlotDimensions();
+    return {
+      width: slotDims.width * 1.13,
+      height: slotDims.height * 1.13,
+    };
+  }
 
   constructor(
     private cardService: CardService,
     private router: Router,
-    private route: ActivatedRoute,
-    private http: HttpClient
+    private route: ActivatedRoute
   ) {}
 
-  async ngOnInit(): Promise<void> {
-    // Obtener el tema de la ruta
+  ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.theme = params['theme'];
       this.initializeCards();
     });
-    try {
-      this.stripe = await loadStripe(this.stripePublishableKey);
-    } catch (error) {
-      console.error('Error loading Stripe.js:', error);
-      this.paymentError =
-        'Could not load payment system. Please refresh the page.';
-    }
   }
 
-  ngOnDestroy(): void {
-    if (this.paymentElement) {
-      try {
-        this.paymentElement.destroy();
-      } catch (error) {
-        console.log(
-          'El elemento de pago ya fue destruido o no está disponible'
-        );
-      } finally {
-        this.paymentElement = undefined;
-      }
+  private animateHeader(): void {
+    const title = document.querySelector('.main-title');
+    const subtitle = document.querySelector('.subtitle');
+    const counter = document.querySelector('.card-counter');
+
+    if (title) {
+      gsap.from(title, {
+        y: -50,
+        opacity: 0,
+        duration: 1,
+        ease: 'power3.out',
+      });
+    }
+
+    if (subtitle) {
+      gsap.from(subtitle, {
+        y: -30,
+        opacity: 0,
+        duration: 1,
+        delay: 0.2,
+        ease: 'power3.out',
+      });
+    }
+
+    if (counter) {
+      gsap.from(counter, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.4,
+        ease: 'back.out(1.7)',
+      });
     }
   }
 
   initializeCards(): void {
     this.cardService.clearSelectedCards();
-    this.selectedCards = []; // Ensure selectedCards is also reset
-    const cardContainer = document.getElementById('cardContainer');
-    if (cardContainer) {
-      cardContainer.innerHTML = ''; // Clear previous cards from the DOM
-    }
     this.cards = this.cardService.getCardsByTheme(this.theme);
-    this.displayCards();
   }
 
   displayCards(): void {
     const cardContainer = document.getElementById('cardContainer');
-    if (!cardContainer) {
-      console.error(
-        '❌ No se encontró el contenedor de cartas (#cardContainer)'
-      );
-      return;
+    if (!cardContainer || this.cards.length === 0) return;
+
+    const numberOfCards = Math.min(12, this.cards.length);
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calcular el centro dinámicamente basado en el viewport
+    const centerX = viewportWidth / 2;
+    // El centro Y se ajusta según el tamaño de la pantalla
+    const centerY = viewportHeight * 0.38; // 50% desde arriba funciona bien para la mayoría
+
+    // Radio adaptativo
+    let radius;
+    if (viewportWidth <= 480) {
+      radius = Math.min(viewportWidth * 0.35, 140);
+    } else if (viewportWidth <= 768) {
+      radius = Math.min(viewportWidth * 0.32, 180);
+    } else if (viewportWidth <= 1366) {
+      radius = Math.min(viewportWidth * 0.18, 220);
+    } else {
+      radius = Math.min(viewportWidth * 0.15, 250);
     }
 
-    if (this.cards.length === 0) {
-      console.warn('⚠️ No hay cartas para mostrar.');
-      return;
-    }
-
-    const numberOfCards = 12; // Or this.cards.length if you want to display all fetched cards
-    const startAngle = -40;
+    const startAngle = -45;
     const angleStep = 90 / (numberOfCards - 1);
-    const isMobile = window.innerWidth <= 768;
-    const radius = isMobile ? 140 : 240;
-    const centerX = window.innerWidth / 2.0;
-    const centerY = window.innerHeight / (isMobile ? 1.9 : 1.45) - 40;
+    const cardDims = this.getCardDimensions();
 
-    for (let i = 0; i < Math.min(numberOfCards, this.cards.length); i++) {
+    this.timeline = gsap.timeline({
+      onComplete: () => {
+        // HABILITAR EVENTOS CUANDO TERMINE LA ANIMACIÓN
+        this.isInitialAnimationComplete = true;
+        this.cardElements.forEach((card) => {
+          card.style.pointerEvents = 'auto';
+        });
+      },
+    });
+
+    for (let i = 0; i < numberOfCards; i++) {
       const cardData = this.cards[i];
+      if (!cardData || !cardData.src) continue;
 
-      if (cardData && cardData.src) {
-        const angle = startAngle + i * angleStep;
-        const radian = angle * (Math.PI / 180);
+      const card = this.createCard(cardData, i);
+      cardContainer.appendChild(card);
+      this.cardElements.push(card);
 
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.style.position = 'absolute';
-        card.style.width = isMobile ? '150px' : '180px'; // Tamaño adaptable
-        card.style.height = isMobile ? '230px' : '275px'; // Ajusta la altura aquí
-        card.style.border = '1px solid #ccc';
-        card.style.borderRadius = '10px';
-        card.style.left = `${
-          centerX + radius * Math.sin(radian) - (isMobile ? 40 : 95)
-        }px`;
-        card.style.top = `${
-          centerY - radius * Math.cos(radian) - (isMobile ? 100 : 125)
-        }px`; // Ajusta la posición vertical aquí
-        card.style.opacity = '0';
-        card.style.zIndex = `${i}`;
-        card.style.transform = `rotate(${angle}deg)`;
-        card.style.backgroundImage = "url('/card-back.webp')";
-        card.style.backgroundSize = 'cover';
-        card.style.transition = 'all 0.5s ease-in-out';
+      const angle = startAngle + i * angleStep;
+      const radian = angle * (Math.PI / 180);
+      const finalX = centerX + radius * Math.sin(radian) - cardDims.width / 2;
+      const finalY = centerY - radius * Math.cos(radian) - cardDims.height / 2;
 
-        card.dataset['src'] = cardData.src;
-        card.dataset['name'] = cardData.name;
-        card.dataset['descriptions'] = cardData.descriptions.join('.,');
-        card.addEventListener('mouseenter', () => {
-          card.style.boxShadow = '1px 1px 20px rgb(255 255 255 / 100%)';
-        });
+      gsap.set(card, {
+        left: centerX - cardDims.width / 2,
+        top: -200,
+        rotation: 0,
+        scale: 0,
+        opacity: 0,
+      });
 
-        card.addEventListener('mouseleave', () => {
-          card.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
-        });
+      this.timeline.to(
+        card,
+        {
+          left: finalX,
+          top: finalY,
+          rotation: angle,
+          scale: 1,
+          opacity: 1,
+          duration: 0.3,
+          ease: 'back.out(1.2)',
+          delay: i * 0.03,
+        },
+        `-=${i === 0 ? 0 : 0.25}`
+      );
 
-        card.addEventListener('click', this.selectCard.bind(this));
-        cardContainer.appendChild(card);
-
-        setTimeout(() => {
-          card.style.opacity = '1';
-        }, i * 100);
-      } else {
-        console.error(`⚠️ La carta en el índice ${i} no tiene datos válidos.`);
-      }
+      card.style.zIndex = String(i + 10);
     }
+
+    // Actualizar los tamaños de los slots dinámicamente
+    this.updateSlotSizes();
   }
 
-  selectCard(event: Event): void {
-    const target = event.currentTarget as HTMLElement;
+  private updateSlotSizes(): void {
+    const slotDims = this.getSlotDimensions();
+    const slots = document.querySelectorAll('.card-slot');
+
+    slots.forEach((slot: Element) => {
+      const htmlSlot = slot as HTMLElement;
+      htmlSlot.style.width = `${slotDims.width}px`;
+      htmlSlot.style.height = `${slotDims.height}px`;
+    });
+  }
+
+  private createCard(cardData: any, index: number): HTMLElement {
+    const card = document.createElement('div');
+    const cardDims = this.getCardDimensions();
+
+    card.classList.add('card');
+    card.style.position = 'absolute';
+    card.style.width = `${cardDims.width}px`;
+    card.style.height = `${cardDims.height}px`;
+    card.style.borderRadius = '10px';
+    card.style.backgroundImage = "url('/card-back.webp')";
+    card.style.backgroundSize = 'cover';
+    card.style.backgroundPosition = 'center';
+
+    // DESHABILITAR EVENTOS INICIALMENTE
+    card.style.pointerEvents = 'none';
+
+    card.dataset['src'] = cardData.src;
+    card.dataset['name'] = cardData.name;
+    card.dataset['descriptions'] = cardData.descriptions.join('.,');
+    card.dataset['index'] = String(index);
+    card.dataset['originalIndex'] = String(index);
+
+    card.addEventListener('click', () => this.selectCard(card));
+
+    return card;
+  }
+
+  private selectCard(card: HTMLElement): void {
     if (
       this.selectedCards.length >= 3 ||
-      target.classList.contains('selected')
+      card.classList.contains('selected') ||
+      this.isAnimating
     ) {
       return;
     }
 
-    const currentZIndex = 1500 + this.selectedCards.length;
-    target.style.zIndex = currentZIndex.toString();
+    this.isAnimating = true;
+    card.classList.add('selected');
 
-    target.classList.add('selected');
-    target.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    const selectedIndex = this.selectedCards.length;
+    const slot = document.getElementById(`slot-${selectedIndex}`);
 
-    const isMobile = window.innerWidth <= 768;
-    const centerX = window.innerWidth / 1.6;
-    const centerY = window.innerHeight / 4.25 + (isMobile ? 155 : 140);
+    if (!slot) {
+      this.isAnimating = false;
+      return;
+    }
 
-    // Espaciado más moderado - entre el original y el muy ancho
-    const cardSpacing = isMobile ? 60 : 140; // Reducido de 200 a 140 para desktop
+    slot.classList.add('filled');
 
-    // Calcular nueva posición basada en cantidad de seleccionadas
-    const offsetX = (this.selectedCards.length - 1) * cardSpacing - cardSpacing;
+    // Obtener las dimensiones actuales
+    const cardInSlotDims = this.getCardInSlotDimensions();
+    const slotRect = slot.getBoundingClientRect();
+    const containerRect = document
+      .getElementById('cardContainer')
+      ?.getBoundingClientRect();
 
-    target.style.left = `${centerX - (isMobile ? 40 : 165) + offsetX}px`;
-    target.style.top = `${centerY - (isMobile ? 40 : 125)}px`;
-    target.style.transform = `scale(${isMobile ? 1.3 : 1.4}) rotateY(180deg)`;
+    if (!containerRect) {
+      this.isAnimating = false;
+      return;
+    }
+
+    // Calcular la posición final relativa al contenedor
+    const targetX =
+      slotRect.left +
+      slotRect.width / 2 -
+      containerRect.left -
+      cardInSlotDims.width / 2;
+    const targetY =
+      slotRect.top +
+      slotRect.height / 2 -
+      containerRect.top -
+      cardInSlotDims.height / 2 +
+      10;
+
+    const selectTimeline = gsap.timeline({
+      onComplete: () => {
+        this.isAnimating = false;
+        this.checkCompletion();
+      },
+    });
+
+    // Guardar la posición actual para calcular el scale correcto
+    const currentWidth = parseFloat(card.style.width);
+    const scaleRatio = cardInSlotDims.width / currentWidth;
+
+    selectTimeline
+      .to(card, {
+        scale: 1.3,
+        zIndex: 1000 + selectedIndex,
+        duration: 0.3,
+        ease: 'power2.out',
+      })
+      .to(card, {
+        rotationY: 90,
+        duration: 0.25,
+        ease: 'power2.in',
+        onComplete: () => {
+          card.style.backgroundImage = `url('${card.dataset['src']}')`;
+        },
+      })
+      .to(card, {
+        rotationY: 180,
+        duration: 0.25,
+        ease: 'power2.out',
+      })
+      .to(card, {
+        left: targetX,
+        top: targetY,
+        scale: scaleRatio,
+        rotation: 0,
+        width: cardInSlotDims.width,
+        height: cardInSlotDims.height,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      });
+
+    this.addSlotGlow(slot);
 
     this.selectedCards.push({
-      src: target.dataset['src'] || '',
-      name: target.dataset['name'] || '',
-      descriptions: target.dataset['descriptions']?.split('.,') || [],
+      src: card.dataset['src'] || '',
+      name: card.dataset['name'] || '',
+      descriptions: card.dataset['descriptions']?.split('.,') || [],
     });
 
-    setTimeout(() => {
-      target.style.backgroundImage = `url('${target.dataset['src']}')`;
-      target.style.pointerEvents = 'none';
-    }, 850);
+    this.updateCounter();
 
-    if (this.selectedCards.length === 3) {
-      this.cardService.setSelectedCards(this.selectedCards);
-      setTimeout(() => {
-        this.showDataModal = true;
-      }, 3000);
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
     }
   }
 
-  async promptForPayment(): Promise<void> {
-    this.showPaymentModal = true;
-    this.paymentError = null;
-    this.isProcessingPayment = true;
+  private addSlotGlow(slot: HTMLElement): void {
+    const glow = document.createElement('div');
+    glow.style.position = 'absolute';
+    glow.style.width = '100%';
+    glow.style.height = '100%';
+    glow.style.top = '0';
+    glow.style.left = '0';
+    glow.style.borderRadius = '10px';
+    glow.style.background =
+      'radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent)';
+    glow.style.pointerEvents = 'none';
+    slot.appendChild(glow);
 
-    this.paymentElement?.destroy();
+    gsap.from(glow, {
+      scale: 0,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
 
-    try {
-      const items = [{ id: 'tarot_reading_description', amount: 400 }]; // Example: 5.00 EUR
+    gsap.to(glow, {
+      opacity: 0,
+      duration: 0.5,
+      delay: 1,
+      onComplete: () => glow.remove(),
+    });
+  }
 
-      const response = await this.http
-        .post<{ clientSecret: string }>(
-          `${this.backendUrl}create-payment-intent`,
-          { items }
-        )
-        .toPromise();
+  private updateCounter(): void {
+    const counter = document.querySelector('.counter');
+    if (!counter) return;
 
-      if (!response || !response.clientSecret) {
-        throw new Error(
-          'Error al obtener la información de pago del servidor.'
-        );
-      }
-      this.clientSecret = response.clientSecret;
-
-      if (this.stripe && this.clientSecret) {
-        this.elements = this.stripe.elements({
-          clientSecret: this.clientSecret,
-          appearance: { theme: 'stripe' },
+    gsap.to(counter, {
+      scale: 1.2,
+      duration: 0.2,
+      ease: 'power2.out',
+      onComplete: () => {
+        counter.textContent = `${this.selectedCards.length}/3`;
+        gsap.to(counter, {
+          scale: 1,
+          duration: 0.2,
+          ease: 'power2.out',
         });
-        this.paymentElement = this.elements.create('payment');
+      },
+    });
+  }
 
-        setTimeout(() => {
-          // Ensure modal is rendered before mounting
-          const paymentElementContainer = document.getElementById(
-            'payment-element-container'
-          );
-          if (paymentElementContainer && this.paymentElement) {
-            this.paymentElement.mount(paymentElementContainer);
-            this.isProcessingPayment = false;
-          } else {
-            console.error('Contenedor del elemento de pago no encontrado.');
-            this.paymentError = 'No se pudo mostrar el formulario de pago.';
-            this.isProcessingPayment = false;
-          }
-        }, 100);
-      } else {
-        throw new Error(
-          'Stripe.js o la clave secreta del cliente no están disponibles.'
-        );
-      }
-    } catch (error: any) {
-      console.error('Error al preparar el pago:', error);
-      this.paymentError =
-        error.message ||
-        'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
-      this.isProcessingPayment = false;
+  private checkCompletion(): void {
+    if (this.selectedCards.length === 3) {
+      setTimeout(() => {
+        this.completeSelection();
+      }, 1500);
     }
   }
 
-  async handlePaymentSubmit(): Promise<void> {
-    if (
-      !this.stripe ||
-      !this.elements ||
-      !this.clientSecret ||
-      !this.paymentElement
-    ) {
-      this.paymentError =
-        'El sistema de pago no está inicializado correctamente.';
-      this.isProcessingPayment = false;
+  private completeSelection(): void {
+    this.cardService.setSelectedCards(this.selectedCards);
+
+    const overlay = document.getElementById('transitionOverlay');
+    if (!overlay) {
+      this.router.navigate(['/descripcion-cartas']);
       return;
     }
 
-    this.isProcessingPayment = true;
-    this.paymentError = null;
+    const finalTimeline = gsap.timeline();
 
-    // Usa confirmParams con return_url para métodos de pago que requieren redirección
-    const { error, paymentIntent } = await this.stripe.confirmPayment({
-      elements: this.elements,
-      confirmParams: {
-        // Asegúrate de usar una URL absoluta y actualiza esta URL según corresponda a tu entorno
-        return_url: window.location.origin + '/descripcion-cartas',
-      },
-      redirect: 'if_required',
+    // Primero desvanecer las cartas no seleccionadas
+    const unselectedCards = document.querySelectorAll('.card:not(.selected)');
+    finalTimeline.to(unselectedCards, {
+      opacity: 0,
+      scale: 0.8,
+      y: 50,
+      stagger: 0.02,
+      duration: 0.5,
+      ease: 'power2.in',
     });
 
-    // Si hay un error durante la confirmación
-    if (error) {
-      this.paymentError =
-        error.message || 'Ocurrió un error inesperado durante el pago.';
-      this.isProcessingPayment = false;
-    } else if (paymentIntent) {
-      // Si obtenemos un paymentIntent, procesamos su estado
-      switch (paymentIntent.status) {
-        case 'succeeded':
-          console.log('¡Pago exitoso!');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-          this.fadeOutAndNavigate();
-          break;
-        case 'processing':
-          this.paymentError =
-            'El pago se está procesando. Te notificaremos cuando se complete.';
-          // Mantener isProcessingPayment como true o manejar según preferencia de UX
-          break;
-        case 'requires_payment_method':
-          this.paymentError =
-            'Pago fallido. Por favor, intenta con otro método de pago.';
-          this.isProcessingPayment = false;
-          break;
-        case 'requires_action':
-          // Para métodos que requieren acción adicional, el usuario podría ser redirigido
-          this.paymentError =
-            'Se requiere una acción adicional para completar el pago.';
-          this.isProcessingPayment = false;
-          break;
-        default:
-          this.paymentError = `Estado del pago: ${paymentIntent.status}. Inténtalo de nuevo.`;
-          this.isProcessingPayment = false;
-          break;
-      }
-    } else {
-      // Si no hay error ni paymentIntent (caso raro)
-      this.paymentError = 'No se pudo determinar el estado del pago.';
-      this.isProcessingPayment = false;
-    }
-  }
+    // NUEVA ANIMACIÓN MEJORADA PARA CARTAS SELECCIONADAS
+    const selectedCards = document.querySelectorAll('.card.selected');
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
-  cancelPayment(): void {
-    this.showPaymentModal = false;
-    this.clientSecret = null;
+    // Calcular dimensiones finales más grandes para el centro
+    const finalCardWidth = Math.min(120, window.innerWidth * 0.08);
+    const finalCardHeight = finalCardWidth * 1.4;
+    const cardSpacing = finalCardWidth + 20; // Espacio entre cartas
 
-    // Manejo seguro de la destrucción del elemento
-    if (this.paymentElement) {
-      try {
-        this.paymentElement.destroy();
-      } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
-      } finally {
-        this.paymentElement = undefined;
-      }
-    }
+    // Mover cartas al centro de la pantalla en línea horizontal
+    selectedCards.forEach((card, index) => {
+      const htmlCard = card as HTMLElement;
 
-    this.isProcessingPayment = false;
-    this.paymentError = null;
-  }
-  private fadeOutAndNavigate(): void {
-    const cardContainer = document.getElementById('cardContainer');
-    const paymentModalOverlay = document.querySelector(
-      '.payment-modal-overlay'
-    ) as HTMLElement;
-
-    // Fade out modal if it's visible
-    if (paymentModalOverlay) {
-      paymentModalOverlay.style.opacity = '0';
-      paymentModalOverlay.style.transition = 'opacity 0.5s ease-out';
-    }
-
-    // Destruye el elemento de pago de forma segura
-    if (this.paymentElement) {
-      try {
-        this.paymentElement.destroy();
-      } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
-      } finally {
-        this.paymentElement = undefined; // Importante: marca como undefined después de destruirlo
-      }
-    }
-
-    // Continúa con la navegación
-    if (cardContainer) {
-      cardContainer.classList.add('fade-out');
-      cardContainer.addEventListener(
-        'animationend',
-        () => {
-          this.router.navigate(['/descripcion-cartas']);
+      finalTimeline.to(
+        htmlCard,
+        {
+          left:
+            centerX - cardSpacing + index * cardSpacing - finalCardWidth / 2,
+          top: centerY - finalCardHeight / 2 - 50, // Un poco más arriba del centro
+          width: finalCardWidth,
+          height: finalCardHeight,
+          scale: 1,
+          rotation: 0, // Sin rotación para mejor visibilidad
+          zIndex: 2000 + index,
+          duration: 1.2,
+          ease: 'power3.inOut',
         },
-        { once: true }
+        index === 0 ? '-=0.2' : '-=0.8'
       );
+    });
+
+    // Añadir brillo dorado
+    finalTimeline.to('.card.selected', {
+      boxShadow:
+        '0 0 50px rgba(255, 215, 0, 0.9), 0 0 100px rgba(255, 215, 0, 0.5)',
+      duration: 1.5,
+    });
+
+    // Pausa para que el usuario vea las cartas
+    finalTimeline.to({}, { duration: 1.5 });
+
+    // Activar overlay de transición
+    finalTimeline.to(overlay, {
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power2.inOut',
+    });
+
+    // Animación final de salida hacia arriba
+    finalTimeline.to('.card.selected', {
+      y: '-=200', // Mover hacia arriba
+      scale: 0.8,
+      opacity: 0.8,
+      stagger: 0.1,
+      duration: 0.6,
+      ease: 'power2.in',
+    });
+
+    // Desvanecimiento final
+    finalTimeline.to('.card.selected', {
+      opacity: 0,
+      scale: 0,
+      stagger: 0.05,
+      duration: 0.4,
+      ease: 'power2.in',
+    });
+
+    finalTimeline.call(() => {
+      this.router.navigate(['/descripcion-cartas']);
+    });
+  }
+  private resetSelection(): void {
+    if (this.isAnimating) return;
+
+    this.selectedCards = [];
+    this.updateCounter();
+
+    const slots = document.querySelectorAll('.card-slot');
+    slots.forEach((slot) => {
+      slot.classList.remove('filled');
+    });
+
+    const selectedCards = document.querySelectorAll('.card.selected');
+    selectedCards.forEach((card: Element) => {
+      const htmlCard = card as HTMLElement;
+      const originalIndex = parseInt(htmlCard.dataset['originalIndex'] || '0');
+
+      htmlCard.classList.remove('selected');
+      htmlCard.style.backgroundImage = "url('/card-back.webp')";
+
+      this.returnCardToOriginalPosition(htmlCard, originalIndex);
+    });
+
+    this.isAnimating = false;
+  }
+
+  private returnCardToOriginalPosition(card: HTMLElement, index: number): void {
+    const numberOfCards = 12;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const centerX = viewportWidth / 2;
+    const centerY = viewportHeight * 0.38;
+    const cardDims = this.getCardDimensions();
+
+    let radius;
+    if (viewportWidth <= 480) {
+      radius = Math.min(viewportWidth * 0.35, 140);
+    } else if (viewportWidth <= 768) {
+      radius = Math.min(viewportWidth * 0.32, 180);
+    } else if (viewportWidth <= 1366) {
+      radius = Math.min(viewportWidth * 0.18, 220);
     } else {
-      setTimeout(() => {
-        this.router.navigate(['/descripcion-cartas']);
-      }, 500);
+      radius = Math.min(viewportWidth * 0.15, 250);
+    }
+
+    const startAngle = -45;
+    const angleStep = 90 / (numberOfCards - 1);
+    const angle = startAngle + index * angleStep;
+    const radian = angle * (Math.PI / 180);
+    const finalX = centerX + radius * Math.sin(radian) - cardDims.width / 2;
+    const finalY = centerY - radius * Math.cos(radian) - cardDims.height / 2;
+
+    gsap.to(card, {
+      left: finalX,
+      top: finalY,
+      width: cardDims.width,
+      height: cardDims.height,
+      rotation: angle,
+      rotationY: 0,
+      scale: 1,
+      zIndex: index + 10,
+      duration: 0.6,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        card.style.pointerEvents = 'auto';
+      },
+    });
+  }
+
+  private handleResize = (): void => {
+    // Actualizar dimensiones de slots
+    this.updateSlotSizes();
+
+    if (this.cardElements.length > 0 && !this.isAnimating) {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const centerX = viewportWidth / 2;
+      const centerY = viewportHeight * 0.38;
+      const cardDims = this.getCardDimensions();
+
+      let radius;
+      if (viewportWidth <= 480) {
+        radius = Math.min(viewportWidth * 0.35, 140);
+      } else if (viewportWidth <= 768) {
+        radius = Math.min(viewportWidth * 0.32, 180);
+      } else if (viewportWidth <= 1366) {
+        radius = Math.min(viewportWidth * 0.18, 220);
+      } else {
+        radius = Math.min(viewportWidth * 0.15, 250);
+      }
+
+      const startAngle = -45;
+      const angleStep = 90 / (this.cardElements.length - 1);
+
+      this.cardElements.forEach((card, i) => {
+        if (!card.classList.contains('selected')) {
+          const angle = startAngle + i * angleStep;
+          const radian = angle * (Math.PI / 180);
+          const finalX =
+            centerX + radius * Math.sin(radian) - cardDims.width / 2;
+          const finalY =
+            centerY - radius * Math.cos(radian) - cardDims.height / 2;
+
+          gsap.to(card, {
+            left: finalX,
+            top: finalY,
+            width: cardDims.width,
+            height: cardDims.height,
+            rotation: angle,
+            duration: 0.3,
+            ease: 'power2.inOut',
+          });
+        }
+      });
+
+      // Actualizar posiciones de cartas seleccionadas
+      const selectedCards = document.querySelectorAll('.card.selected');
+      selectedCards.forEach((card: Element, index) => {
+        const htmlCard = card as HTMLElement;
+        const slot = document.getElementById(`slot-${index}`);
+        if (slot) {
+          const slotRect = slot.getBoundingClientRect();
+          const containerRect = document
+            .getElementById('cardContainer')
+            ?.getBoundingClientRect();
+          const cardInSlotDims = this.getCardInSlotDimensions();
+
+          if (containerRect) {
+            const targetX =
+              slotRect.left +
+              slotRect.width / 2 -
+              containerRect.left -
+              cardInSlotDims.width / 2;
+            const targetY =
+              slotRect.top +
+              slotRect.height / 2 -
+              containerRect.top -
+              cardInSlotDims.height / 2 +
+              10;
+
+            gsap.to(htmlCard, {
+              left: targetX,
+              top: targetY,
+              width: cardInSlotDims.width,
+              height: cardInSlotDims.height,
+              duration: 0.3,
+            });
+          }
+        }
+      });
+    }
+  };
+
+  private setupHoverEffects(): void {
+    this.cardElements.forEach((card) => {
+      let hoverAnimation: gsap.core.Tween | null = null;
+
+      card.addEventListener('mouseenter', () => {
+        if (!card.classList.contains('selected') && !this.isAnimating) {
+          if (hoverAnimation) {
+            hoverAnimation.kill();
+          }
+
+          const originalZ = card.style.zIndex;
+          card.dataset['originalZ'] = originalZ;
+
+          hoverAnimation = gsap.to(card, {
+            scale: 1.05,
+            y: '-=10',
+            zIndex: 500,
+            duration: 0.3,
+            ease: 'power2.out',
+          });
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (!card.classList.contains('selected') && !this.isAnimating) {
+          if (hoverAnimation) {
+            hoverAnimation.kill();
+          }
+
+          const originalZ = card.dataset['originalZ'] || '10';
+
+          hoverAnimation = gsap.to(card, {
+            scale: 1,
+            y: '+=10',
+            zIndex: parseInt(originalZ),
+            duration: 0.3,
+            ease: 'power2.out',
+          });
+        }
+      });
+    });
+  }
+
+  private setupTouchSupport(): void {
+    if ('ontouchstart' in window) {
+      this.cardElements.forEach((card) => {
+        card.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (!card.classList.contains('selected') && !this.isAnimating) {
+            gsap.to(card, {
+              scale: 1.05,
+              duration: 0.2,
+            });
+          }
+        });
+
+        card.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          if (!card.classList.contains('selected') && !this.isAnimating) {
+            gsap.to(card, {
+              scale: 1,
+              duration: 0.2,
+            });
+            this.selectCard(card);
+          }
+        });
+      });
     }
   }
-  onUserDataSubmitted(userData: any): void {
-    console.log('Datos del usuario recibidos:', userData);
-    this.showDataModal = false;
+
+  ngAfterViewInit(): void {
+    this.animateHeader();
 
     setTimeout(() => {
-      this.promptForPayment();
-    }, 300);
+      this.displayCards();
+
+      setTimeout(() => {
+        this.setupHoverEffects();
+        this.setupTouchSupport();
+      }, 800);
+    }, 400);
+
+    window.addEventListener('resize', this.handleResize);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.resetSelection();
+      }
+    });
   }
 
-  onDataModalClosed(): void {
-    this.showDataModal = false;
+  ngOnDestroy(): void {
+    if (this.timeline) {
+      this.timeline.kill();
+    }
+
+    this.cardElements.forEach((card) => {
+      gsap.killTweensOf(card);
+    });
+
+    window.removeEventListener('resize', this.handleResize);
+
+    const cardContainer = document.getElementById('cardContainer');
+    if (cardContainer) {
+      cardContainer.innerHTML = '';
+    }
   }
-  volverAlInicio() {
-    // Si usas Angular Router:
-    this.router.navigate(['/']);
+
+  public initialize(): void {
+    this.initializeCards();
+    this.setupTouchSupport();
+    document.body.classList.add('cards-page');
   }
 }

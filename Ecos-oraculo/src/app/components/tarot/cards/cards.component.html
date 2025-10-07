@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <!-- Google tag (gtag.js) -->
     <script
       async
-      src="https://www.googletagmanager.com/gtag/js?id=GT-K5QNXGSM"
+      src="https://www.googletagmanager.com/gtag/js?id=G-PJDQNK9DX4"
     ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -12,7 +13,8 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-      gtag("config", "GT-K5QNXGSM");
+
+      gtag("config", "G-PJDQNK9DX4");
     </script>
     <!-- Google Tag Manager -->
     <script>
@@ -25,10 +27,10 @@
         j.async = true;
         j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
         f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-NM5V9XQ2");
+      })(window, document, "script", "dataLayer", "GTM-59978X4K");
     </script>
-    <!-- End Google Tag Manager -->
-    <meta charset="UTF-8" />
+    <!-- End Google Tag Manager -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
@@ -36,81 +38,77 @@
     <!-- Google Tag Manager (noscript) -->
     <noscript
       ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-NM5V9XQ2"
+        src="https://www.googletagmanager.com/ns.html?id=GTM-59978X4K"
         height="0"
         width="0"
         style="display: none; visibility: hidden"
       ></iframe
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div class="background">
-      <button class="back-home-btn" (click)="volverAlInicio()">
-        <i class="fa fa-arrow-left"></i> Volver al inicio
-      </button>
-      <!-- Video de fondo -->
-      <video autoplay muted loop playsinline class="background-video">
-        <source src="/TAROT.webm" type="video/webm" />
-        Tu navegador no soporta videos HTML5.
-      </video>
 
+    <!--  <div class="background">
+     
       <h2>Selecciona 3 cartas</h2>
       <div [@fadeIn] class="content-container">
         <div class="cartas-container">
           <div id="cardContainer" class="card-container"></div>
         </div>
       </div>
-    </div>
+    </div> -->
+    <app-particles class="particles-js"></app-particles>
+    <button class="back-home-btn" (click)="volverAlInicio()">
+      <i class="fa fa-arrow-left"></i> Volver al inicio
+    </button>
+    <div class="background">
+      <!-- Efectos sutiles de partículas -->
+      <div class="floating-stars">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+      </div>
 
-    <div *ngIf="showPaymentModal" class="payment-modal-overlay">
-      <div class="payment-modal-content">
-        <p class="modal-text">
-          Para revelar las descripciones detalladas de tus cartas y lo que los
-          astros tienen para ti, por favor realiza una pequeña contribución.
-        </p>
+      <!-- Header mejorado -->
+      <div class="header-container">
+        <h2 class="main-title">
+          <span>Selecciona</span>
+          <span class="number-highlight">3</span>
+          <span>cartas</span>
+        </h2>
+        <p class="subtitle">Deja que el universo guíe tu elección</p>
+        <div class="card-counter">
+          Cartas seleccionadas:
+          <span class="counter">{{ selectedCards.length }}/3</span>
+        </div>
+      </div>
 
-        <!-- Stripe Payment Element Container -->
-        <div id="payment-element-container"></div>
-
-        <div
-          *ngIf="isProcessingPayment && !paymentError"
-          class="loading-container"
-        >
-          <p>
-            {{ clientSecret ? "Procesando pago..." : "Inicializando pago..." }}
-          </p>
-          <div class="spinner"></div>
+      <!-- Contenedor principal -->
+      <div [@fadeIn] class="content-container">
+        <!-- Mesa de cartas -->
+        <div class="cartas-container">
+          <div id="cardContainer" class="card-container"></div>
         </div>
 
-        <div *ngIf="paymentError" class="payment-error-message">
-          <p>Error: {{ paymentError }}</p>
+        <!-- Slots para cartas seleccionadas -->
+        <div class="selected-area" id="selectedArea">
+          <div class="card-slot" id="slot-0">
+            <div class="slot-label">Pasado</div>
+          </div>
+          <div class="card-slot" id="slot-1">
+            <div class="slot-label">Presente</div>
+          </div>
+          <div class="card-slot" id="slot-2">
+            <div class="slot-label">Futuro</div>
+          </div>
         </div>
+      </div>
 
-        <div
-          class="modal-actions"
-          *ngIf="clientSecret && !isProcessingPayment && !paymentError"
-        >
-          <button
-            (click)="handlePaymentSubmit()"
-            class="pay-button"
-            [disabled]="isProcessingPayment"
-          >
-            {{ isProcessingPayment ? "Procesando..." : "Pagar Ahora" }}
-          </button>
-        </div>
-        <button
-          (click)="cancelPayment()"
-          class="cancel-button"
-          [disabled]="isProcessingPayment"
-        >
-          Cancelar
-        </button>
+      <!-- Overlay de transición -->
+      <div class="transition-overlay" id="transitionOverlay">
+        <div class="loading-spinner"></div>
+        <p>Revelando tu destino...</p>
       </div>
     </div>
-    <app-recolecta-datos
-      *ngIf="showDataModal"
-      (onDataSubmitted)="onUserDataSubmitted($event)"
-      (onModalClosed)="onDataModalClosed()"
-    >
-    </app-recolecta-datos>
   </body>
 </html>

@@ -16,15 +16,108 @@ class ChatController {
         this.chatWithNumerologist = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const { numerologyData, userMessage, birthDate, fullName, conversationHistory, } = req.body;
-                // Intentar generar respuesta con fallback
-                const response = yield this.generateWithFallback(numerologyData, userMessage, birthDate, fullName, conversationHistory);
-                // Respuesta exitosa
+                // Validar entrada
+                this.validateNumerologyRequest(numerologyData, userMessage);
+                // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
+                const model = this.genAI.getGenerativeModel({
+                    model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
+                    generationConfig: {
+                        temperature: 0.85, // ✅ Reducido para mayor consistencia
+                        topK: 50, // ✅ Mayor diversidad controlada
+                        topP: 0.92, // ✅ Aumentado para mejor fluidez
+                        maxOutputTokens: 512, // ✅ Aumentado de 400 para respuestas completas
+                        candidateCount: 1, // ✅ Solo una respuesta
+                        stopSequences: [], // ✅ Sin secuencias de parada
+                    },
+                    // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA NUMEROLOGÍA
+                    safetySettings: [
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                    ],
+                });
+                const contextPrompt = this.createNumerologyContext(conversationHistory);
+                // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
+                const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 150-350 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas que vas a calcular números, DEBES completar TODO el cálculo
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono numerológico y conversacional
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta de la numeróloga (asegúrate de completar TODOS tus cálculos y análisis antes de terminar):`;
+                console.log(`Generando lectura numerológica...`);
+                // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
+                let attempts = 0;
+                const maxAttempts = 3;
+                let text = "";
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = yield model.generateContent(fullPrompt);
+                        const response = result.response;
+                        text = response.text();
+                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                        if (text && text.trim().length >= 100) {
+                            break; // Respuesta válida, salir del loop
+                        }
+                        attempts++;
+                        console.warn(`Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`);
+                        if (attempts >= maxAttempts) {
+                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        }
+                        // Esperar un poco antes de reintentar
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    catch (innerError) {
+                        attempts++;
+                        // Si es error 503 (overloaded) y no es el último intento
+                        if (innerError.status === 503 && attempts < maxAttempts) {
+                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
+                            console.warn(`Error 503 - Servicio sobrecargado. Esperando ${delay}ms...`);
+                            yield new Promise((resolve) => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        if (attempts >= maxAttempts) {
+                            throw innerError;
+                        }
+                        console.warn(`Intento ${attempts} falló:`, innerError.message);
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                }
+                if (!text || text.trim() === "") {
+                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                }
+                // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
+                text = this.ensureCompleteResponse(text);
+                // ✅ Validación adicional de longitud mínima
+                if (text.trim().length < 80) {
+                    throw new Error("Respuesta generada demasiado corta");
+                }
                 const chatResponse = {
                     success: true,
-                    response: response,
+                    response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Lectura numerológica generada exitosamente`);
+                console.log(`Lectura numerológica generada exitosamente (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -58,6 +151,33 @@ class ChatController {
             throw new Error("GEMINI_API_KEY no está configurada en las variables de entorno");
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+    // ✅ MÉTODO MEJORADO PARA ASEGURAR RESPUESTAS COMPLETAS
+    ensureCompleteResponse(text) {
+        let processedText = text.trim();
+        // Remover posibles marcadores de código o formato incompleto
+        processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+        const lastChar = processedText.slice(-1);
+        const endsIncomplete = !["!", "?", ".", "…", "✨", "🔢", "💫"].includes(lastChar);
+        if (endsIncomplete && !processedText.endsWith("...")) {
+            // Buscar la última oración completa
+            const sentences = processedText.split(/([.!?])/);
+            if (sentences.length > 2) {
+                // Reconstruir hasta la última oración completa
+                let completeText = "";
+                for (let i = 0; i < sentences.length - 1; i += 2) {
+                    if (sentences[i].trim()) {
+                        completeText += sentences[i] + (sentences[i + 1] || ".");
+                    }
+                }
+                if (completeText.trim().length > 80) {
+                    return completeText.trim();
+                }
+            }
+            // Si no se puede encontrar una oración completa, agregar cierre apropiado
+            processedText = processedText.trim() + "...";
+        }
+        return processedText;
     }
     createNumerologyContext(history) {
         const conversationContext = history && history.length > 0
@@ -108,8 +228,6 @@ ITALIANO:
 - "Guarda cosa vedo nei tuoi numeri..."
 - "La tua vibrazione numerica rivela..."
 
-
-
 CÓMO DEBES COMPORTARTE:
 
 🔢 PERSONALIDAD NUMEROLÓGICA:
@@ -153,7 +271,7 @@ CÓMO DEBES COMPORTARTE:
 - Usa expresiones variadas como: "Mira lo que veo en tus números...", "Esto es interesante...", "Los números me están diciendo algo hermoso sobre ti..."
 - Evita repetir las mismas frases - sé creativa y espontánea
 - Mantén un equilibrio entre místico y conversacional
-- Respuestas de 2-600 palabras que fluyan naturalmente y SEAN COMPLETAS
+- Respuestas de 150-350 palabras que fluyan naturalmente y SEAN COMPLETAS
 - SIEMPRE completa tus cálculos e interpretaciones
 - NO abuses del nombre de la persona - haz que la conversación fluya naturalmente sin repeticiones constantes
 - NUNCA dejes cálculos incompletos - SIEMPRE termina lo que empiezas
@@ -251,111 +369,35 @@ ITALIANO:
   - Si no entiendes algo específico, pregunta de forma amigable
   - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
   - NUNCA devuelvas respuestas vacías por errores de escritura
-  - Si el usuario escribe insultos o comentarios negativos, responde con empatía y sin confrontación, como: "Entiendo que puedas sentirte frustrado. Estoy aquí para ayudarte a encontrar respuestas en los números."
+  - Si el usuario escribe insultos o comentarios negativos, responde con empatía y sin confrontación
   - NUNCA DEJES UNA RESPUESTA INCOMPLETA - SIEMPRE completa lo que empiezas
           
 ${conversationContext}
 
-Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga curiosa y entusiasta que realmente quiere conocer a la persona para poder ayudarla mejor en su idioma nativo. Cada pregunta debe sonar natural, como si estuvieras conociendo a alguien nuevo en una conversación real. SIEMPRE enfócate en obtener nombre completo y fecha de nacimiento, pero de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona.`;
+Recuerda: Eres una guía numerológica sabia pero ACCESIBLE que muestra GENUINO INTERÉS PERSONAL por cada persona. Habla como una amiga curiosa y entusiasta que realmente quiere conocer a la persona para poder ayudarla mejor en su idioma nativo. Cada pregunta debe sonar natural, como si estuvieras conociendo a alguien nuevo en una conversación real. SIEMPRE enfócate en obtener nombre completo y fecha de nacimiento, pero de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona. SIEMPRE COMPLETA tus cálculos numerológicos - nunca los dejes a medias.`;
     }
-    ensureCompleteResponse(text) {
-        const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith("...")) {
-            const sentences = text.split(/[.!?]/);
-            if (sentences.length > 1) {
-                const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join(".") + ".";
-            }
-            else {
-                return text.trim() + "...";
-            }
+    // Validación de la solicitud numerológica
+    validateNumerologyRequest(numerologyData, userMessage) {
+        if (!numerologyData) {
+            const error = new Error("Datos de la numeróloga requeridos");
+            error.statusCode = 400;
+            error.code = "MISSING_NUMEROLOGY_DATA";
+            throw error;
         }
-        return text;
-    }
-    generateWithFallback(numerologyData, userMessage, birthDate, fullName, conversationHistory) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const maxRetries = 3;
-            let lastError = null;
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                try {
-                    console.log(`Intento ${attempt} de ${maxRetries} para generar respuesta...`);
-                    // Obtener el modelo Gemini con configuración ajustada según el intento
-                    const model = this.genAI.getGenerativeModel({
-                        model: "gemini-2.0-flash",
-                        generationConfig: {
-                            temperature: 1.2 + attempt * 0.1, // Aumentar temperatura en cada intento
-                            topK: 40,
-                            topP: 1,
-                            maxOutputTokens: 400,
-                        },
-                    });
-                    // Crear prompt con variaciones según el intento
-                    const contextPrompt = this.createNumerologyContext(conversationHistory);
-                    let fullPrompt;
-                    if (attempt === 1) {
-                        // Primer intento: prompt normal
-                        fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del numerólogo (completa tu análisis):`;
-                    }
-                    else if (attempt === 2) {
-                        // Segundo intento: prompt más directo
-                        fullPrompt = `${contextPrompt}\n\nUsuario escribió: "${userMessage}"\n\nResponde de forma conversacional y completa como numeróloga:`;
-                    }
-                    else {
-                        // Tercer intento: prompt simplificado
-                        fullPrompt = `Eres Maestra Sofia, una numeróloga amigable. El usuario dice: "${userMessage}"\n\nResponde de forma natural y útil:`;
-                    }
-                    // Generar contenido
-                    const result = yield model.generateContent(fullPrompt);
-                    const response = result.response;
-                    let text = response.text();
-                    // Verificar si la respuesta es válida
-                    if (text && text.trim() !== "") {
-                        text = this.ensureCompleteResponse(text);
-                        console.log(`✅ Respuesta generada exitosamente en el intento ${attempt}`);
-                        return text.trim();
-                    }
-                    else {
-                        throw new Error(`Respuesta vacía en el intento ${attempt}`);
-                    }
-                }
-                catch (error) {
-                    lastError = error;
-                    console.log(`❌ Error en intento ${attempt}:`, error.message);
-                    // Esperar antes del siguiente intento (excepto en el último)
-                    if (attempt < maxRetries) {
-                        yield new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-                    }
-                }
-            }
-            // Si todos los intentos fallan, devolver respuesta predeterminada
-            console.log("⚠️ Todos los intentos fallaron, usando respuesta predeterminada");
-            return this.getFallbackResponse(userMessage, birthDate, fullName);
-        });
-    }
-    getFallbackResponse(userMessage, birthDate, fullName) {
-        // Respuestas dinámicas basadas en los datos disponibles
-        if (birthDate && fullName) {
-            return `¡Hola! Me da mucho gusto conocerte. Aunque hay una pequeña interferencia en las vibraciones cósmicas, puedo decirte que tus números principales son fascinantes:
-
-Los números están tratando de decirme algo más sobre ti, pero necesito un momento para que las energías se estabilicen. ¿Te gustaría que profundicemos en algún aspecto específico de tu perfil numerológico?
-
-¿Hay algo en particular sobre los números que te gustaría explorar?`;
+        if (!userMessage ||
+            typeof userMessage !== "string" ||
+            userMessage.trim() === "") {
+            const error = new Error("Mensaje del usuario requerido");
+            error.statusCode = 400;
+            error.code = "MISSING_USER_MESSAGE";
+            throw error;
         }
-        if (birthDate) {
+        if (userMessage.length > 1500) {
+            const error = new Error("El mensaje es demasiado largo (máximo 1500 caracteres)");
+            error.statusCode = 400;
+            error.code = "MESSAGE_TOO_LONG";
+            throw error;
         }
-        if (fullName) {
-        }
-        // Respuesta general cuando no hay datos específicos
-        return `¡Hola! Me da mucho gusto que hayas venido a explorar el mundo de los números conmigo. Las energías numerológicas están un poco dispersas en este momento, pero estoy aquí para ayudarte.
-
-Para poder darte la mejor lectura posible, me encantaría conocer:
-- Tu nombre completo (para calcular tu Número del Destino)
-- Tu fecha de nacimiento (para tu Camino de Vida)
-
-Los números tienen tanto que revelarte sobre tu personalidad, tu propósito y tu futuro. ¿Qué te gustaría saber sobre la numerología? ¿Hay alguna situación en tu vida donde sientes que los números podrían guiarte?
-
-¡Estoy aquí para ayudarte a descifrar los mensajes que los números tienen para ti!`;
     }
     handleError(error, res) {
         var _a, _b, _c, _d, _e;
@@ -367,6 +409,12 @@ Los números tienen tanto que revelarte sobre tu personalidad, tu propósito y t
             statusCode = error.statusCode;
             errorMessage = error.message;
             errorCode = error.code || "VALIDATION_ERROR";
+        }
+        else if (error.status === 503) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+            errorCode = "SERVICE_OVERLOADED";
         }
         else if (((_a = error.message) === null || _a === void 0 ? void 0 : _a.includes("quota")) ||
             ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes("limit"))) {

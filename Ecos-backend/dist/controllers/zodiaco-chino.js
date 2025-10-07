@@ -18,36 +18,107 @@ class ChineseZodiacController {
                 const { zodiacData, userMessage, birthYear, birthDate, fullName, conversationHistory, } = req.body;
                 // Validar entrada
                 this.validateHoroscopeRequest(zodiacData, userMessage);
-                // Obtener el modelo Gemini
+                // ✅ CONFIGURACIÓN OPTIMIZADA - CONSISTENTE CON OTROS CONTROLADORES
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.0-flash",
+                    model: "gemini-2.0-flash-exp",
                     generationConfig: {
-                        temperature: 1.2,
-                        topK: 40,
-                        topP: 1,
-                        maxOutputTokens: 600,
+                        temperature: 0.85, // ✅ Reducido de 1.2 para mayor consistencia
+                        topK: 50, // ✅ Mayor diversidad controlada
+                        topP: 0.92, // ✅ Reducido de 1 para mejor control
+                        maxOutputTokens: 600, // ✅ Mantenido para interpretaciones completas
+                        candidateCount: 1,
+                        stopSequences: [],
                     },
+                    // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS
+                    safetySettings: [
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                    ],
                 });
-                // Crear el prompt contextualizado
                 const contextPrompt = this.createHoroscopeContext(zodiacData, birthYear, birthDate, fullName, conversationHistory);
-                const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta de la astróloga (completa tu sabiduría):`;
-                console.log(`Generando consulta de horóscopo...`);
-                // Generar contenido con Gemini
-                const result = yield model.generateContent(fullPrompt);
-                const response = result.response;
-                let text = response.text();
-                if (!text || text.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini");
+                // ✅ PROMPT MEJORADO CON INSTRUCCIONES CLARAS
+                const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 200-550 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas características del signo, DEBES completar la descripción
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono astrológico amigable y místico
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta de la astróloga (asegúrate de completar TODO tu análisis horoscópico antes de terminar):`;
+                console.log(`Generando consulta de horóscopo occidental...`);
+                // ✅ SISTEMA DE REINTENTOS ROBUSTO - ELIMINA "Respuesta vacía de Gemini"
+                let attempts = 0;
+                const maxAttempts = 3;
+                let text = "";
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = yield model.generateContent(fullPrompt);
+                        const response = result.response;
+                        text = response.text();
+                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                        if (text && text.trim().length >= 150) {
+                            break; // ✅ Respuesta válida, salir del loop
+                        }
+                        attempts++;
+                        console.warn(`⚠️ Intento ${attempts}: Respuesta vacía o muy corta (${(text === null || text === void 0 ? void 0 : text.length) || 0} caracteres), reintentando...`);
+                        if (attempts >= maxAttempts) {
+                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        }
+                        // Esperar antes de reintentar
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    catch (innerError) {
+                        attempts++;
+                        // ✅ Si es error 503 (overloaded) y no es el último intento
+                        if (innerError.status === 503 && attempts < maxAttempts) {
+                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
+                            console.warn(`⚠️ Error 503 - Servicio sobrecargado. Esperando ${delay}ms antes del intento ${attempts + 1}...`);
+                            yield new Promise((resolve) => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        if (attempts >= maxAttempts) {
+                            throw innerError;
+                        }
+                        console.warn(`⚠️ Intento ${attempts} falló:`, innerError.message);
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
                 }
-                // Verificar si la respuesta parece estar cortada
+                // ✅ VALIDACIÓN FINAL - SI DESPUÉS DE TODOS LOS INTENTOS SIGUE VACÍO
+                if (!text || text.trim() === "") {
+                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                }
+                // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
                 text = this.ensureCompleteResponse(text);
-                // Respuesta exitosa
+                // ✅ Validación adicional de longitud mínima
+                if (text.trim().length < 100) {
+                    throw new Error("Respuesta generada demasiado corta");
+                }
                 const chatResponse = {
                     success: true,
                     response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Consulta de horóscopo generada exitosamente`);
+                console.log(`✅ Consulta de horóscopo generada exitosamente (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -82,6 +153,33 @@ class ChineseZodiacController {
             throw new Error("GEMINI_API_KEY no está configurada en las variables de entorno");
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+    // ✅ MÉTODO MEJORADO PARA ASEGURAR RESPUESTAS COMPLETAS
+    ensureCompleteResponse(text) {
+        let processedText = text.trim();
+        // Remover posibles marcadores de código o formato incompleto
+        processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+        const lastChar = processedText.slice(-1);
+        const endsIncomplete = !["!", "?", ".", "…", "✨", "🌟", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"].includes(lastChar);
+        if (endsIncomplete && !processedText.endsWith("...")) {
+            // Buscar la última oración completa
+            const sentences = processedText.split(/([.!?])/);
+            if (sentences.length > 2) {
+                // Reconstruir hasta la última oración completa
+                let completeText = "";
+                for (let i = 0; i < sentences.length - 1; i += 2) {
+                    if (sentences[i].trim()) {
+                        completeText += sentences[i] + (sentences[i + 1] || ".");
+                    }
+                }
+                if (completeText.trim().length > 100) {
+                    return completeText.trim();
+                }
+            }
+            // Si no se puede encontrar una oración completa, agregar cierre apropiado
+            processedText = processedText.trim() + "...";
+        }
+        return processedText;
     }
     createHoroscopeContext(zodiacData, birthYear, birthDate, fullName, history) {
         const conversationContext = history && history.length > 0
@@ -181,6 +279,7 @@ CÓMO DEBES COMPORTARTE:
 - Respuestas de 200-550 palabras que fluyan naturalmente y SEAN COMPLETAS
 - SIEMPRE completa tus análisis e interpretaciones astrológicas
 - NO abuses del nombre de la persona - haz que la conversación fluya naturalmente
+- NUNCA dejes características del signo a medias
 
 🗣️ VARIACIONES EN SALUDOS Y EXPRESIONES CELESTIALES:
 - Saludos SOLO EN PRIMER CONTACTO: "¡Saludos estelares!", "¡Qué honor conectar contigo!", "Me da mucha alegría hablar contigo", "¡Perfecto momento cósmico para conectar!"
@@ -253,7 +352,7 @@ ITALIANO:
   
 ${conversationContext}
 
-Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por cada persona en su idioma nativo. Habla como una amiga sabia que realmente quiere conocer la fecha de nacimiento para poder compartir la sabiduría de los astros. SIEMPRE enfócate en obtener la fecha de nacimiento de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona, adaptándote perfectamente al idioma del usuario.`;
+Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por cada persona en su idioma nativo. Habla como una amiga sabia que realmente quiere conocer la fecha de nacimiento para poder compartir la sabiduría de los astros. SIEMPRE enfócate en obtener la fecha de nacimiento de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona, adaptándote perfectamente al idioma del usuario. Completa SIEMPRE tus interpretaciones horoscópicas - nunca dejes análisis de signos a medias.`;
     }
     generateHoroscopeDataSection(birthYear, birthDate, fullName) {
         let dataSection = "DATOS DISPONIBLES PARA CONSULTA HOROSCÓPICA:\n";
@@ -261,6 +360,9 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
             dataSection += `- Nombre: ${fullName}\n`;
         }
         if (birthDate) {
+            const zodiacSign = this.calculateWesternZodiacSign(birthDate);
+            dataSection += `- Fecha de nacimiento: ${birthDate}\n`;
+            dataSection += `- Signo zodiacal calculado: ${zodiacSign}\n`;
         }
         else if (birthYear) {
             dataSection += `- Año de nacimiento: ${birthYear}\n`;
@@ -273,20 +375,40 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
         }
         return dataSection;
     }
-    ensureCompleteResponse(text) {
-        const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith("...")) {
-            const sentences = text.split(/[.!?]/);
-            if (sentences.length > 1) {
-                const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join(".") + ".";
-            }
-            else {
-                return text.trim() + "...";
-            }
+    calculateWesternZodiacSign(dateStr) {
+        try {
+            const date = new Date(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
+                return "Aries ♈";
+            if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
+                return "Tauro ♉";
+            if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+                return "Géminis ♊";
+            if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
+                return "Cáncer ♋";
+            if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
+                return "Leo ♌";
+            if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
+                return "Virgo ♍";
+            if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
+                return "Libra ♎";
+            if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+                return "Escorpio ♏";
+            if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+                return "Sagitario ♐";
+            if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
+                return "Capricornio ♑";
+            if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+                return "Acuario ♒";
+            if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
+                return "Piscis ♓";
+            return "Fecha inválida";
         }
-        return text;
+        catch (_a) {
+            return "Error en cálculo";
+        }
     }
     validateHoroscopeRequest(zodiacData, userMessage) {
         if (!zodiacData) {
@@ -311,8 +433,8 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
         }
     }
     handleError(error, res) {
-        var _a, _b, _c, _d;
-        console.error("Error en HoroscopeController:", error);
+        var _a, _b, _c, _d, _e;
+        console.error("❌ Error en HoroscopeController:", error);
         let statusCode = 500;
         let errorMessage = "Error interno del servidor";
         let errorCode = "INTERNAL_ERROR";
@@ -320,6 +442,12 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
             statusCode = error.statusCode;
             errorMessage = error.message;
             errorCode = error.code || "VALIDATION_ERROR";
+        }
+        else if (error.status === 503) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+            errorCode = "SERVICE_OVERLOADED";
         }
         else if (((_a = error.message) === null || _a === void 0 ? void 0 : _a.includes("quota")) ||
             ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes("limit"))) {
@@ -337,6 +465,12 @@ Recuerda: Eres una sabia astróloga que muestra GENUINO INTERÉS PERSONAL por ca
             statusCode = 401;
             errorMessage = "Error de autenticación con el servicio de IA.";
             errorCode = "AUTH_ERROR";
+        }
+        else if ((_e = error.message) === null || _e === void 0 ? void 0 : _e.includes("Respuesta vacía")) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio no pudo generar una respuesta. Por favor, intenta de nuevo.";
+            errorCode = "EMPTY_RESPONSE";
         }
         const errorResponse = {
             success: false,

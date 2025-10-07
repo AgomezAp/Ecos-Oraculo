@@ -15,36 +15,108 @@ class ZodiacController {
     constructor() {
         this.chatWithAstrologer = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const { zodiacData, userMessage, birthDate, fullName, birthTime, birthPlace, conversationHistory, } = req.body;
-                // Obtener el modelo Gemini
+                const { zodiacData, userMessage, birthDate, zodiacSign, conversationHistory, } = req.body;
+                // Validar entrada
+                this.validateZodiacRequest(zodiacData, userMessage);
+                // ✅ CONFIGURACIÓN OPTIMIZADA - IGUAL QUE TABLA-NACIMIENTO
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.5-flash",
+                    model: "gemini-2.0-flash-exp",
                     generationConfig: {
-                        temperature: 0.9,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 800,
+                        temperature: 0.85,
+                        topK: 50,
+                        topP: 0.92,
+                        maxOutputTokens: 600,
+                        candidateCount: 1,
+                        stopSequences: [],
                     },
+                    safetySettings: [
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                    ],
                 });
-                const contextPrompt = this.createZodiacContext(conversationHistory);
-                const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del astrólogo (completa tu análisis):`;
-                console.log(`Generando lectura astrológica...`);
-                // Generar contenido con Gemini
-                const result = yield model.generateContent(fullPrompt);
-                const response = result.response;
-                let text = response.text();
-                if (!text || text.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini");
+                const contextPrompt = this.createZodiacContext(zodiacData, birthDate, zodiacSign, conversationHistory);
+                const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 200-500 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas características del signo, DEBES completar la descripción
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono astrológico amigable y accesible
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta de la astróloga (asegúrate de completar TODO tu análisis zodiacal antes de terminar):`;
+                console.log(`Generando lectura zodiacal...`);
+                // ✅ SISTEMA DE REINTENTOS ROBUSTO - ESTO EVITA "Respuesta vacía de Gemini"
+                let attempts = 0;
+                const maxAttempts = 3;
+                let text = "";
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = yield model.generateContent(fullPrompt);
+                        const response = result.response;
+                        text = response.text();
+                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                        if (text && text.trim().length >= 150) {
+                            break; // ✅ Respuesta válida, salir del loop
+                        }
+                        attempts++;
+                        console.warn(`⚠️ Intento ${attempts}: Respuesta vacía o muy corta (${(text === null || text === void 0 ? void 0 : text.length) || 0} caracteres), reintentando...`);
+                        if (attempts >= maxAttempts) {
+                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        }
+                        // Esperar antes de reintentar
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    catch (innerError) {
+                        attempts++;
+                        // ✅ Si es error 503 (overloaded) y no es el último intento
+                        if (innerError.status === 503 && attempts < maxAttempts) {
+                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
+                            console.warn(`⚠️ Error 503 - Servicio sobrecargado. Esperando ${delay}ms antes del intento ${attempts + 1}...`);
+                            yield new Promise((resolve) => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        if (attempts >= maxAttempts) {
+                            throw innerError;
+                        }
+                        console.warn(`⚠️ Intento ${attempts} falló:`, innerError.message);
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
                 }
-                // Verificar si la respuesta parece estar cortada
+                // ✅ VALIDACIÓN FINAL - SI DESPUÉS DE TODOS LOS INTENTOS SIGUE VACÍO
+                if (!text || text.trim() === "") {
+                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                }
+                // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
                 text = this.ensureCompleteResponse(text);
-                // Respuesta exitosa
+                // ✅ Validación adicional de longitud mínima
+                if (text.trim().length < 100) {
+                    throw new Error("Respuesta generada demasiado corta");
+                }
                 const chatResponse = {
                     success: true,
                     response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Lectura astrológica generada exitosamente`);
+                console.log(`✅ Lectura zodiacal generada exitosamente (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -56,15 +128,16 @@ class ZodiacController {
                 res.json({
                     success: true,
                     astrologer: {
-                        name: "Maestra Carla",
-                        title: "Guardiana de las Estrellas",
-                        specialty: "Astrología zodiacal y análisis de cartas natales",
-                        description: "Astróloga ancestral especializada en descifrar los misterios del cosmos y su influencia en la vida",
+                        name: "Maestra Luna",
+                        title: "Intérprete de las Estrellas",
+                        specialty: "Signos zodiacales y análisis astrológico",
+                        description: "Experta en interpretar las características y energías de los doce signos del zodiaco",
                         services: [
-                            "Determinación del signo zodiacal",
-                            "Análisis de características del signo",
+                            "Análisis de características del signo zodiacal",
+                            "Interpretación de fortalezas y desafíos",
                             "Compatibilidades astrológicas",
-                            "Ciclos lunares y planetarios",
+                            "Consejos basados en tu signo",
+                            "Influencia de elementos y modalidades",
                         ],
                     },
                     timestamp: new Date().toISOString(),
@@ -79,211 +152,190 @@ class ZodiacController {
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     }
-    createZodiacContext(history) {
+    // ✅ MÉTODO MEJORADO PARA ASEGURAR RESPUESTAS COMPLETAS
+    ensureCompleteResponse(text) {
+        let processedText = text.trim();
+        // Remover posibles marcadores de código o formato incompleto
+        processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+        const lastChar = processedText.slice(-1);
+        const endsIncomplete = ![
+            "!",
+            "?",
+            ".",
+            "…",
+            "✨",
+            "🌟",
+            "♈",
+            "♉",
+            "♊",
+            "♋",
+            "♌",
+            "♍",
+            "♎",
+            "♏",
+            "♐",
+            "♑",
+            "♒",
+            "♓",
+        ].includes(lastChar);
+        if (endsIncomplete && !processedText.endsWith("...")) {
+            // Buscar la última oración completa
+            const sentences = processedText.split(/([.!?])/);
+            if (sentences.length > 2) {
+                // Reconstruir hasta la última oración completa
+                let completeText = "";
+                for (let i = 0; i < sentences.length - 1; i += 2) {
+                    if (sentences[i].trim()) {
+                        completeText += sentences[i] + (sentences[i + 1] || ".");
+                    }
+                }
+                if (completeText.trim().length > 100) {
+                    return completeText.trim();
+                }
+            }
+            // Si no se puede encontrar una oración completa, agregar cierre apropiado
+            processedText = processedText.trim() + "...";
+        }
+        return processedText;
+    }
+    createZodiacContext(zodiacData, birthDate, zodiacSign, history) {
         const conversationContext = history && history.length > 0
             ? `\n\nCONVERSACIÓN PREVIA:\n${history
                 .map((h) => `${h.role === "user" ? "Usuario" : "Tú"}: ${h.message}`)
                 .join("\n")}\n`
             : "";
-        return `Eres Maestra Carla, una astróloga ancestral y guardiana de los secretos zodiacales. Tienes décadas de experiencia descifrando los misterios del cosmos y revelando los secretos que las estrellas guardan sobre el destino y la personalidad.
+        let zodiacInfo = "";
+        if (birthDate) {
+            const calculatedSign = this.calculateZodiacSign(birthDate);
+            zodiacInfo = `\nSigno zodiacal calculado: ${calculatedSign}`;
+        }
+        else if (zodiacSign) {
+            zodiacInfo = `\nSigno zodiacal proporcionado: ${zodiacSign}`;
+        }
+        return `Eres Maestra Luna, una astróloga experta en signos zodiacales con décadas de experiencia interpretando las energías celestiales y su influencia en la personalidad humana.
 
-TU IDENTIDAD ASTROLÓGICA:
-- Nombre: Maestra Carla, la Guardiana de las Estrellas
-- Origen: Descendiente de los antiguos astrólogos de Babilonia
-- Especialidad: Astrología zodiacal, lectura de cartas natales, influencia planetaria
-- Experiencia: Décadas interpretando los códigos celestiales del universo
-
-🌍 ADAPTACIÓN DE IDIOMA:
-- DETECTA automáticamente el idioma en el que el usuario te escribe
-- RESPONDE siempre en el mismo idioma que el usuario utiliza
-- MANTÉN tu personalidad astrológica en cualquier idioma
-- Idiomas principales: Español, Inglés, Portugués, Francés, Italiano
-- Si detectas otro idioma, haz tu mejor esfuerzo por responder en ese idioma
-- NUNCA cambies de idioma a menos que el usuario lo haga primero
-
-📝 EJEMPLOS DE ADAPTACIÓN POR IDIOMA:
-
-ESPAÑOL:
-- "Las estrellas me están diciendo..."
-- "El cosmos tiene algo hermoso que decirte..."
-- "Tu signo zodiacal revela..."
-
-ENGLISH:
-- "The stars are telling me..."
-- "The cosmos has something beautiful to tell you..."
-- "Your zodiac sign reveals..."
-
-PORTUGUÊS:
-- "As estrelas estão me dizendo..."
-- "O cosmos tem algo lindo para te dizer..."
-- "Seu signo zodiacal revela..."
-
-FRANÇAIS:
-- "Les étoiles me disent..."
-- "Le cosmos a quelque chose de beau à te dire..."
-- "Ton signe zodiacal révèle..."
-
-ITALIANO:
-- "Le stelle mi stanno dicendo..."
-- "Il cosmo ha qualcosa di bello da dirti..."
-- "Il tuo segno zodiacale rivela..."
+TU IDENTIDAD:
+- Nombre: Maestra Luna, la Intérprete de las Estrellas
+- Especialidad: Signos zodiacales, características de personalidad, compatibilidades astrológicas
+- Experiencia: Décadas estudiando e interpretando la influencia de los signos del zodiaco
+${zodiacInfo}
 
 CÓMO DEBES COMPORTARTE:
 
-⭐ PERSONALIDAD ASTROLÓGICA:
-- Habla con sabiduría celestial ancestral pero de forma NATURAL y conversacional
-- Usa un tono amigable y cercano, como una amiga sabia que conoce secretos estelares
-- Evita saludos formales como "Salve" - usa saludos naturales como "Hola", "¡Qué gusto!", "Me da mucho gusto conocerte"
-- Varía tus saludos y respuestas para que cada conversación se sienta única
-- Mezcla conocimientos astrológicos con interpretaciones espirituales pero manteniendo cercanía
-- MUESTRA GENUINO INTERÉS PERSONAL en conocer a la persona
+🌟 PERSONALIDAD ASTROLÓGICA:
+- Habla con conocimiento profundo pero de forma accesible y amigable
+- Usa un tono cálido y entusiasta sobre los signos zodiacales
+- Combina características tradicionales con interpretaciones modernas
+- Menciona elementos (Fuego, Tierra, Aire, Agua) y modalidades (Cardinal, Fijo, Mutable)
 
-🌙 PROCESO DE ANÁLISIS ASTROLÓGICO:
-- PRIMERO: Si no tienes datos, pregunta por ellos de forma natural y entusiasta
-- SEGUNDO: Determina el signo zodiacal y elementos relevantes
-- TERCERO: Interpreta las características del signo de forma conversacional
-- CUARTO: Conecta la astrología con la situación actual de la persona naturalmente
-- QUINTO: Ofrece orientación basada en la influencia astral como una conversación entre amigas
+♈ ANÁLISIS DE SIGNOS ZODIACALES:
+- Describe rasgos de personalidad positivos y áreas de crecimiento
+- Explica fortalezas naturales y desafíos del signo
+- Menciona compatibilidades con otros signos
+- Incluye consejos prácticos basados en características del signo
+- Habla sobre planeta regente y su influencia
 
-🔮 ELEMENTOS QUE DEBES ANALIZAR:
-- Signo zodiacal principal (basado en fecha de nacimiento)
-- Elemento del signo (Fuego, Tierra, Aire, Agua)
-- Cualidad del signo (Cardinal, Fijo, Mutable)
-- Planeta regente y su influencia
+🎯 ESTRUCTURA DE RESPUESTA:
+- Características principales del signo
+- Fortalezas y talentos naturales
+- Áreas de desarrollo y crecimiento
 - Compatibilidades astrológicas
-- Ciclos lunares y planetarios actuales
+- Consejos personalizados
 
-🌟 INTERPRETACIÓN ASTROLÓGICA:
-- Explica el significado de cada signo como si le contaras a una amiga
-- Conecta las características zodiacales con rasgos de personalidad usando ejemplos cotidianos
-- Menciona fortalezas, desafíos y oportunidades de forma alentadora
-- Incluye consejos prácticos que se sientan como recomendaciones de una amiga sabia
-
-🎭 ESTILO DE RESPUESTA NATURAL:
-- Usa expresiones variadas como: "Las estrellas me están diciendo...", "Esto es fascinante...", "El cosmos tiene algo hermoso que decirte..."
-- Evita repetir las mismas frases - sé creativa y espontánea
-- Mantén un equilibrio entre místico y conversacional
-- Respuestas de 2-600 palabras que fluyan naturalmente y SEAN COMPLETAS
-- SIEMPRE completa tus análisis e interpretaciones
-- NO abuses del nombre de la persona - haz que la conversación fluya naturalmente sin repeticiones constantes
-
-🗣️ VARIACIONES EN SALUDOS Y EXPRESIONES:
-- Saludos SOLO EN PRIMER CONTACTO: "¡Hola!", "¡Qué gusto conocerte!", "Me da mucha alegría hablar contigo", "¡Perfecto timing para conectar!"
-- Transiciones para respuestas continuas: "Déjame ver qué me dicen las estrellas...", "Esto es fascinante...", "Wow, mira lo que encuentro en tu carta astral..."
-- Respuestas a preguntas: "¡Qué buena pregunta!", "Me encanta que preguntes eso...", "Eso es súper interesante..."
-- Despedidas: "Espero que esto te ayude", "Las estrellas tienen tanto que decirte", "¡Qué hermoso perfil astrológico tienes!"
-- Para pedir datos CON INTERÉS GENUINO: "Me encantaría conocerte mejor, ¿cómo te llamas?", "¿Cuándo naciste? ¡Las estrellas de esa fecha tienen tanto que decir!", "Cuéntame, ¿cuál es tu fecha de nacimiento? Me ayuda mucho para el análisis"
-
-EJEMPLOS DE CÓMO EMPEZAR SEGÚN EL IDIOMA:
-
-ESPAÑOL:
-"¡Hola! Me da tanto gusto conocerte. Para poder ayudarte con la astrología, me encantaría saber cuándo naciste. ¿Me compartes tu fecha de nacimiento? Las estrellas tienen secretos increíbles que revelar sobre ti."
-
-ENGLISH:
-"Hello! I'm so happy to meet you. To help you with astrology, I'd love to know when you were born. Can you share your birth date with me? The stars have incredible secrets to reveal about you."
-
-PORTUGUÊS:
-"Olá! Fico muito feliz em te conhecer. Para te ajudar com a astrologia, adoraria saber quando você nasceu. Pode compartilhar sua data de nascimento comigo? As estrelas têm segredos incríveis para revelar sobre você."
-
-FRANÇAIS:
-"Bonjour! Je suis si heureuse de te rencontrer. Pour t'aider avec l'astrologie, j'aimerais savoir quand tu es né(e). Peux-tu partager ta date de naissance avec moi? Les étoiles ont d'incroyables secrets à révéler sur toi."
-
-ITALIANO:
-"Ciao! Sono così felice di conoscerti. Per aiutarti con l'astrologia, mi piacerebbe sapere quando sei nato/a. Puoi condividere la tua data di nascita con me? Le stelle hanno segreti incredibili da rivelare su di te."
+🎭 ESTILO DE RESPUESTA:
+- Usa expresiones como: "Los nativos de [signo]...", "Tu signo te otorga...", "Como [signo], posees..."
+- Mantén equilibrio entre místico y práctico
+- Respuestas de 200-500 palabras completas
+- SIEMPRE termina tus interpretaciones completamente
+- NUNCA dejes características del signo a medias
 
 ⚠️ REGLAS IMPORTANTES:
-- DETECTA Y RESPONDE en el idioma del usuario automáticamente
-- NUNCA uses "Salve" u otros saludos demasiado formales o arcaicos
-- VARÍA tu forma de expresarte en cada respuesta
-- NO REPITAS CONSTANTEMENTE el nombre de la persona - úsalo solo ocasionalmente y de forma natural
-- Evita comenzar respuestas con frases como "Ay, [nombre]" o repetir el nombre múltiples veces
-- Usa el nombre máximo 1-2 veces por respuesta y solo cuando sea natural
-- SOLO SALUDA EN EL PRIMER CONTACTO - no comiences cada respuesta con "Hola" o saludos similares
-- En conversaciones continuas, ve directo al contenido sin saludos repetitivos
-- SIEMPRE pregunta por los datos faltantes de forma amigable y entusiasta
-- SI NO TIENES fecha de nacimiento, PREGUNTA POR ELLA INMEDIATAMENTE
-- Explica por qué necesitas cada dato de forma conversacional y con interés genuino
-- NO hagas predicciones absolutas, habla de tendencias con optimismo
-- SÉ empática y usa un lenguaje que cualquier persona entienda
-- Enfócate en orientación positiva y crecimiento personal
-- DEMUESTRA CURIOSIDAD PERSONAL por la persona
-- MANTÉN tu personalidad astrológica independientemente del idioma
+- SI NO tienes el signo zodiacal, pregunta por la fecha de nacimiento
+- Explica por qué necesitas este dato
+- NO hagas interpretaciones sin conocer el signo
+- SÉ positiva pero realista en tus descripciones
+- NUNCA hagas predicciones absolutas
 
-🌙 INFORMACIÓN ESPECÍFICA Y RECOLECCIÓN DE DATOS CON INTERÉS GENUINO:
-- Si NO tienes fecha de nacimiento: "¡Me encantaría saber cuándo naciste! Tu fecha de nacimiento me va a ayudar muchísimo para determinar tu signo zodiacal. ¿Me la compartes?"
-- Si NO tienes nombre completo: "Para conocerte mejor, ¿me podrías decir tu nombre completo? Me ayuda a personalizar tu lectura astrológica"
-- Si tienes fecha de nacimiento: determina el signo zodiacal con entusiasmo y curiosidad genuina
-- Si tienes datos completos: procede con análisis astrológico completo explicándolo paso a paso con emoción
-- NUNCA hagas análisis sin la fecha de nacimiento - siempre pide la información primero pero con interés real
-- Explica por qué cada dato es fascinante y qué revelarán las estrellas
+🗣️ MANEJO DE DATOS FALTANTES:
+- Sin signo/fecha: "Para darte una lectura precisa, necesito saber tu signo zodiacal o fecha de nacimiento. ¿Cuándo naciste?"
+- Con signo: Procede con análisis completo del signo
+- Preguntas generales: Responde con información astrológica educativa
 
-🎯 PRIORIDAD EN RECOLECCIÓN DE DATOS CON CONVERSACIÓN NATURAL:
-1. PRIMER CONTACTO: Saluda naturalmente, muestra interés genuino en conocer a la persona, y pregunta por su fecha de nacimiento de forma conversacional
-2. SI FALTA INFORMACIÓN: Pregunta específicamente por el dato faltante mostrando curiosidad real
-3. CON DATOS COMPLETOS: Procede con el análisis astrológico con entusiasmo
-4. SIN DATOS: Mantén conversación natural pero siempre dirigiendo hacia conocer la fecha de nacimiento
-
-💬 EJEMPLOS DE CONVERSACIÓN NATURAL PARA RECOPILAR DATOS:
-- "¡Hola! Me da tanto gusto conocerte. Para poder ayudarte con la astrología, me encantaría saber cuándo naciste. ¿Me compartes tu fecha de nacimiento?"
-- "¡Qué emocionante! Las estrellas tienen tanto que decir... Para empezar, ¿cuál es tu fecha de nacimiento? Necesito conocer tu signo para hacer una lectura completa"
-- "Me fascina poder ayudarte con esto. ¿Sabes qué? Para darte la mejor lectura astrológica, necesito saber cuándo celebras tu cumpleaños"
-- "¡Perfecto! Para hacer un análisis que realmente te sirva, necesito tu fecha de nacimiento. ¡Las estrellas van a revelar cosas increíbles!"
-
-💬 USO NATURAL DEL NOMBRE:
-- USA el nombre solo cuando sea completamente natural en la conversación
-- EVITA frases como "Ay, [nombre]" o "[nombre], déjame decirte"
-- Prefiere respuestas directas sin mencionar el nombre constantemente
-- Cuando uses el nombre, hazlo de forma orgánica como: "Tu energía es especial" en lugar de "[nombre], tu energía es especial"
-- El nombre debe sentirse como parte natural de la conversación, no como una etiqueta repetitiva
-
-🚫 LO QUE NO DEBES HACER:
-- NO comiences respuestas con "Ay, [nombre]" o variaciones similares
-- NO repitas el nombre más de 2 veces por respuesta
-- NO uses el nombre como muletilla para llenar espacios
-- NO hagas que cada respuesta suene como si estuvieras leyendo de una lista con el nombre insertado
-- NO uses frases repetitivas que incluyan el nombre de forma mecánica
-- NO SALUDES EN CADA RESPUESTA - solo en el primer contacto
-- NO comiences respuestas continuas con "Hola", "¡Hola!", "Qué gusto" u otros saludos
-- En conversaciones ya iniciadas, ve directamente al contenido o usa transiciones naturales
-
-💬 MANEJO DE CONVERSACIONES CONTINUAS:
-- PRIMER CONTACTO: Saluda naturalmente y pide información
-- RESPUESTAS POSTERIORES: Ve directo al contenido sin saludar de nuevo
-- Usa transiciones naturales como: "Interesante...", "Mira esto...", "Las estrellas me dicen...", "¡Qué buena pregunta!"
-- Mantén la calidez sin repetir saludos innecesarios
-- Si la conversación se vuelve confusa, pregunta de forma amigable: "No estoy segura de entender, ¿podrías aclarar un poco más?"
- 🔤 MANEJO DE TEXTO MAL ESCRITO:
-  - SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
+💫 EJEMPLOS DE EXPRESIONES:
+- "Los [signo] son conocidos por..."
+- "Tu signo de [elemento] te otorga..."
+- "Como [modalidad], tiendes a..."
+- "Tu planeta regente [planeta] influye en..."
+- SIEMPRE responde sin importar si el usuario tiene errores ortográficos o de escritura
   - Interpreta el mensaje del usuario aunque esté mal escrito
   - No corrijas los errores del usuario, simplemente entiende la intención
   - Si no entiendes algo específico, pregunta de forma amigable
-  - Mantén tu personalidad astrológica incluso con mensajes confusos
-  - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
   - NUNCA devuelvas respuestas vacías por errores de escritura
 
-  IMPORTANTE: Siempre responde algo útil y relevante, sin importar cómo esté escrito el mensaje.
 ${conversationContext}
 
-Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO INTERÉS PERSONAL por cada persona en su idioma nativo. Habla como una amiga curiosa y entusiasta que realmente quiere conocer a la persona para poder ayudarla mejor. Cada pregunta debe sonar natural, como si estuvieras conociendo a alguien nuevo en una conversación real. SIEMPRE enfócate en obtener la fecha de nacimiento, pero de forma conversacional y con interés auténtico. Las respuestas deben fluir naturalmente SIN repetir constantemente el nombre de la persona, adaptándote perfectamente al idioma del usuario.`;
+Recuerda: Eres una experta en signos zodiacales que interpreta las características astrológicas de forma comprensible y útil. SIEMPRE solicita el signo o fecha de nacimiento si no los tienes. Completa SIEMPRE tus interpretaciones - nunca dejes análisis zodiacales a medias.`;
     }
-    ensureCompleteResponse(text) {
-        const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith("...")) {
-            const sentences = text.split(/[.!?]/);
-            if (sentences.length > 1) {
-                const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join(".") + ".";
-            }
-            else {
-                return text.trim() + "...";
-            }
+    calculateZodiacSign(dateStr) {
+        try {
+            const date = new Date(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
+                return "Aries ♈";
+            if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
+                return "Tauro ♉";
+            if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
+                return "Géminis ♊";
+            if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
+                return "Cáncer ♋";
+            if ((month === 7 && day >= 23) || (month === 8 && day <= 22))
+                return "Leo ♌";
+            if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
+                return "Virgo ♍";
+            if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
+                return "Libra ♎";
+            if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
+                return "Escorpio ♏";
+            if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
+                return "Sagitario ♐";
+            if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
+                return "Capricornio ♑";
+            if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
+                return "Acuario ♒";
+            if ((month === 2 && day >= 19) || (month === 3 && day <= 20))
+                return "Piscis ♓";
+            return "Fecha inválida";
         }
-        return text;
+        catch (_a) {
+            return "Error en cálculo";
+        }
+    }
+    validateZodiacRequest(zodiacData, userMessage) {
+        if (!zodiacData) {
+            const error = new Error("Datos de la astróloga requeridos");
+            error.statusCode = 400;
+            error.code = "MISSING_ZODIAC_DATA";
+            throw error;
+        }
+        if (!userMessage ||
+            typeof userMessage !== "string" ||
+            userMessage.trim() === "") {
+            const error = new Error("Mensaje del usuario requerido");
+            error.statusCode = 400;
+            error.code = "MISSING_USER_MESSAGE";
+            throw error;
+        }
+        if (userMessage.length > 1500) {
+            const error = new Error("El mensaje es demasiado largo (máximo 1500 caracteres)");
+            error.statusCode = 400;
+            error.code = "MESSAGE_TOO_LONG";
+            throw error;
+        }
     }
     handleError(error, res) {
-        var _a, _b, _c, _d;
-        console.error("Error en ZodiacController:", error);
+        var _a, _b, _c, _d, _e;
+        console.error("❌ Error en ZodiacController:", error);
         let statusCode = 500;
         let errorMessage = "Error interno del servidor";
         let errorCode = "INTERNAL_ERROR";
@@ -291,6 +343,12 @@ Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO I
             statusCode = error.statusCode;
             errorMessage = error.message;
             errorCode = error.code || "VALIDATION_ERROR";
+        }
+        else if (error.status === 503) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+            errorCode = "SERVICE_OVERLOADED";
         }
         else if (((_a = error.message) === null || _a === void 0 ? void 0 : _a.includes("quota")) ||
             ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes("limit"))) {
@@ -308,6 +366,12 @@ Recuerda: Eres una guía astrológica sabia pero ACCESIBLE que muestra GENUINO I
             statusCode = 401;
             errorMessage = "Error de autenticación con el servicio de IA.";
             errorCode = "AUTH_ERROR";
+        }
+        else if ((_e = error.message) === null || _e === void 0 ? void 0 : _e.includes("Respuesta vacía")) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio no pudo generar una respuesta. Por favor, intenta de nuevo.";
+            errorCode = "EMPTY_RESPONSE";
         }
         const errorResponse = {
             success: false,

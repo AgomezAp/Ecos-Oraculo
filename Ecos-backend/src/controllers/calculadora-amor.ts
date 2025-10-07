@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ApiError, ChatResponse } from "../interfaces/helpers";
-
+import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 interface LoveCalculatorData {
   name: string;
   specialty: string;
@@ -32,7 +32,6 @@ export class LoveCalculatorController {
     }
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   }
-
 
   private validateLoveCalculatorRequest(
     loveCalculatorData: LoveCalculatorData,
@@ -67,7 +66,6 @@ export class LoveCalculatorController {
   }
 
   private createLoveCalculatorContext(
-  
     history?: Array<{ role: string; message: string }>
   ): string {
     const conversationContext =
@@ -77,7 +75,7 @@ export class LoveCalculatorController {
             .join("\n")}\n`
         : "";
 
-return `Eres Maestra Valentina, una experta en compatibilidad amorosa y relaciones basada en numerología del amor. Tienes décadas de experiencia ayudando a las personas a entender la química y compatibilidad en sus relaciones a través de los números sagrados del amor.
+    return `Eres Maestra Valentina, una experta en compatibilidad amorosa y relaciones basada en numerología del amor. Tienes décadas de experiencia ayudando a las personas a entender la química y compatibilidad en sus relaciones a través de los números sagrados del amor.
 
 TU IDENTIDAD COMO EXPERTA EN AMOR:
 - Nombre: Maestra Valentina, la Guardiana del Amor Eterno
@@ -284,20 +282,39 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
   }
 
   private ensureCompleteResponse(text: string): string {
-    const lastChar = text.trim().slice(-1);
-    const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
+    let processedText = text.trim();
 
-    if (endsIncomplete && !text.trim().endsWith("...")) {
-      const sentences = text.split(/[.!?]/);
-      if (sentences.length > 1) {
-        const completeSentences = sentences.slice(0, -1);
-        return completeSentences.join(".") + ".";
-      } else {
-        return text.trim() + "...";
+    // Remover posibles marcadores de código o formato incompleto
+    processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+
+    const lastChar = processedText.slice(-1);
+    const endsIncomplete = !["!", "?", ".", "…", "💕", "💖", "❤️"].includes(
+      lastChar
+    );
+
+    if (endsIncomplete && !processedText.endsWith("...")) {
+      // Buscar la última oración completa
+      const sentences = processedText.split(/([.!?])/);
+
+      if (sentences.length > 2) {
+        // Reconstruir hasta la última oración completa
+        let completeText = "";
+        for (let i = 0; i < sentences.length - 1; i += 2) {
+          if (sentences[i].trim()) {
+            completeText += sentences[i] + (sentences[i + 1] || ".");
+          }
+        }
+
+        if (completeText.trim().length > 100) {
+          return completeText.trim();
+        }
       }
+
+      // Si no se puede encontrar una oración completa, agregar cierre apropiado
+      processedText = processedText.trim() + "...";
     }
 
-    return text;
+    return processedText;
   }
 
   public chatWithLoveExpert = async (
@@ -305,39 +322,117 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
     res: Response
   ): Promise<void> => {
     try {
-      const {
-        loveCalculatorData,
-        userMessage,
-      }: LoveCalculatorRequest = req.body;
+      const { loveCalculatorData, userMessage }: LoveCalculatorRequest =
+        req.body;
 
       this.validateLoveCalculatorRequest(loveCalculatorData, userMessage);
 
+      // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
         generationConfig: {
-          temperature: 0.9,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 800,
+          temperature: 0.85, // ✅ Reducido de 0.9 para mayor consistencia
+          topK: 50, // ✅ Aumentado de 40 para más diversidad controlada
+          topP: 0.92, // ✅ Reducido de 0.95 para evitar respuestas dispersas
+          maxOutputTokens: 1024, // ✅ Aumentado de 800 para respuestas completas
+          candidateCount: 1, // ✅ Solo una respuesta (evita confusión)
+          stopSequences: [], // ✅ Sin secuencias de parada que corten respuestas
         },
+        // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA TEMAS DE AMOR
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+          },
+        ],
       });
 
       const contextPrompt = this.createLoveCalculatorContext(
-         req.body.conversationHistory ,
+        req.body.conversationHistory
       );
-      const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del experto en amor (completa tu análisis):`;
+
+      // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
+      const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 250-600 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas que vas a hacer algo (calcular, analizar, explicar), DEBES completarlo
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono cálido y romántico en el idioma detectado del usuario
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta del experto en amor (asegúrate de completar TODO tu análisis antes de terminar):`;
 
       console.log(`Generando análisis de compatibilidad amorosa...`);
 
-      const result = await model.generateContent(fullPrompt);
-      const response = result.response;
-      let text = response.text();
+      // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
+      let attempts = 0;
+      const maxAttempts = 3;
+      let text = "";
 
-      if (!text || text.trim() === "") {
-        throw new Error("Respuesta vacía de Gemini");
+      while (attempts < maxAttempts) {
+        try {
+          const result = await model.generateContent(fullPrompt);
+          const response = result.response;
+          text = response.text();
+
+          // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+          if (text && text.trim().length >= 100) {
+            break; // Respuesta válida, salir del loop
+          }
+
+          attempts++;
+          console.warn(
+            `Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`
+          );
+
+          if (attempts >= maxAttempts) {
+            throw new Error(
+              "No se pudo generar una respuesta válida después de varios intentos"
+            );
+          }
+
+          // Esperar un poco antes de reintentar
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (innerError) {
+          attempts++;
+          if (attempts >= maxAttempts) {
+            throw innerError;
+          }
+          console.warn(`Intento ${attempts} falló:`, innerError);
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
       }
 
+      if (!text || text.trim() === "") {
+        throw new Error(
+          "Respuesta vacía de Gemini después de múltiples intentos"
+        );
+      }
+
+      // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
       text = this.ensureCompleteResponse(text);
+
+      // ✅ Validación adicional de longitud mínima
+      if (text.trim().length < 100) {
+        throw new Error("Respuesta generada demasiado corta");
+      }
 
       const chatResponse: ChatResponse = {
         success: true,
@@ -345,7 +440,9 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
         timestamp: new Date().toISOString(),
       };
 
-      console.log(`Análisis de compatibilidad generado exitosamente`);
+      console.log(
+        `Análisis de compatibilidad generado exitosamente (${text.length} caracteres)`
+      );
       res.json(chatResponse);
     } catch (error) {
       this.handleError(error, res);

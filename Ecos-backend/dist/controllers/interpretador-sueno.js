@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatController = void 0;
-const genai_1 = require("@google/genai");
+const generative_ai_1 = require("@google/generative-ai");
 class ChatController {
     constructor() {
         this.chatWithDreamInterpreter = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -18,24 +18,106 @@ class ChatController {
                 const { interpreterData, userMessage, conversationHistory, } = req.body;
                 // Validar entrada
                 this.validateDreamChatRequest(interpreterData, userMessage);
-                // Crear el prompt contextualizado
+                // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
+                const model = this.genAI.getGenerativeModel({
+                    model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
+                    generationConfig: {
+                        temperature: 0.85, // ✅ Reducido de 1.5 para mayor consistencia
+                        topK: 50, // ✅ Mayor diversidad controlada
+                        topP: 0.92, // ✅ Aumentado de 0.5 para mejor fluidez
+                        maxOutputTokens: 512, // ✅ Aumentado de 300 para respuestas completas
+                        candidateCount: 1, // ✅ Solo una respuesta
+                        stopSequences: [], // ✅ Sin secuencias de parada
+                    },
+                    // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA INTERPRETACIÓN DE SUEÑOS
+                    safetySettings: [
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                    ],
+                });
                 const contextPrompt = this.createDreamInterpreterContext(interpreterData, conversationHistory);
-                const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del intérprete (completa tu respuesta):`;
+                // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
+                const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 150-300 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas que vas a interpretar algo, DEBES completarlo
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono místico y cálido en el idioma detectado del usuario
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta del intérprete de sueños (asegúrate de completar TODA tu interpretación antes de terminar):`;
                 console.log(`Generando interpretación de sueños...`);
-                // Generar contenido con reintentos
-                const response = yield this.generateContentWithRetry(fullPrompt);
-                if (!response || response.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini");
+                // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
+                let attempts = 0;
+                const maxAttempts = 3;
+                let text = "";
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = yield model.generateContent(fullPrompt);
+                        const response = result.response;
+                        text = response.text();
+                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                        if (text && text.trim().length >= 100) {
+                            break; // Respuesta válida, salir del loop
+                        }
+                        attempts++;
+                        console.warn(`Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`);
+                        if (attempts >= maxAttempts) {
+                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        }
+                        // Esperar un poco antes de reintentar
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    catch (innerError) {
+                        attempts++;
+                        // Si es error 503 (overloaded) y no es el último intento
+                        if (innerError.status === 503 && attempts < maxAttempts) {
+                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
+                            console.warn(`Error 503 - Servicio sobrecargado. Esperando ${delay}ms...`);
+                            yield new Promise((resolve) => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        if (attempts >= maxAttempts) {
+                            throw innerError;
+                        }
+                        console.warn(`Intento ${attempts} falló:`, innerError.message);
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
                 }
-                // Verificar si la respuesta parece estar cortada
-                const finalResponse = this.ensureCompleteResponse(response);
-                // Respuesta exitosa
+                if (!text || text.trim() === "") {
+                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                }
+                // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
+                text = this.ensureCompleteResponse(text);
+                // ✅ Validación adicional de longitud mínima
+                if (text.trim().length < 80) {
+                    throw new Error("Respuesta generada demasiado corta");
+                }
                 const chatResponse = {
                     success: true,
-                    response: finalResponse.trim(),
+                    response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Interpretación generada exitosamente`);
+                console.log(`Interpretación generada exitosamente (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -70,81 +152,34 @@ class ChatController {
         if (!process.env.GEMINI_API_KEY) {
             throw new Error("GEMINI_API_KEY no está configurada en las variables de entorno");
         }
-        // Inicializar con la nueva biblioteca
-        this.genAI = new genai_1.GoogleGenAI({
-            apiKey: process.env.GEMINI_API_KEY,
-            // Si quieres usar Vertex AI, descomenta estas líneas:
-            // vertexai: true,
-            // project: 'tu-project-id',
-            // location: 'global'
-        });
+        this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     }
-    // Método para generar contenido con reintentos
-    generateContentWithRetry(prompt_1) {
-        return __awaiter(this, arguments, void 0, function* (prompt, maxRetries = 3) {
-            const model = "gemini-2.0-flash";
-            const generationConfig = {
-                maxOutputTokens: 300,
-                temperature: 1.5,
-                topP: 0.5,
-                safetySettings: [
-                    {
-                        category: genai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                        threshold: genai_1.HarmBlockThreshold.BLOCK_NONE,
-                    },
-                    {
-                        category: genai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                        threshold: genai_1.HarmBlockThreshold.BLOCK_NONE,
-                    },
-                    {
-                        category: genai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                        threshold: genai_1.HarmBlockThreshold.BLOCK_NONE,
-                    },
-                    {
-                        category: genai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                        threshold: genai_1.HarmBlockThreshold.BLOCK_NONE,
-                    },
-                ],
-            };
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                try {
-                    const req = {
-                        model: model,
-                        contents: [
-                            {
-                                role: "user",
-                                parts: [{ text: prompt }],
-                            },
-                        ],
-                        config: generationConfig,
-                    };
-                    const response = yield this.genAI.models.generateContent(req);
-                    // Extraer el texto de la respuesta
-                    if (response.candidates && response.candidates.length > 0) {
-                        const candidate = response.candidates[0];
-                        if (candidate.content &&
-                            candidate.content.parts &&
-                            candidate.content.parts.length > 0) {
-                            return candidate.content.parts[0].text || "";
-                        }
+    // ✅ MÉTODO MEJORADO PARA ASEGURAR RESPUESTAS COMPLETAS
+    ensureCompleteResponse(text) {
+        let processedText = text.trim();
+        // Remover posibles marcadores de código o formato incompleto
+        processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+        const lastChar = processedText.slice(-1);
+        const endsIncomplete = !["!", "?", ".", "…", "🔮", "✨", "🌙"].includes(lastChar);
+        if (endsIncomplete && !processedText.endsWith("...")) {
+            // Buscar la última oración completa
+            const sentences = processedText.split(/([.!?])/);
+            if (sentences.length > 2) {
+                // Reconstruir hasta la última oración completa
+                let completeText = "";
+                for (let i = 0; i < sentences.length - 1; i += 2) {
+                    if (sentences[i].trim()) {
+                        completeText += sentences[i] + (sentences[i + 1] || ".");
                     }
-                    throw new Error("No se pudo extraer el texto de la respuesta");
                 }
-                catch (error) {
-                    console.log(`Intento ${attempt} fallido:`, error.message);
-                    // Si es error 503 (overloaded) y no es el último intento, esperar y reintentar
-                    if (error.status === 503 && attempt < maxRetries) {
-                        const delay = Math.pow(2, attempt) * 1000; // Delay exponencial: 2s, 4s, 8s
-                        console.log(`Esperando ${delay}ms antes del siguiente intento...`);
-                        yield new Promise((resolve) => setTimeout(resolve, delay));
-                        continue;
-                    }
-                    // Si es el último intento o no es un error 503, lanzar el error
-                    throw error;
+                if (completeText.trim().length > 80) {
+                    return completeText.trim();
                 }
             }
-            throw new Error("Se agotaron todos los intentos de generación");
-        });
+            // Si no se puede encontrar una oración completa, agregar cierre apropiado
+            processedText = processedText.trim() + "...";
+        }
+        return processedText;
     }
     // Método para crear el contexto del intérprete de sueños
     createDreamInterpreterContext(interpreter, history) {
@@ -310,8 +345,8 @@ ITALIANO:
   - NUNCA devuelvas respuestas vacías por errores de escritura
 
 🎭 ESTILO DE RESPUESTA:
-- Respuestas de 100–250 palabras
-- SIEMPRE termina tus pensamientos completamente
+- Respuestas de 150-300 palabras que fluyan naturalmente y SEAN COMPLETAS
+- SIEMPRE completa interpretaciones y reflexiones
 - ADAPTA tu estilo místico al idioma detectado
 - Usa expresiones culturalmente apropiadas para cada idioma
 
@@ -332,25 +367,9 @@ FRANÇAIS:
 ITALIANO:
 "Ah, vedo che sei venuto da me cercando di svelare i misteri del tuo mondo onirico... I sogni sono finestre sull'anima e messaggi dai piani superiori. Dimmi, quali visioni ti hanno visitato nel regno di Morfeo?"
 
-\${conversationContext}
+${conversationContext}
 
 Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a entender los mensajes ocultos de sus sueños en su idioma nativo. Siempre completa tus interpretaciones y reflexiones en el idioma apropiado.`;
-    }
-    // Método para asegurar que la respuesta esté completa
-    ensureCompleteResponse(text) {
-        const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith("...")) {
-            const sentences = text.split(/[.!?]/);
-            if (sentences.length > 1) {
-                const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join(".") + ".";
-            }
-            else {
-                return text.trim() + "...";
-            }
-        }
-        return text;
     }
     // Validación de la solicitud para intérprete de sueños
     validateDreamChatRequest(interpreterData, userMessage) {

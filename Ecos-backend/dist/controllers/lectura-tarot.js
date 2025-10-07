@@ -18,35 +18,106 @@ class AnimalInteriorController {
                 const { guideData, userMessage, conversationHistory } = req.body;
                 // Validar entrada
                 this.validateAnimalChatRequest(guideData, userMessage);
-                // Obtener el modelo Gemini
+                // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
                 const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.0-flash",
+                    model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
                     generationConfig: {
-                        temperature: 1.5, // Creatividad para conexiones espirituales
-                        topP: 0.5,
-                        maxOutputTokens: 300,
+                        temperature: 0.85, // ✅ Reducido de 1.5 para mayor consistencia
+                        topK: 50, // ✅ Mayor diversidad controlada
+                        topP: 0.92, // ✅ Aumentado de 0.5 para mejor fluidez
+                        maxOutputTokens: 512, // ✅ Aumentado de 300 para respuestas completas
+                        candidateCount: 1, // ✅ Solo una respuesta
+                        stopSequences: [], // ✅ Sin secuencias de parada
                     },
+                    // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA CONEXIONES ESPIRITUALES
+                    safetySettings: [
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        },
+                        {
+                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                        },
+                    ],
                 });
-                // Crear el prompt contextualizado
                 const contextPrompt = this.createAnimalGuideContext(guideData, conversationHistory);
-                const fullPrompt = `${contextPrompt}\n\nUsuario: "${userMessage}"\n\nRespuesta del guía (completa tu respuesta):`;
+                // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
+                const fullPrompt = `${contextPrompt}
+
+⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
+1. DEBES generar una respuesta COMPLETA de entre 150-300 palabras
+2. NUNCA dejes una respuesta a medias o incompleta
+3. Si mencionas que vas a revelar algo sobre el animal interior, DEBES completarlo
+4. Toda respuesta DEBE terminar con una conclusión clara y un punto final
+5. Si detectas que tu respuesta se está cortando, finaliza la idea actual con coherencia
+6. SIEMPRE mantén el tono chamánico y espiritual en el idioma detectado del usuario
+7. Si el mensaje tiene errores ortográficos, interpreta la intención y responde normalmente
+
+Usuario: "${userMessage}"
+
+Respuesta del guía espiritual (asegúrate de completar TODA tu guía antes de terminar):`;
                 console.log(`Generando lectura de animal interior...`);
-                // Generar contenido con Gemini
-                const result = yield model.generateContent(fullPrompt);
-                const response = result.response;
-                let text = response.text();
-                if (!text || text.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini");
+                // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
+                let attempts = 0;
+                const maxAttempts = 3;
+                let text = "";
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = yield model.generateContent(fullPrompt);
+                        const response = result.response;
+                        text = response.text();
+                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                        if (text && text.trim().length >= 100) {
+                            break; // Respuesta válida, salir del loop
+                        }
+                        attempts++;
+                        console.warn(`Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`);
+                        if (attempts >= maxAttempts) {
+                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        }
+                        // Esperar un poco antes de reintentar
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
+                    catch (innerError) {
+                        attempts++;
+                        // Si es error 503 (overloaded) y no es el último intento
+                        if (innerError.status === 503 && attempts < maxAttempts) {
+                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
+                            console.warn(`Error 503 - Servicio sobrecargado. Esperando ${delay}ms...`);
+                            yield new Promise((resolve) => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        if (attempts >= maxAttempts) {
+                            throw innerError;
+                        }
+                        console.warn(`Intento ${attempts} falló:`, innerError.message);
+                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    }
                 }
-                // Verificar si la respuesta parece estar cortada
+                if (!text || text.trim() === "") {
+                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                }
+                // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
                 text = this.ensureCompleteResponse(text);
-                // Respuesta exitosa
+                // ✅ Validación adicional de longitud mínima
+                if (text.trim().length < 80) {
+                    throw new Error("Respuesta generada demasiado corta");
+                }
                 const chatResponse = {
                     success: true,
                     response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Lectura de animal interior generada exitosamente`);
+                console.log(`Lectura de animal interior generada exitosamente (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -74,6 +145,33 @@ class AnimalInteriorController {
             throw new Error("GEMINI_API_KEY no está configurada en las variables de entorno");
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+    // ✅ MÉTODO MEJORADO PARA ASEGURAR RESPUESTAS COMPLETAS
+    ensureCompleteResponse(text) {
+        let processedText = text.trim();
+        // Remover posibles marcadores de código o formato incompleto
+        processedText = processedText.replace(/```[\s\S]*?```/g, "").trim();
+        const lastChar = processedText.slice(-1);
+        const endsIncomplete = !["!", "?", ".", "…", "🦅", "🐺", "🌙"].includes(lastChar);
+        if (endsIncomplete && !processedText.endsWith("...")) {
+            // Buscar la última oración completa
+            const sentences = processedText.split(/([.!?])/);
+            if (sentences.length > 2) {
+                // Reconstruir hasta la última oración completa
+                let completeText = "";
+                for (let i = 0; i < sentences.length - 1; i += 2) {
+                    if (sentences[i].trim()) {
+                        completeText += sentences[i] + (sentences[i + 1] || ".");
+                    }
+                }
+                if (completeText.trim().length > 80) {
+                    return completeText.trim();
+                }
+            }
+            // Si no se puede encontrar una oración completa, agregar cierre apropiado
+            processedText = processedText.trim() + "...";
+        }
+        return processedText;
     }
     // Método para crear el contexto del guía de animales espirituales
     createAnimalGuideContext(guide, history) {
@@ -158,7 +256,7 @@ CÓMO DEBES COMPORTARTE:
 🌙 ESTILO DE RESPUESTA:
 - Usa expresiones como: "Los espíritus animales me susurran...", "Tu energía salvaje revela...", "El reino animal reconoce en ti..."
 - Mantén un equilibrio entre místico y práctico
-- Respuestas de 100-250 palabras
+- Respuestas de 150-300 palabras que fluyan naturalmente y SEAN COMPLETAS
 - SIEMPRE termina tus pensamientos completamente
 
 EJEMPLOS DE CÓMO EMPEZAR SEGÚN EL IDIOMA:
@@ -193,28 +291,9 @@ ITALIANO:
   - Ejemplos: "ola" = "hola", "k tal" = "qué tal", "mi signo" = "mi signo"
   - NUNCA devuelvas respuestas vacías por errores de escritura
 
-EJEMPLO DE CÓMO EMPEZAR:
-"Bienvenido/a, alma buscadora... Siento las energías salvajes que fluyen a través de ti. Cada ser humano lleva en su interior el espíritu de un animal guía, una fuerza primordial que refleja su verdadera esencia. Para descubrir cuál es el tuyo, necesito conocer tu naturaleza más profunda. Cuéntame, ¿cómo te describes cuando nadie te está observando?"
-
 ${conversationContext}
 
 Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conectar con su animal interior. Siempre completa tus lecturas y orientaciones, adaptándote perfectamente al idioma del usuario.`;
-    }
-    // Método para asegurar que la respuesta esté completa
-    ensureCompleteResponse(text) {
-        const lastChar = text.trim().slice(-1);
-        const endsIncomplete = !["!", "?", ".", "…"].includes(lastChar);
-        if (endsIncomplete && !text.trim().endsWith("...")) {
-            const sentences = text.split(/[.!?]/);
-            if (sentences.length > 1) {
-                const completeSentences = sentences.slice(0, -1);
-                return completeSentences.join(".") + ".";
-            }
-            else {
-                return text.trim() + "...";
-            }
-        }
-        return text;
     }
     // Validación de la solicitud para guía de animal interior
     validateAnimalChatRequest(guideData, userMessage) {
@@ -249,6 +328,12 @@ Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conec
             statusCode = error.statusCode;
             errorMessage = error.message;
             errorCode = error.code || "VALIDATION_ERROR";
+        }
+        else if (error.status === 503) {
+            statusCode = 503;
+            errorMessage =
+                "El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo en unos minutos.";
+            errorCode = "SERVICE_OVERLOADED";
         }
         else if (((_a = error.message) === null || _a === void 0 ? void 0 : _a.includes("quota")) ||
             ((_b = error.message) === null || _b === void 0 ? void 0 : _b.includes("limit"))) {
