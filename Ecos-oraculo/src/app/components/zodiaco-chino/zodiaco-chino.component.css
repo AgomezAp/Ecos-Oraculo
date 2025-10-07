@@ -1,5 +1,20 @@
 /* Contenedor de fondo con imagen - adaptado para background-container */
-
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden !important;
+}
+::ng-deep body,
+::ng-deep html {
+  overflow: hidden !important;
+  height: 100vh !important;
+  position: fixed !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 1;
+}
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -59,7 +74,7 @@
   width: 100%;
   height: 100%;
   z-index: -3; /* Mover atrás del video */
-  overflow-y: hidden!important;
+  overflow-y: hidden !important;
 }
 
 /* Contenedor principal con z-index actualizado */
@@ -74,7 +89,7 @@
   justify-content: flex-start;
   padding: 20px;
   overflow: hidden;
-    overflow-y: hidden!important;
+  overflow-y: hidden !important;
   z-index: 1; /* Asegurar que esté sobre el video */
 }
 
