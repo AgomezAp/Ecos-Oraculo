@@ -146,6 +146,16 @@
 
       // Método 1: Detectar por tamaño de ventana
       setInterval(function () {
+        // Calcular el factor de zoom
+        const zoomLevel = window.devicePixelRatio || 1;
+        const isZoomed = zoomLevel !== 1;
+
+        // Si hay zoom activo, no detectar como devtools
+        if (isZoomed) {
+          devtools.open = false;
+          return;
+        }
+
         if (
           window.outerHeight - window.innerHeight > threshold ||
           window.outerWidth - window.innerWidth > threshold
