@@ -1127,7 +1127,7 @@ body {
   position: absolute;
   top: 24px;
   left: 24px;
-  z-index: 100;
+  z-index: 10000;
   padding: 15px 30px;
   font-size: 12px;
   color: white;

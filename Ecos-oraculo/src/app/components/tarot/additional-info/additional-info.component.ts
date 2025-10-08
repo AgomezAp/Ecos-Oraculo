@@ -318,7 +318,7 @@ export class AdditionalInfoComponent implements OnInit, AfterViewInit {
 
     const nombreCliente = this.nombreCliente;
     const numeroCliente = `${this.countryCode}${this.phone}`;
-    const numeroMaestro = '+573113519086';
+    const numeroMaestro = '+573006821133';
 
     const datosMod = {
       sessionId: '1234',

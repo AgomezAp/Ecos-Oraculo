@@ -92,39 +92,56 @@ export class WelcomeComponent implements OnInit {
    * @param {string} theme - El tema seleccionado
    */
   startTarot(theme: string): void {
-    // Añadir efecto de selección
+    console.log('🎯 Tema seleccionado:', theme);
+
     this.selectedTheme = theme;
     this.isLoading = true;
 
-    // Efecto de vibración en móviles
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
     }
 
-    // Animación de transición
     setTimeout(() => {
+      // ✅ GUARDAR TEMA EN EL SERVICIO (además de localStorage)
+      this.cardService.setTheme(theme);
       localStorage.setItem('tema', theme);
 
       const selectedCardData = this.cardData
-        .filter((card: any) => card.descriptions[theme]?.length > 0)
+        .filter((card: any) => {
+          const hasDescriptions = card.descriptions[theme]?.length > 0;
+          if (!hasDescriptions) {
+            console.warn(
+              `⚠️ Carta sin descripciones para tema "${theme}":`,
+              card.name
+            );
+          }
+          return hasDescriptions;
+        })
         .map((card: any) => ({
           ...card,
           descriptions: card.descriptions[theme],
         }));
 
+      console.log(
+        '📦 Cartas filtradas para tema:',
+        theme,
+        selectedCardData.length
+      );
+
       if (selectedCardData.length === 0) {
-        console.error('No se encontraron cartas para el tema:', theme);
+        console.error('❌ No se encontraron cartas para el tema:', theme);
+        alert(`No hay cartas disponibles para el tema "${theme}"`);
         this.isLoading = false;
         return;
       }
 
       this.cardService.setSelectedCards(selectedCardData);
 
-      // Transición suave a la siguiente página
       setTimeout(() => {
+        console.log('🚀 Navegando a /cartas con tema:', theme);
         this.router.navigate(['/cartas', theme]);
-      });
-    });
+      }, 300);
+    }, 200);
   }
 
   /**

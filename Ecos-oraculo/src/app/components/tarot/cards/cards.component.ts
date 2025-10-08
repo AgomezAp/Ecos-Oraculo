@@ -69,6 +69,9 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   isProcessingPayment: boolean = false;
   paymentError: string | null = null;
   // Stripe configuration
+  /* pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+    pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL
+  */
   private stripePublishableKey =
     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
   private backendUrl = environment.apiUrl;
@@ -104,11 +107,83 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.userData = null;
       }
     }
+    console.log('🎬 CardsComponent iniciado');
 
+    // ✅ OBTENER TEMA DE 3 FUENTES (prioridad)
+    this.route.params.subscribe((params) => {
+      // 1. Desde la URL
+      const urlTheme = params['tema'];
+      // 2. Desde el servicio
+      const serviceTheme = this.cardService.getTheme();
+      // 3. Desde localStorage (fallback)
+      const storageTheme = localStorage.getItem('tema');
+
+      this.theme = urlTheme || serviceTheme || storageTheme || '';
+
+      console.log('📍 Tema desde URL:', urlTheme);
+      console.log('📍 Tema desde servicio:', serviceTheme);
+      console.log('📍 Tema desde localStorage:', storageTheme);
+      console.log('✅ Tema final usado:', this.theme);
+
+      if (!this.theme) {
+        console.error('❌ No se encontró tema. Redirigiendo...');
+        alert('Por favor selecciona un tema primero');
+        this.router.navigate(['/welcome']);
+        return;
+      }
+
+      this.loadCards();
+    });
     // Inicializar cartas
     this.initializeCards();
   }
+  private loadCards(): void {
+    console.log('🃏 Cargando cartas para tema:', this.theme);
 
+    // ✅ OBTENER CARTAS DEL SERVICIO CON EL TEMA
+    let cardsFromService = this.cardService.getSelectedCards();
+
+    console.log('📦 Cartas desde servicio:', cardsFromService.length);
+
+    // ✅ SI NO HAY CARTAS, OBTENERLAS POR TEMA
+    if (!cardsFromService || cardsFromService.length === 0) {
+      console.warn(
+        '⚠️ No hay cartas en servicio, obteniendo por tema:',
+        this.theme
+      );
+      cardsFromService = this.cardService.getCardsByTheme(this.theme);
+      console.log('📦 Cartas obtenidas por tema:', cardsFromService.length);
+    }
+
+    // ✅ VALIDAR QUE LAS CARTAS TENGAN DESCRIPCIONES
+    this.cards = cardsFromService
+      .filter((card: any) => {
+        const hasDescriptions =
+          card.descriptions && card.descriptions.length > 0;
+        if (!hasDescriptions) {
+          console.error('❌ Carta sin descripciones:', card);
+        }
+        return hasDescriptions;
+      })
+      .map((card: any, index: number) => ({
+        id: index,
+        src: card.src,
+        name: card.name,
+        descriptions: Array.isArray(card.descriptions)
+          ? card.descriptions
+          : [card.descriptions],
+        revealed: false,
+        selected: false,
+      }));
+
+    console.log('✅ Cartas finales cargadas:', this.cards.length);
+
+    if (this.cards.length === 0) {
+      console.error('❌ No hay cartas disponibles');
+      alert('No se pudieron cargar las cartas. Intenta de nuevo.');
+      this.router.navigate(['/welcome']);
+    }
+  }
   ngOnDestroy(): void {
     if (this.paymentElement) {
       try {

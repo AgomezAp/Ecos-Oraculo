@@ -45,11 +45,10 @@
       ></iframe
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->
+    <button class="back-home-btn" (click)="volverAlInicio()">
+      <i class="fa fa-arrow-left"></i> Volver al inicio
+    </button>
     <div class="background">
-      <button class="back-home-btn" (click)="volverAlInicio()">
-        <i class="fa fa-arrow-left"></i> Volver al inicio
-      </button>
-
       <div class="cosmic-dust"></div>
       <div class="mystical-orbs">
         <div class="orb orb-1"></div>
@@ -140,13 +139,7 @@
                       required
                     >
                       <option value="">Seleccionar...</option>
-                      <option value="+57">🇨🇴 Colombia (+57)</option>
-                      <option value="+52">🇲🇽 México (+52)</option>
                       <option value="+34">🇪🇸 España (+34)</option>
-                      <option value="+1">🇺🇸 USA (+1)</option>
-                      <option value="+54">🇦🇷 Argentina (+54)</option>
-                      <option value="+51">🇵🇪 Perú (+51)</option>
-                      <option value="+56">🇨🇱 Chile (+56)</option>
                     </select>
                     <div class="select-arrow">▼</div>
                   </div>
