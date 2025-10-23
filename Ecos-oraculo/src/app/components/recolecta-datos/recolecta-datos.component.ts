@@ -18,19 +18,19 @@ export class RecolectaDatosComponent {
   // ✅ Propiedades de datos
   userData: any = {
     NIF: '',
-    numero_pasapote: '',
-    pais: '',
-    nombre: '',
-    apellido: '',
+    // numero_pasapote: '', // ❌ ELIMINADO
+    // pais: '', // ❌ ELIMINADO
+    nombre: '', // ✅ AHORA INCLUYE NOMBRE Y APELLIDO
+    // apellido: '', // ❌ ELIMINADO - unificado con nombre
     direccion: '',
-    calle: '',
+    // calle: '', // ❌ ELIMINADO
     codigo_postal: '',
-    ciudad: '',
-    provincia: '',
-    comunidad_autonoma: '',
+    // ciudad: '', // ❌ ELIMINADO
+    // provincia: '', // ❌ ELIMINADO
+    // comunidad_autonoma: '', // ❌ ELIMINADO
     importe: 4.0,
     email: '',
-    telefono: '',
+    telefono: '', // ✅ RESTAURADO
   };
   aceptaTerminos = false;
   showTerminosError = false;
@@ -112,31 +112,19 @@ export class RecolectaDatosComponent {
       isValid = false;
     }
 
-    // Validar nombre
+    // Validar nombre (ahora incluye nombre y apellido)
     if (!this.userData.nombre || !this.userData.nombre.toString().trim()) {
-      this.dataFormErrors['nombre'] = 'El nombre es obligatorio';
+      this.dataFormErrors['nombre'] = 'El nombre completo es obligatorio';
       isValid = false;
-    } else if (this.userData.nombre.toString().trim().length < 2) {
+    } else if (this.userData.nombre.toString().trim().length < 3) {
       this.dataFormErrors['nombre'] =
-        'El nombre debe tener al menos 2 caracteres';
+        'El nombre completo debe tener al menos 3 caracteres';
       isValid = false;
     }
 
-    // Validar apellido
-    if (!this.userData.apellido || !this.userData.apellido.toString().trim()) {
-      this.dataFormErrors['apellido'] = 'El apellido es obligatorio';
-      isValid = false;
-    } else if (this.userData.apellido.toString().trim().length < 2) {
-      this.dataFormErrors['apellido'] =
-        'El apellido debe tener al menos 2 caracteres';
-      isValid = false;
-    }
+    // ❌ ELIMINADO - Validar apellido (unificado con nombre)
 
-    // ❌ COMENTADO - Validar país
-    // if (!this.userData.pais || !this.userData.pais.toString().trim()) {
-    //   this.dataFormErrors['pais'] = 'Selecciona tu país';
-    //   isValid = false;
-    // }
+    // ❌ ELIMINADO - Validar país
 
     // ✅ Validar teléfono
     if (!this.userData.telefono || !this.userData.telefono.toString().trim()) {
@@ -158,7 +146,7 @@ export class RecolectaDatosComponent {
       );
     }
 
-    // ❌ COMENTADO - Validar dirección
+    // Validar dirección
     if (
       !this.userData.direccion ||
       !this.userData.direccion.toString().trim()
@@ -167,7 +155,7 @@ export class RecolectaDatosComponent {
       isValid = false;
     }
 
-    // ❌ COMENTADO - Validar código postal
+    // Validar código postal
     if (
       !this.userData.codigo_postal ||
       !this.userData.codigo_postal.toString().trim()
@@ -176,23 +164,13 @@ export class RecolectaDatosComponent {
       isValid = false;
     }
 
-    // ❌ COMENTADO - Validar ciudad
-    if (!this.userData.ciudad || !this.userData.ciudad.toString().trim()) {
-      this.dataFormErrors['ciudad'] = 'La ciudad es obligatoria';
-      isValid = false;
-    }
+    // ❌ ELIMINADO - Validar ciudad
 
-    // ❌ COMENTADO - Validar NIF o Pasaporte
+    // Validar NIF
     const nif = this.userData.NIF ? this.userData.NIF.toString().trim() : '';
-    const pasaporte = this.userData.numero_pasapote
-      ? this.userData.numero_pasapote.toString().trim()
-      : '';
 
-    if (!nif && !pasaporte) {
-      this.dataFormErrors['NIF'] =
-        'Debes proporcionar NIF o número de pasaporte';
-      this.dataFormErrors['numero_pasapote'] =
-        'Debes proporcionar NIF o número de pasaporte';
+    if (!nif) {
+      this.dataFormErrors['NIF'] = 'Debes proporcionar tu NIF/NIE/DNI';
       isValid = false;
     }
 
@@ -242,41 +220,21 @@ export class RecolectaDatosComponent {
 
     try {
       // ✅ LIMPIAR Y NORMALIZAR DATOS ANTES DE ENVIAR
-      /*    const datosToSend: Datos = {
-        NIF: '', // ❌ Campo comentado - enviar vacío
-        numero_pasapote: '', // ❌ Campo comentado - enviar vacío
-        pais: '', // ❌ Campo comentado - enviar vacío
-        nombre: (this.userData.nombre || '').toString().trim(),
-        apellido: (this.userData.apellido || '').toString().trim(),
-        direccion: '', // ❌ Campo comentado - enviar vacío
-        calle: '', // ❌ Campo comentado - enviar vacío
-        codigo_postal: '', // ❌ Campo comentado - enviar vacío
-        ciudad: '', // ❌ Campo comentado - enviar vacío
-        provincia: '', // ❌ Campo comentado - enviar vacío
-        comunidad_autonoma: '', // ❌ Campo comentado - enviar vacío
-        importe: this.userData.importe || 5.0,
-        email: (this.userData.email || '').toString().trim(),
-        telefono: (this.userData.telefono || '').toString().trim(),
-      }; */
       const datosToSend: Datos = {
         NIF: (this.userData.NIF || '').toString().trim(),
-        numero_pasapote: (this.userData.numero_pasapote || '')
-          .toString()
-          .trim(),
-        pais: (this.userData.pais || '').toString().trim(),
-        nombre: (this.userData.nombre || '').toString().trim(),
-        apellido: (this.userData.apellido || '').toString().trim(),
+        numero_pasapote: '', // ❌ ELIMINADO - enviar vacío
+        pais: '', // ❌ ELIMINADO - enviar vacío
+        nombre: (this.userData.nombre || '').toString().trim(), // ✅ AHORA INCLUYE NOMBRE Y APELLIDO
+        apellido: '', // ❌ ELIMINADO - enviar vacío
         direccion: (this.userData.direccion || '').toString().trim(),
-        calle: (this.userData.calle || '').toString().trim(),
+        calle: '', // ❌ ELIMINADO - enviar vacío
         codigo_postal: (this.userData.codigo_postal || '').toString().trim(),
-        ciudad: (this.userData.ciudad || '').toString().trim(),
-        provincia: (this.userData.provincia || '').toString().trim(),
-        comunidad_autonoma: (this.userData.comunidad_autonoma || '')
-          .toString()
-          .trim(),
-        importe: this.userData.importe || 5.0,
+        ciudad: '', // ❌ ELIMINADO - enviar vacío
+        provincia: '', // ❌ ELIMINADO - enviar vacío
+        comunidad_autonoma: '', // ❌ ELIMINADO - enviar vacío
+        importe: this.userData.importe || 4.0,
         email: (this.userData.email || '').toString().trim(),
-        telefono: (this.userData.telefono || '').toString().trim(), // ✅ ASEGURAR que telefono sea string
+        telefono: (this.userData.telefono || '').toString().trim(), // ✅ RESTAURADO
       };
 
       console.log('📤 Datos a enviar (limpios):', datosToSend); // DEBUG
@@ -287,7 +245,7 @@ export class RecolectaDatosComponent {
       }); // DEBUG TELÉFONO
 
       // ✅ VALIDAR UNA VEZ MÁS LOS CAMPOS CRÍTICOS
-      const camposCriticos = ['nombre', 'apellido', 'email', 'telefono'];
+      const camposCriticos = ['nombre', 'email', 'telefono', 'NIF', 'direccion', 'codigo_postal'];
       const faltantes = camposCriticos.filter(
         (campo) => !datosToSend[campo as keyof Datos]
       );

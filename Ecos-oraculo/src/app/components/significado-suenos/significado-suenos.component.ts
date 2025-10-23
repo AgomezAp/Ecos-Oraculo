@@ -797,20 +797,20 @@ export class SignificadoSuenosComponent
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES
       const nombre = this.userData.nombre?.trim();
-      const apellido = this.userData.apellido?.trim();
+      // const apellido = this.userData.apellido?.trim(); // ❌ ELIMINADO
       const email = this.userData.email?.trim();
       const telefono = this.userData.telefono?.trim();
 
       console.log('🔍 Validando campos individuales:');
       console.log('  - nombre:', nombre, nombre ? '✅' : '❌');
-      console.log('  - apellido:', apellido, apellido ? '✅' : '❌');
+      // console.log('  - apellido:', apellido, apellido ? '✅' : '❌'); // ❌ ELIMINADO
       console.log('  - email:', email, email ? '✅' : '❌');
       console.log('  - telefono:', telefono, telefono ? '✅' : '❌');
 
-      if (!nombre || !apellido || !email || !telefono) {
+      if (!nombre || !email || !telefono) { // ❌ QUITADO !apellido
         console.error('❌ Faltan campos requeridos para el pago');
         this.paymentError =
-          'Faltan datos del cliente. Por favor, verifica que hayas completado todos los campos (nombre, apellido, email y teléfono).';
+          'Faltan datos del cliente. Por favor, verifica que hayas completado todos los campos (nombre, email y teléfono).';
         this.isProcessingPayment = false;
         this.showDataModal = true;
         return;
@@ -818,7 +818,7 @@ export class SignificadoSuenosComponent
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: `${nombre} ${apellido}`,
+        name: nombre, // ❌ Ya no concatenamos con apellido
         email: email,
         phone: telefono,
       };
@@ -1121,7 +1121,7 @@ export class SignificadoSuenosComponent
     console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -1141,7 +1141,7 @@ export class SignificadoSuenosComponent
     this.userData = {
       ...userData,
       nombre: userData.nombre?.toString().trim(),
-      apellido: userData.apellido?.toString().trim(),
+      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
       telefono: userData.telefono?.toString().trim(),
     };

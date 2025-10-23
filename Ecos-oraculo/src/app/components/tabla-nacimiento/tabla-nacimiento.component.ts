@@ -627,23 +627,21 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
       const nombre = this.userData.nombre?.toString().trim();
-      const apellido = this.userData.apellido?.toString().trim();
+      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
 
       console.log('🔍 Validando campos individuales para tabla de nacimiento:');
       console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌');
       console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
       console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
 
-      if (!nombre || !apellido || !email || !telefono) {
+      if (!nombre || !email || !telefono) {
         console.error(
           '❌ Faltan campos requeridos para el pago de tabla de nacimiento'
         );
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
-        if (!apellido) faltantes.push('apellido');
         if (!email) faltantes.push('email');
         if (!telefono) faltantes.push('teléfono');
 
@@ -657,7 +655,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: `${nombre} ${apellido}`,
+        name: nombre,
         email: email,
         phone: telefono,
       };
@@ -1007,7 +1005,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -1030,7 +1028,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     this.userData = {
       ...userData,
       nombre: userData.nombre?.toString().trim(),
-      apellido: userData.apellido?.toString().trim(),
+      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
       telefono: userData.telefono?.toString().trim(),
     };

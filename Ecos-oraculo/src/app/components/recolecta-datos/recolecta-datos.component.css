@@ -14,12 +14,12 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Modal Container */
+/* Modal Container - MÁS ANCHO Y COMPACTO */
 .data-modal {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  max-width: 600px;
+  max-width: 900px; /* ✅ Aumentado de 600px a 900px */
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -72,27 +72,27 @@
   transform: scale(1.05);
 }
 
-/* Content */
+/* Content - MÁS COMPACTO */
 .data-content {
-  padding: 25px;
+  padding: 20px 30px; /* ✅ Reducido verticalmente, aumentado horizontalmente */
   color: #495057;
 }
 
 .data-info {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 15px; /* ✅ Reducido de 25px a 15px */
 }
 
 .data-info p {
-  font-size: 1.1rem;
+  font-size: 1rem; /* ✅ Reducido de 1.1rem a 1rem */
   color: #6c757d;
   margin: 0;
 }
 
-/* Form Sections */
+/* Form Sections - MÁS COMPACTAS */
 .form-section {
-  margin-bottom: 30px;
-  padding: 20px;
+  margin-bottom: 18px; /* ✅ Reducido de 30px a 18px */
+  padding: 15px 20px; /* ✅ Reducido padding vertical */
   background: #f8f9fa;
   border-radius: 12px;
   border: 1px solid #e9ecef;
@@ -100,42 +100,54 @@
 
 .form-section h4 {
   color: #495057;
-  font-size: 1.2rem;
-  margin: 0 0 15px 0;
-  padding-bottom: 8px;
+  font-size: 1.1rem; /* ✅ Reducido de 1.2rem */
+  margin: 0 0 12px 0; /* ✅ Reducido margen inferior */
+  padding-bottom: 6px; /* ✅ Reducido padding */
   border-bottom: 2px solid #e9ecef;
   font-weight: 600;
 }
 
-/* Form Layout */
+/* Form Layout - OPTIMIZADO PARA 2 COLUMNAS */
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+  grid-template-columns: 1fr 1fr; /* ✅ 2 columnas iguales */
+  gap: 15px 20px; /* ✅ gap vertical y horizontal */
+  margin-bottom: 0; /* ✅ Sin margen inferior extra */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px; /* ✅ Reducido de 8px a 6px */
 }
 
 .form-group label {
   color: #495057;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem; /* ✅ Ligeramente reducido */
 }
 
-/* Form Inputs */
+/* ✅ Checkbox group sin gap vertical excesivo */
+.form-group.checkbox-group {
+  margin-top: 8px;
+  gap: 0;
+}
+
+.checkbox-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Form Inputs - MÁS COMPACTOS */
 .form-group input,
 .form-group select {
-  padding: 12px 15px;
+  padding: 10px 12px; /* ✅ Reducido de 12px 15px */
   border: 1px solid #ced4da;
   border-radius: 8px;
   background: #ffffff;
   color: #495057;
-  font-size: 1rem;
+  font-size: 0.95rem; /* ✅ Ligeramente reducido */
   transition: all 0.3s ease;
 }
 
@@ -216,26 +228,26 @@
   margin: 0 auto 10px;
 }
 
-/* Action Buttons */
+/* Action Buttons - MÁS COMPACTOS */
 .data-actions {
   display: flex;
   gap: 15px;
   justify-content: flex-end;
-  margin-top: 30px;
-  padding-top: 20px;
+  margin-top: 20px; /* ✅ Reducido de 30px */
+  padding-top: 15px; /* ✅ Reducido de 20px */
   border-top: 1px solid #e9ecef;
 }
 
 .cancel-button,
 .continue-button {
-  padding: 12px 25px;
+  padding: 10px 20px; /* ✅ Reducido de 12px 25px */
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem; /* ✅ Ligeramente reducido */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 1px solid;
-  min-width: 120px;
+  min-width: 110px; /* ✅ Reducido de 120px */
 }
 
 .cancel-button {
@@ -300,7 +312,7 @@
   }
 }
 
-/* Responsive Design */
+/* Responsive Design - MEJORADO */
 @media (max-width: 768px) {
   .data-modal {
     max-width: 95%;
@@ -312,15 +324,16 @@
   }
 
   .data-header h3 {
-    font-size: 1.2rem;
+    font-size: 1.1rem; /* ✅ Reducido */
   }
 
   .data-content {
-    padding: 20px;
+    padding: 15px 20px; /* ✅ Más compacto en móvil */
   }
 
   .form-section {
-    padding: 15px;
+    padding: 12px 15px; /* ✅ Reducido */
+    margin-bottom: 15px; /* ✅ Reducido */
   }
 
   .form-row {
@@ -331,11 +344,19 @@
   .data-actions {
     flex-direction: column;
     gap: 10px;
+    margin-top: 15px; /* ✅ Reducido */
   }
 
   .cancel-button,
   .continue-button {
     width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* ✅ Tablet: mantener 2 columnas pero reducir ancho del modal */
+  .data-modal {
+    max-width: 750px;
   }
 }
 

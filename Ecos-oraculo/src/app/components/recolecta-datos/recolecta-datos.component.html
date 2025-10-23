@@ -58,54 +58,34 @@
           </div>
 
           <form class="data-form" (ngSubmit)="submitUserData()">
-             Datos de identificación 
-        <div class="form-section">
-          <h4>Datos de Identificación</h4>
-          <div class="form-row">
-           <div class="form-group">
-              <label for="nif">NIE/DNI:</label>
-              <input
-                type="text"
-                id="nif"
-                [(ngModel)]="userData.NIF"
-                name="nif"
-                placeholder="12345678X"
-                [class.error]="hasError('NIF')"
-              />
-              <span *ngIf="hasError('NIF')" class="error-message">{{
-                dataFormErrors["NIF"]
-              }}</span>
-            </div> 
-
-          <div class="form-group">
-              <label for="pasaporte">Número de Pasaporte:</label>
-              <input
-                type="text"
-                id="pasaporte"
-                [(ngModel)]="userData.numero_pasapote"
-                name="pasaporte"
-                placeholder="Opcional si tienes NIE"
-                [class.error]="hasError('numero_pasapote')"
-              />
-              <span *ngIf="hasError('numero_pasapote')" class="error-message">{{
-                dataFormErrors["numero_pasapote"]
-              }}</span>
-            </div> 
-          </div>
-        </div>
-
-            <!-- Datos personales -->
+            <!-- Datos de identificación -->
             <div class="form-section">
-              <h4>Datos Personales</h4>
+              <h4>Datos de Identificación</h4>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="nombre">Nombre *:</label>
+                  <label for="nif">NIE/DNI *:</label>
+                  <input
+                    type="text"
+                    id="nif"
+                    [(ngModel)]="userData.NIF"
+                    name="nif"
+                    placeholder="12345678X"
+                    required
+                    [class.error]="hasError('NIF')"
+                  />
+                  <span *ngIf="hasError('NIF')" class="error-message">{{
+                    dataFormErrors["NIF"]
+                  }}</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="nombre">Nombre completo *:</label>
                   <input
                     type="text"
                     id="nombre"
                     [(ngModel)]="userData.nombre"
                     name="nombre"
-                    placeholder="Tu nombre"
+                    placeholder="Nombre y apellidos"
                     required
                     [class.error]="hasError('nombre')"
                   />
@@ -113,188 +93,91 @@
                     dataFormErrors["nombre"]
                   }}</span>
                 </div>
+              </div>
+            </div>
+
+            <!-- Datos de contacto -->
+            <div class="form-section">
+              <h4>Datos de Contacto</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">Email *:</label>
+                  <input
+                    type="email"
+                    id="email"
+                    [(ngModel)]="userData.email"
+                    name="email"
+                    placeholder="tu@email.com"
+                    required
+                    [class.error]="hasError('email')"
+                  />
+                  <span *ngIf="hasError('email')" class="error-message">{{
+                    dataFormErrors["email"]
+                  }}</span>
+                </div>
 
                 <div class="form-group">
-                  <label for="apellido">Apellido *:</label>
+                  <label for="telefono">Teléfono *:</label>
                   <input
-                    type="text"
-                    id="apellido"
-                    [(ngModel)]="userData.apellido"
-                    name="apellido"
-                    placeholder="Tu apellido"
+                    type="tel"
+                    id="telefono"
+                    [(ngModel)]="userData.telefono"
+                    name="telefono"
+                    placeholder="+34 123 456 789"
                     required
-                    [class.error]="hasError('apellido')"
+                    [class.error]="hasError('telefono')"
                   />
-                  <span *ngIf="hasError('apellido')" class="error-message">{{
-                    dataFormErrors["apellido"]
+                  <span *ngIf="hasError('telefono')" class="error-message">{{
+                    dataFormErrors["telefono"]
                   }}</span>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="email">Email *:</label>
-                <input
-                  type="email"
-                  id="email"
-                  [(ngModel)]="userData.email"
-                  name="email"
-                  placeholder="tu@email.com"
-                  required
-                  [class.error]="hasError('email')"
-                />
-                <span *ngIf="hasError('email')" class="error-message">{{
-                  dataFormErrors["email"]
-                }}</span>
-              </div>
-
-              <!-- ✅ Nuevo checkbox para factura y noticias -->
+              <!-- ✅ Checkbox para factura -->
               <div class="form-group checkbox-group">
                 <span class="checkbox-text">
-                  Te llegará una factura al correo electronico
+                  📧 Te llegará una factura al correo electrónico
                 </span>
               </div>
-              <div class="form-group">
-                <label for="telefono">Teléfono *</label>
-                <input
-                  type="tel"
-                  id="telefono"
-                  [(ngModel)]="userData.telefono"
-                  [class.error]="hasError('telefono')"
-                  placeholder="+34 123 456 789"
-                />
-                <span *ngIf="hasError('telefono')" class="error-message">
-                  {{ dataFormErrors["telefono"] }}
-                </span>
-              </div>
-              <div></div>
-              <div class="form-group">
-            <label for="pais">País *:</label>
-            <select
-              id="pais"
-              [(ngModel)]="userData.pais"
-              name="pais"
-              required
-              [class.error]="hasError('pais')"
-            >
-              <option value="">Selecciona tu país</option>
-              <option *ngFor="let country of countries" [value]="country">
-                {{ country }}
-              </option>
-            </select>
-            <span *ngIf="hasError('pais')" class="error-message">{{
-              dataFormErrors["pais"]
-            }}</span>
-          </div>
-            </div>
-           
-         Datos de dirección
-        <div class="form-section">
-        <h4>Dirección</h4>
-          <div class="form-group">
-            <label for="direccion">Dirección completa *:</label>
-            <input
-              type="text"
-              id="direccion"
-              [(ngModel)]="userData.direccion"
-              name="direccion"
-              placeholder="Calle, número, piso..."
-              required
-              [class.error]="hasError('direccion')"
-            />
-            <span *ngIf="hasError('direccion')" class="error-message">{{
-              dataFormErrors["direccion"]
-            }}</span>
-          </div>
-
-          <div class="form-row">
-             <div class="form-group">
-              <label for="calle">Calle:</label>
-              <input
-                type="text"
-                id="calle"
-                [(ngModel)]="userData.calle"
-                name="calle"
-                placeholder="Nombre de la calle"
-                [class.error]="hasError('calle')"
-              />
-              <span *ngIf="hasError('calle')" class="error-message">{{
-                dataFormErrors["calle"]
-              }}</span>
-            </div> 
-
-            <div class="form-group">
-              <label for="codigo_postal">Código Postal *:</label>
-              <input
-                type="text"
-                id="codigo_postal"
-                [(ngModel)]="userData.codigo_postal"
-                name="codigo_postal"
-                placeholder="28001"
-                required
-                [class.error]="hasError('codigo_postal')"
-              />
-              <span *ngIf="hasError('codigo_postal')" class="error-message">{{
-                dataFormErrors["codigo_postal"]
-              }}</span>
-            </div>
-          </div>
-
-           <div class="form-row">
-            <div class="form-group">
-              <label for="ciudad">Ciudad *:</label>
-              <input
-                type="text"
-                id="ciudad"
-                [(ngModel)]="userData.ciudad"
-                name="ciudad"
-                placeholder="Tu ciudad"
-                required
-                [class.error]="hasError('ciudad')"
-              />
-              <span *ngIf="hasError('ciudad')" class="error-message">{{
-                dataFormErrors["ciudad"]
-              }}</span>
             </div>
 
-            <div class="form-group">
-              <label for="provincia">Provincia:</label>
-              <input
-                type="text"
-                id="provincia"
-                [(ngModel)]="userData.provincia"
-                name="provincia"
-                placeholder="Tu provincia"
-                [class.error]="hasError('provincia')"
-              />
-              <span *ngIf="hasError('provincia')" class="error-message">{{
-                dataFormErrors["provincia"]
-              }}</span>
-            </div>
-          </div> 
+            <!-- Datos de dirección -->
+            <div class="form-section">
+              <h4>Dirección</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="direccion">Dirección completa *:</label>
+                  <input
+                    type="text"
+                    id="direccion"
+                    [(ngModel)]="userData.direccion"
+                    name="direccion"
+                    placeholder="Calle, número, piso..."
+                    required
+                    [class.error]="hasError('direccion')"
+                  />
+                  <span *ngIf="hasError('direccion')" class="error-message">{{
+                    dataFormErrors["direccion"]
+                  }}</span>
+                </div>
 
                 <div class="form-group">
-            <label for="comunidad_autonoma">Comunidad Autónoma:</label>
-            <select
-              id="comunidad_autonoma"
-              [(ngModel)]="userData.comunidad_autonoma"
-              name="comunidad_autonoma"
-              [class.error]="hasError('comunidad_autonoma')"
-            >
-              <option value="">Selecciona tu comunidad</option>
-              <option
-                *ngFor="let comunidad of comunidadesAutonomas"
-                [value]="comunidad"
-              >
-                {{ comunidad }}
-              </option>
-            </select>
-            <span
-              *ngIf="hasError('comunidad_autonoma')"
-              class="error-message"
-              >{{ dataFormErrors["comunidad_autonoma"] }}</span
-            >
-          </div> 
-        </div>
+                  <label for="codigo_postal">Código Postal *:</label>
+                  <input
+                    type="text"
+                    id="codigo_postal"
+                    [(ngModel)]="userData.codigo_postal"
+                    name="codigo_postal"
+                    placeholder="28001"
+                    required
+                    [class.error]="hasError('codigo_postal')"
+                  />
+                  <span *ngIf="hasError('codigo_postal')" class="error-message">{{
+                    dataFormErrors["codigo_postal"]
+                  }}</span>
+                </div>
+              </div>
+            </div>
 
             <!-- Importe -->
             <div class="form-section">

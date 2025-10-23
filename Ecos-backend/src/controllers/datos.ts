@@ -5,7 +5,7 @@ export const registrarDatos = async (req: Request, res: Response): Promise<void>
     const {
       Nombre,
       telefono,
-      pais
+      // pais // ❌ CAMPO ELIMINADO
     } = req.body;
 
     try {
@@ -13,7 +13,7 @@ export const registrarDatos = async (req: Request, res: Response): Promise<void>
       const datos = await Datos.create({
         Nombre,
         telefono,
-        pais
+        // pais // ❌ CAMPO ELIMINADO
       });
 
       res.status(200).json({

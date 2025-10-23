@@ -12,13 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registrarDatos = void 0;
 const datos_1 = require("../models/datos");
 const registrarDatos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { Nombre, telefono, pais } = req.body;
+    const { Nombre, telefono,
+    // pais // ❌ CAMPO ELIMINADO
+     } = req.body;
     try {
         // Crear el nuevo registro de datos
         const datos = yield datos_1.Datos.create({
             Nombre,
             telefono,
-            pais
+            // pais // ❌ CAMPO ELIMINADO
         });
         res.status(200).json({
             message: "Datos registrados con éxito",

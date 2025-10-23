@@ -18,10 +18,11 @@ Datos.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    pais: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
+    // ❌ CAMPO COMENTADO - Ya no se utiliza
+    // pais: {
+    //     type: DataTypes.STRING,
+    //     allowNull: false,
+    // },
 }, {
     sequelize: connection_1.default,
     modelName: 'Datos',

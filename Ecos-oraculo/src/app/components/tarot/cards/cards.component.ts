@@ -709,7 +709,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS OBLIGATORIOS
-    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || !userData[field].toString().trim()
     );
@@ -725,7 +725,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.userData = {
       ...userData,
       nombre: userData.nombre.toString().trim(),
-      apellido: userData.apellido.toString().trim(),
+      // apellido: userData.apellido.toString().trim(), // ❌ ELIMINADO
       email: userData.email.toString().trim(),
       telefono: userData.telefono.toString().trim(),
     };
@@ -788,23 +788,22 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // ✅ EXTRAER Y VALIDAR CAMPOS
       const nombre = this.userData.nombre?.toString().trim();
-      const apellido = this.userData.apellido?.toString().trim();
+      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
 
       console.log('🔍 Campos validados:');
       console.log('  ✓ nombre:', nombre);
-      console.log('  ✓ apellido:', apellido);
       console.log('  ✓ email:', email);
       console.log('  ✓ telefono:', telefono);
 
-      if (!nombre || !apellido || !email || !telefono) {
+      if (!nombre || !email || !telefono) {
         throw new Error('Faltan campos obligatorios del cliente');
       }
 
       // ✅ CREAR customerInfo (SOLO 3 CAMPOS)
       const customerInfo = {
-        name: `${nombre} ${apellido}`,
+        name: nombre,
         email: email,
         phone: telefono,
       };

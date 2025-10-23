@@ -506,16 +506,15 @@ export class AnimalInteriorComponent
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
       const nombre = this.userData.nombre?.toString().trim();
-      const apellido = this.userData.apellido?.toString().trim();
+      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
-      if (!nombre || !apellido || !email || !telefono) {
+      if (!nombre || !email || !telefono) {
         console.error(
           '❌ Faltan campos requeridos para el pago de animal interior'
         );
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
-        if (!apellido) faltantes.push('apellido');
         if (!email) faltantes.push('email');
         if (!telefono) faltantes.push('teléfono');
 
@@ -529,7 +528,7 @@ export class AnimalInteriorComponent
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: `${nombre} ${apellido}`,
+        name: nombre,
         email: email,
         phone: telefono,
       };
@@ -833,7 +832,7 @@ export class AnimalInteriorComponent
     console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'apellido', 'email', 'telefono'];
+    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -856,7 +855,7 @@ export class AnimalInteriorComponent
     this.userData = {
       ...userData,
       nombre: userData.nombre?.toString().trim(),
-      apellido: userData.apellido?.toString().trim(),
+      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
       telefono: userData.telefono?.toString().trim(),
     };
