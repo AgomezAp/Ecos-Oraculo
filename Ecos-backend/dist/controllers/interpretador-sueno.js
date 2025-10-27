@@ -16,10 +16,8 @@ class ChatController {
         // ✅ LISTA DE MODELOS DE RESPALDO (en orden de preferencia)
         this.MODELS_FALLBACK = [
             "gemini-2.0-flash-exp",
-            "gemini-1.5-pro-latest",
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-flash",
-            "gemini-1.0-pro-latest",
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
         ];
         this.chatWithDreamInterpreter = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {

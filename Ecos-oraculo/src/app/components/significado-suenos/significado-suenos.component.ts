@@ -318,6 +318,7 @@ export class SignificadoSuenosComponent
     // Abrir el modal de recolecta de datos
     setTimeout(() => {
       this.showDataModal = true;
+      this.cdr.markForCheck();
       console.log('📝 Modal de datos abierto para desbloqueo onírico');
     }, 100);
   }
@@ -512,6 +513,7 @@ export class SignificadoSuenosComponent
           // ✅ Mostrar modal de datos con timeout para asegurar el cambio
           setTimeout(() => {
             this.showDataModal = true;
+            this.cdr.markForCheck();
             console.log('📝 showDataModal establecido a:', this.showDataModal);
           }, 100);
 
@@ -754,6 +756,7 @@ export class SignificadoSuenosComponent
     console.log('💳 EJECUTANDO promptForPayment()');
 
     this.showPaymentModal = true;
+    this.cdr.markForCheck();
     this.paymentError = null;
     this.isProcessingPayment = true;
 
@@ -801,6 +804,7 @@ export class SignificadoSuenosComponent
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -816,12 +820,14 @@ export class SignificadoSuenosComponent
       console.log('  - email:', email, email ? '✅' : '❌');
       console.log('  - telefono:', telefono, telefono ? '✅' : '❌');
 
-      if (!nombre || !email || !telefono) { // ❌ QUITADO !apellido
+      if (!nombre || !email || !telefono) {
+        // ❌ QUITADO !apellido
         console.error('❌ Faltan campos requeridos para el pago');
         this.paymentError =
           'Faltan datos del cliente. Por favor, verifica que hayas completado todos los campos (nombre, email y teléfono).';
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -854,16 +860,26 @@ export class SignificadoSuenosComponent
         );
       }
       this.clientSecret = response.clientSecret;
+      console.log('🔑 clientSecret obtenido:', this.clientSecret);
+
+      console.log('🔍 Verificando this.stripe:', this.stripe);
+      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
+        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
+        console.log('✅ Elements creado:', this.elements);
+        
         this.paymentElement = this.elements.create('payment');
+        console.log('✅ Payment element creado:', this.paymentElement);
 
         // Cambiar isProcessingPayment a false ANTES de buscar el contenedor
         this.isProcessingPayment = false;
+        this.cdr.markForCheck();
+        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         // Pequeña espera para que Angular actualice el DOM
         setTimeout(() => {
@@ -875,12 +891,18 @@ export class SignificadoSuenosComponent
           if (paymentElementContainer && this.paymentElement) {
             console.log('✅ Montando payment element...');
             this.paymentElement.mount(paymentElementContainer);
+            console.log('🎉 Payment element montado exitosamente!');
           } else {
             console.error('❌ Contenedor del elemento de pago no encontrado.');
+            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
+            this.cdr.markForCheck();
           }
         }, 100);
       } else {
+        console.error('❌ Stripe o clientSecret no disponibles:');
+        console.error('   - this.stripe:', this.stripe);
+        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
@@ -892,6 +914,7 @@ export class SignificadoSuenosComponent
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -1142,6 +1165,7 @@ export class SignificadoSuenosComponent
         )}`
       );
       this.showDataModal = true; // Mantener modal abierto
+      this.cdr.markForCheck();
       return;
     }
 
@@ -1170,6 +1194,7 @@ export class SignificadoSuenosComponent
     }
 
     this.showDataModal = false;
+    this.cdr.markForCheck();
 
     // Enviar datos al backend (opcional, no bloquea el pago)
     this.sendUserDataToBackend(userData);
@@ -1181,23 +1206,20 @@ export class SignificadoSuenosComponent
       next: (response) => {
         console.log('✅ Datos enviados correctamente al backend:', response);
 
-        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        // ✅ LLAMAR A promptForPayment() PARA INICIALIZAR STRIPE
+        this.promptForPayment();
       },
       error: (error) => {
         console.error('❌ Error enviando datos al backend:', error);
 
-        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        // ✅ AUN ASÍ PROCEDER AL PAGO
         console.log('⚠️ Continuando con el pago a pesar del error del backend');
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        this.promptForPayment();
       },
     });
   }
   onDataModalClosed(): void {
     this.showDataModal = false;
+    this.cdr.markForCheck();
   }
 }

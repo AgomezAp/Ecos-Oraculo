@@ -350,6 +350,7 @@ export class CalculadoraAmorComponent
     // Abrir el modal de recolecta de datos
     setTimeout(() => {
       this.showDataModal = true;
+      this.cdr.markForCheck();
       console.log('📝 Modal de datos abierto para desbloqueo');
     }, 100);
   }
@@ -551,6 +552,7 @@ export class CalculadoraAmorComponent
         // Mostrar modal de datos con timeout
         setTimeout(() => {
           this.showDataModal = true;
+          this.cdr.markForCheck();
           console.log('📝 showDataModal establecido a:', this.showDataModal);
         }, 100);
 
@@ -705,6 +707,7 @@ export class CalculadoraAmorComponent
     console.log('💳 EJECUTANDO promptForPayment() para amor');
 
     this.showPaymentModal = true;
+    this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
     this.isProcessingPayment = true;
 
@@ -749,6 +752,7 @@ export class CalculadoraAmorComponent
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -775,6 +779,7 @@ export class CalculadoraAmorComponent
         )}. Por favor, completa el formulario primero.`;
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -1274,6 +1279,7 @@ export class CalculadoraAmorComponent
         )}`
       );
       this.showDataModal = true; // Mantener modal abierto
+      this.cdr.markForCheck();
       return;
     }
 
@@ -1305,6 +1311,7 @@ export class CalculadoraAmorComponent
     }
 
     this.showDataModal = false;
+    this.cdr.markForCheck();
 
     // ✅ NUEVO: Enviar datos al backend como en otros componentes
     this.sendUserDataToBackend(userData);
@@ -1319,24 +1326,21 @@ export class CalculadoraAmorComponent
           response
         );
 
-        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
+        this.promptForPayment();
       },
       error: (error) => {
         console.error('❌ Error enviando datos al backend desde amor:', error);
 
-        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
         console.log('⚠️ Continuando con el pago a pesar del error del backend');
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        this.promptForPayment();
       },
     });
   }
   onDataModalClosed(): void {
     this.showDataModal = false;
+    this.cdr.markForCheck();
   }
 
   showLoveWheelAfterDelay(delayMs: number = 3000): void {

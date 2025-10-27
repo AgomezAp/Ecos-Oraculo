@@ -317,6 +317,7 @@ export class AnimalInteriorComponent
         // Mostrar modal de datos con timeout
         setTimeout(() => {
           this.showDataModal = true;
+          this.cdr.markForCheck();
           console.log('📝 showDataModal establecido a:', this.showDataModal);
         }, 100);
 
@@ -461,6 +462,7 @@ export class AnimalInteriorComponent
     console.log('💳 EJECUTANDO promptForPayment() para animal interior');
 
     this.showPaymentModal = true;
+    this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
     this.isProcessingPayment = true;
 
@@ -508,6 +510,7 @@ export class AnimalInteriorComponent
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -530,6 +533,7 @@ export class AnimalInteriorComponent
         )}. Por favor, completa el formulario primero.`;
         this.isProcessingPayment = false;
         this.showDataModal = true;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -855,6 +859,7 @@ export class AnimalInteriorComponent
         )}`
       );
       this.showDataModal = true; // Mantener modal abierto
+      this.cdr.markForCheck();
       return;
     }
 
@@ -886,6 +891,7 @@ export class AnimalInteriorComponent
     }
 
     this.showDataModal = false;
+    this.cdr.markForCheck();
 
     // ✅ NUEVO: Enviar datos al backend como en otros componentes
     this.sendUserDataToBackend(userData);
@@ -900,10 +906,8 @@ export class AnimalInteriorComponent
           response
         );
 
-        // ✅ PROCEDER AL PAGO DESPUÉS DE UN PEQUEÑO DELAY
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
+        this.promptForPayment();
       },
       error: (error) => {
         console.error(
@@ -911,16 +915,15 @@ export class AnimalInteriorComponent
           error
         );
 
-        // ✅ AUN ASÍ PROCEDER AL PAGO (el backend puede fallar pero el pago debe continuar)
+        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
         console.log('⚠️ Continuando con el pago a pesar del error del backend');
-        setTimeout(() => {
-          this.promptForPayment();
-        }, 500);
+        this.promptForPayment();
       },
     });
   }
   onDataModalClosed(): void {
     this.showDataModal = false;
+    this.cdr.markForCheck();
   }
   showAnimalWheelAfterDelay(delayMs: number = 3000): void {
     if (this.wheelTimer) {
