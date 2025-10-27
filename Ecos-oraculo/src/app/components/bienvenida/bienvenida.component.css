@@ -57,7 +57,7 @@
   min-height: 60vh;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
   gap: 0.5rem;
 }
 
@@ -150,22 +150,24 @@
 }
 
 .services-section {
-  max-width: 1200px;
-  margin: 4rem auto 0;
-  text-align: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 .services-title {
   font-size: 3rem;
-  margin-bottom: 3rem;
+  margin: 2rem 0 0 0; /* Margen superior para separarlo del texto anterior */
+  padding: 0;
   font-weight: 300;
   font-family: "Berkshire Swash", cursive;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: left;
 }
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   padding: 2rem 0;
 }
@@ -594,7 +596,8 @@
   );
   border-color: #69c9d0;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(105, 201, 208, 0.15), inset 0 0 10px rgba(238, 29, 82, 0.06);
+  box-shadow: 0 8px 20px rgba(105, 201, 208, 0.15),
+    inset 0 0 10px rgba(238, 29, 82, 0.06);
   transform: translateY(-2px);
 }
 .social-link.facebook:hover {
@@ -1174,5 +1177,75 @@
   .cookie-buttons {
     width: 100%;
     justify-content: center;
+  }
+}
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto; /* ✅ Cambiar de 60vh a auto */
+    padding: 1rem 0 0 0; /* ✅ Reducir padding */
+  }
+
+  .hero-content {
+    flex: 1.2;
+    max-width: 700px;
+    padding-left: 0rem;
+    margin-bottom: 0; /* ✅ Eliminar margen inferior */
+  }
+
+  /* ✅ OCULTAR el logo en móvil */
+  .hero-symbol {
+    display: none;
+  }
+
+  /* ✅ Reducir márgenes en los textos del hero */
+  .main-title {
+    font-size: 3.4rem;
+    font-family: "Berkshire Swash", cursive;
+    margin: 0.5rem 0; /* ✅ Reducir margen */
+  }
+
+  .description {
+    font-size: 1.6rem;
+    margin: 0.5rem 0; /* ✅ Reducir margen */
+    font-weight: 700;
+    font-family: "El Messiri", sans-serif;
+  }
+
+  .services-text {
+    font-size: 1.3rem;
+    margin: 1rem 0 0.5rem 0; /* ✅ Reducir margen inferior */
+  }
+
+  /* ✅ CENTRAR el título de servicios en móvil y pegarlo más */
+  .services-title {
+    text-align: center;
+    font-size: 2rem;
+    margin: 0.5rem 0 0.5rem 0; /* ✅ Reducir márgenes superior e inferior */
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .service-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.2rem;
+  }
+
+  .tarot-card .service-icon {
+    padding: 6px;
+  }
+
+  .horoscopo-card .service-icon {
+    padding: 4px;
+  }
+
+  .content {
+    padding: 1rem;
   }
 }
