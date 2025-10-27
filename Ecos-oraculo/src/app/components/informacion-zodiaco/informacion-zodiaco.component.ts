@@ -8,6 +8,8 @@ import {
   OnInit,
   Optional,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -87,6 +89,7 @@ interface AstrologerInfo {
   ],
   templateUrl: './informacion-zodiaco.component.html',
   styleUrl: './informacion-zodiaco.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InformacionZodiacoComponent
   implements OnInit, OnDestroy, AfterViewChecked
@@ -164,7 +167,8 @@ export class InformacionZodiacoComponent
     private http: HttpClient,
     private zodiacoService: InformacionZodiacoService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    @Optional() public dialogRef: MatDialogRef<InformacionZodiacoComponent>
+    @Optional() public dialogRef: MatDialogRef<InformacionZodiacoComponent>,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -337,6 +341,7 @@ export class InformacionZodiacoComponent
       ) {
         console.log('✅ Mostrando ruleta astral - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta astral en este momento');
       }
@@ -376,6 +381,7 @@ export class InformacionZodiacoComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta astral manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta astral - sin tiradas disponibles'
@@ -608,6 +614,7 @@ export class InformacionZodiacoComponent
             // Mostrar modal de datos
             setTimeout(() => {
               this.showDataModal = true;
+              this.cdr.markForCheck();
             }, 100);
           }, 2000);
         } else if (!this.firstQuestionAsked) {
@@ -616,6 +623,7 @@ export class InformacionZodiacoComponent
         }
 
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         this.isLoading = false;
@@ -629,6 +637,7 @@ export class InformacionZodiacoComponent
         };
         this.messages.push(errorMsg);
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
     });
   }
@@ -998,9 +1007,8 @@ export class InformacionZodiacoComponent
 
     this.messages = [];
     this.hasStartedConversation = false;
-    setTimeout(() => {
-      this.startConversation();
-    }, 500);
+    this.startConversation();
+    this.cdr.markForCheck();
   }
 
   onKeyPress(event: KeyboardEvent): void {

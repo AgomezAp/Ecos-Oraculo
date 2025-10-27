@@ -8,6 +8,8 @@ import {
   OnInit,
   Optional,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
@@ -66,6 +68,7 @@ interface ConversationMessage {
   ],
   templateUrl: './lectura-numerologia.component.html',
   styleUrl: './lectura-numerologia.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LecturaNumerologiaComponent
   implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
@@ -158,7 +161,8 @@ export class LecturaNumerologiaComponent
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private numerologyService: NumerologiaService,
     private http: HttpClient,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef
   ) {}
   ngAfterViewInit(): void {
     this.setVideosSpeed(0.67); // 0.5 = más lento, 1 = normal
@@ -297,6 +301,7 @@ export class LecturaNumerologiaComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta numerológica manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta numerológica - sin tiradas disponibles'
@@ -628,6 +633,7 @@ export class LecturaNumerologiaComponent
                 // Mostrar modal de datos
                 setTimeout(() => {
                   this.showDataModal = true;
+                  this.cdr.markForCheck();
                 }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
@@ -636,6 +642,7 @@ export class LecturaNumerologiaComponent
             }
 
             this.saveMessagesToSession();
+            this.cdr.markForCheck();
           } else {
             this.handleError('Error al obtener respuesta del numerólogo');
           }
@@ -645,6 +652,7 @@ export class LecturaNumerologiaComponent
           this.isTyping = false;
           console.error('Error:', error);
           this.handleError('Error de conexión. Por favor, inténtalo de nuevo.');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -1029,9 +1037,8 @@ export class LecturaNumerologiaComponent
 
     this.messages = [];
     this.hasStartedConversation = false;
-    setTimeout(() => {
-      this.startConversation();
-    }, 500);
+    this.startConversation();
+    this.cdr.markForCheck();
   }
 
   private handleError(errorMessage: string): void {
@@ -1229,6 +1236,7 @@ export class LecturaNumerologiaComponent
         !this.showDataModal
       ) {
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       }
     }, delayMs);
   }

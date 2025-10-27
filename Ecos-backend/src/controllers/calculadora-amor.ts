@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ApiError, ChatResponse } from "../interfaces/helpers";
 import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+
 interface LoveCalculatorData {
   name: string;
   specialty: string;
@@ -23,6 +24,15 @@ interface LoveCalculatorRequest {
 
 export class LoveCalculatorController {
   private genAI: GoogleGenerativeAI;
+
+  // ✅ LISTA DE MODELOS DE RESPALDO (en orden de preferencia)
+  private readonly MODELS_FALLBACK = [
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-pro-latest",
+    "gemini-1.5-flash-latest",
+    "gemini-1.5-flash",
+    "gemini-1.0-pro-latest",
+  ];
 
   constructor() {
     if (!process.env.GEMINI_API_KEY) {
@@ -327,43 +337,10 @@ Recuerda: Eres una experta en amor que combina numerología con consejos románt
 
       this.validateLoveCalculatorRequest(loveCalculatorData, userMessage);
 
-      // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
-      const model = this.genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
-        generationConfig: {
-          temperature: 0.85, // ✅ Reducido de 0.9 para mayor consistencia
-          topK: 50, // ✅ Aumentado de 40 para más diversidad controlada
-          topP: 0.92, // ✅ Reducido de 0.95 para evitar respuestas dispersas
-          maxOutputTokens: 1024, // ✅ Aumentado de 800 para respuestas completas
-          candidateCount: 1, // ✅ Solo una respuesta (evita confusión)
-          stopSequences: [], // ✅ Sin secuencias de parada que corten respuestas
-        },
-        // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA TEMAS DE AMOR
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-        ],
-      });
-
       const contextPrompt = this.createLoveCalculatorContext(
         req.body.conversationHistory
       );
 
-      // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
       const fullPrompt = `${contextPrompt}
 
 ⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
@@ -381,48 +358,111 @@ Respuesta del experto en amor (asegúrate de completar TODO tu análisis antes d
 
       console.log(`Generando análisis de compatibilidad amorosa...`);
 
-      // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
-      let attempts = 0;
-      const maxAttempts = 3;
+      // ✅ SISTEMA DE FALLBACK: Intentar con múltiples modelos
       let text = "";
+      let usedModel = "";
+      let allModelErrors: string[] = [];
 
-      while (attempts < maxAttempts) {
+      for (const modelName of this.MODELS_FALLBACK) {
+        console.log(`\n🔄 Trying model: ${modelName}`);
+
         try {
-          const result = await model.generateContent(fullPrompt);
-          const response = result.response;
-          text = response.text();
+          const model = this.genAI.getGenerativeModel({
+            model: modelName,
+            generationConfig: {
+              temperature: 0.85,
+              topK: 50,
+              topP: 0.92,
+              maxOutputTokens: 1024,
+              candidateCount: 1,
+              stopSequences: [],
+            },
+            safetySettings: [
+              {
+                category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+            ],
+          });
 
-          // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
-          if (text && text.trim().length >= 100) {
-            break; // Respuesta válida, salir del loop
-          }
+          // ✅ REINTENTOS para cada modelo (por si está temporalmente sobrecargado)
+          let attempts = 0;
+          const maxAttempts = 3;
+          let modelSucceeded = false;
 
-          attempts++;
-          console.warn(
-            `Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`
-          );
-
-          if (attempts >= maxAttempts) {
-            throw new Error(
-              "No se pudo generar una respuesta válida después de varios intentos"
+          while (attempts < maxAttempts && !modelSucceeded) {
+            attempts++;
+            console.log(
+              `  Attempt ${attempts}/${maxAttempts} with ${modelName}...`
             );
+
+            try {
+              const result = await model.generateContent(fullPrompt);
+              const response = result.response;
+              text = response.text();
+
+              // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+              if (text && text.trim().length >= 100) {
+                console.log(
+                  `  ✅ Success with ${modelName} on attempt ${attempts}`
+                );
+                usedModel = modelName;
+                modelSucceeded = true;
+                break; // Salir del while de reintentos
+              }
+
+              console.warn(`  ⚠️ Response too short, retrying...`);
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            } catch (attemptError: any) {
+              console.warn(
+                `  ❌ Attempt ${attempts} failed:`,
+                attemptError.message
+              );
+
+              if (attempts >= maxAttempts) {
+                allModelErrors.push(`${modelName}: ${attemptError.message}`);
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
           }
 
-          // Esperar un poco antes de reintentar
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        } catch (innerError) {
-          attempts++;
-          if (attempts >= maxAttempts) {
-            throw innerError;
+          // Si este modelo tuvo éxito, salir del loop de modelos
+          if (modelSucceeded) {
+            break;
           }
-          console.warn(`Intento ${attempts} falló:`, innerError);
-          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (modelError: any) {
+          console.error(
+            `  ❌ Model ${modelName} failed completely:`,
+            modelError.message
+          );
+          allModelErrors.push(`${modelName}: ${modelError.message}`);
+
+          // Esperar un poco antes de intentar con el siguiente modelo
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          continue;
         }
       }
 
+      // ✅ Si todos los modelos fallaron
       if (!text || text.trim() === "") {
+        console.error("❌ All models failed. Errors:", allModelErrors);
         throw new Error(
-          "Respuesta vacía de Gemini después de múltiples intentos"
+          `Todos los modelos de IA no están disponibles actualmente. Intentados: ${this.MODELS_FALLBACK.join(
+            ", "
+          )}. Por favor, inténtalo de nuevo en un momento.`
         );
       }
 
@@ -441,7 +481,7 @@ Respuesta del experto en amor (asegúrate de completar TODO tu análisis antes d
       };
 
       console.log(
-        `Análisis de compatibilidad generado exitosamente (${text.length} caracteres)`
+        `✅ Análisis de compatibilidad generado exitosamente con ${usedModel} (${text.length} caracteres)`
       );
       res.json(chatResponse);
     } catch (error) {
@@ -476,6 +516,12 @@ Respuesta del experto en amor (asegúrate de completar TODO tu análisis antes d
       statusCode = 401;
       errorMessage = "Error de autenticación con el servicio de IA.";
       errorCode = "AUTH_ERROR";
+    } else if (
+      error.message?.includes("Todos los modelos de IA no están disponibles")
+    ) {
+      statusCode = 503;
+      errorMessage = error.message;
+      errorCode = "ALL_MODELS_UNAVAILABLE";
     }
 
     const errorResponse: ChatResponse = {

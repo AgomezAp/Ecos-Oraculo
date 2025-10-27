@@ -7,6 +7,8 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,6 +62,7 @@ interface ChatMessage {
   ],
   templateUrl: './animal-interior.component.html',
   styleUrl: './animal-interior.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnimalInteriorComponent
   implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
@@ -119,7 +122,8 @@ export class AnimalInteriorComponent
 
   constructor(
     private animalService: AnimalInteriorService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
   @ViewChild('backgroundVideo') backgroundVideo!: ElementRef<HTMLVideoElement>;
 
@@ -385,6 +389,7 @@ export class AnimalInteriorComponent
               // Mostrar modal de datos
               setTimeout(() => {
                 this.showDataModal = true;
+                this.cdr.markForCheck();
               }, 100);
             }, 2000);
           } else if (!this.firstQuestionAsked) {
@@ -401,6 +406,7 @@ export class AnimalInteriorComponent
           });
         }
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.isLoading = false;
@@ -413,6 +419,7 @@ export class AnimalInteriorComponent
           isUser: false,
         });
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
     });
   }
@@ -932,6 +939,7 @@ export class AnimalInteriorComponent
       ) {
         console.log('✅ Mostrando ruleta animal - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta animal en este momento');
       }
@@ -971,6 +979,7 @@ export class AnimalInteriorComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta animal manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta animal - sin tiradas disponibles'
@@ -1082,6 +1091,7 @@ export class AnimalInteriorComponent
     );
 
     this.showFortuneWheel = true;
+    this.cdr.markForCheck();
     console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 }

@@ -6,6 +6,8 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   ConversationMessage,
@@ -47,6 +49,7 @@ import {
   ],
   templateUrl: './significado-suenos.component.html',
   styleUrl: './significado-suenos.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignificadoSuenosComponent
   implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
@@ -134,7 +137,8 @@ export class SignificadoSuenosComponent
   constructor(
     private dreamService: InterpretadorSuenosService,
     private http: HttpClient,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef
   ) {}
   ngAfterViewInit(): void {
     this.setVideosSpeed(0.66); // 0.5 = más lento, 1 = normal
@@ -224,6 +228,7 @@ export class SignificadoSuenosComponent
       ) {
         console.log('✅ Mostrando ruleta - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta en este momento');
       }
@@ -436,6 +441,7 @@ export class SignificadoSuenosComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log('❌ No se puede activar ruleta - sin tiradas disponibles');
       alert(
@@ -580,6 +586,7 @@ export class SignificadoSuenosComponent
                 // Mostrar modal de datos
                 setTimeout(() => {
                   this.showDataModal = true;
+                  this.cdr.markForCheck();
                 }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
@@ -588,6 +595,7 @@ export class SignificadoSuenosComponent
             }
 
             this.saveMessagesToSession();
+            this.cdr.markForCheck();
           } else {
             this.handleError('Error al obtener respuesta del intérprete');
           }
@@ -597,6 +605,7 @@ export class SignificadoSuenosComponent
           this.isTyping = false;
           console.error('Error:', error);
           this.handleError('Error de conexión. Por favor, inténtalo de nuevo.');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -1029,9 +1038,8 @@ export class SignificadoSuenosComponent
 
     this.messages = [];
     this.hasStartedConversation = false;
-    setTimeout(() => {
-      this.startConversation();
-    }, 500);
+    this.startConversation();
+    this.cdr.markForCheck();
   }
 
   private handleError(errorMessage: string): void {

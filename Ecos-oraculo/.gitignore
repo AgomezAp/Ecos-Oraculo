@@ -40,3 +40,16 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Optimización de imágenes y videos
+/public-optimized/
+/public-videos-optimized/
+
+# Scripts de optimización
+optimize-images-sharp.js
+optimize-videos.js
+
+# Documentación de desarrollo (opcional)
+*-GUIDE.md
+*-SUMMARY.md
+*-RECOVERY.md

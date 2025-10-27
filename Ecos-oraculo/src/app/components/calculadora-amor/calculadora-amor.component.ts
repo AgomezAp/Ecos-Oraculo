@@ -6,6 +6,8 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -62,6 +64,7 @@ import {
   ],
   templateUrl: './calculadora-amor.component.html',
   styleUrl: './calculadora-amor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalculadoraAmorComponent
   implements OnInit, OnDestroy, AfterViewChecked
@@ -155,7 +158,8 @@ export class CalculadoraAmorComponent
   constructor(
     private calculadoraAmorService: CalculadoraAmorService,
     private formBuilder: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {
     this.compatibilityForm = this.createCompatibilityForm();
   }
@@ -422,9 +426,11 @@ export class CalculadoraAmorComponent
       .subscribe({
         next: (info) => {
           this.loveExpertInfo = info;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error al cargar información del experto:', error);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -479,12 +485,15 @@ export class CalculadoraAmorComponent
       .subscribe({
         next: (response) => {
           this.handleCalculationResponse(response);
+          this.cdr.markForCheck();
         },
         error: (error) => {
           this.handleError(error);
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -630,6 +639,7 @@ export class CalculadoraAmorComponent
                 // Mostrar modal de datos
                 setTimeout(() => {
                   this.showDataModal = true;
+                  this.cdr.markForCheck();
                 }, 100);
               }, 2000);
             } else if (!this.firstQuestionAsked) {
@@ -638,6 +648,7 @@ export class CalculadoraAmorComponent
             }
 
             this.saveMessagesToSession();
+            this.cdr.markForCheck();
           } else {
             this.handleError('Error al obtener respuesta del experto en amor');
           }
@@ -647,6 +658,7 @@ export class CalculadoraAmorComponent
           this.isTyping = false;
           console.error('Error:', error);
           this.handleError('Error de conexión. Por favor, inténtalo de nuevo.');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -880,30 +892,26 @@ export class CalculadoraAmorComponent
 
   // Método para resetear el chat
   resetChat(): void {
-    // Confirmar antes de resetear
-    const confirmReset = confirm(
-      '¿Estás seguro de que quieres reiniciar la conversación?'
-    );
+    // Limpiar el historial de conversación
+    this.conversationHistory = [];
 
-    if (confirmReset) {
-      // Limpiar el historial de conversación
-      this.conversationHistory = [];
+    // Limpiar el mensaje actual
+    this.currentMessage = '';
 
-      // Limpiar el mensaje actual
-      this.currentMessage = '';
+    // Resetear flags
+    this.isLoading = false;
+    this.isTyping = false;
 
-      // Resetear flags
-      this.isLoading = false;
-      this.isTyping = false;
+    // Agregar mensaje de bienvenida inicial
+    this.addWelcomeMessage();
 
-      // Agregar mensaje de bienvenida inicial si lo deseas
-      this.addWelcomeMessage();
+    // Forzar detección de cambios
+    this.cdr.markForCheck();
 
-      // Scroll al inicio
-      setTimeout(() => {
-        this.scrollToBottom();
-      }, 100);
-    }
+    // Scroll al inicio
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 100);
   }
   private addWelcomeMessage(): void {
     const welcomeMessage = {
@@ -1091,10 +1099,8 @@ export class CalculadoraAmorComponent
     this.hasStartedConversation = false;
     this.calculadoraAmorService.resetService();
     this.compatibilityForm.reset();
-
-    setTimeout(() => {
-      this.initializeLoveWelcomeMessage();
-    }, 500);
+    this.initializeLoveWelcomeMessage();
+    this.cdr.markForCheck();
   }
 
   /**
@@ -1353,6 +1359,7 @@ export class CalculadoraAmorComponent
       ) {
         console.log('✅ Mostrando ruleta del amor - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta del amor en este momento');
       }
@@ -1457,6 +1464,7 @@ export class CalculadoraAmorComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta del amor manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta del amor - sin tiradas disponibles'

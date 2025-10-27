@@ -13,44 +13,20 @@ exports.AnimalInteriorController = void 0;
 const generative_ai_1 = require("@google/generative-ai");
 class AnimalInteriorController {
     constructor() {
+        // ✅ LISTA DE MODELOS DE RESPALDO (en orden de preferencia)
+        this.MODELS_FALLBACK = [
+            "gemini-2.0-flash-exp",
+            "gemini-1.5-pro-latest",
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-flash",
+            "gemini-1.0-pro-latest",
+        ];
         this.chatWithAnimalGuide = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const { guideData, userMessage, conversationHistory } = req.body;
                 // Validar entrada
                 this.validateAnimalChatRequest(guideData, userMessage);
-                // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
-                const model = this.genAI.getGenerativeModel({
-                    model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
-                    generationConfig: {
-                        temperature: 0.85, // ✅ Reducido de 1.5 para mayor consistencia
-                        topK: 50, // ✅ Mayor diversidad controlada
-                        topP: 0.92, // ✅ Aumentado de 0.5 para mejor fluidez
-                        maxOutputTokens: 512, // ✅ Aumentado de 300 para respuestas completas
-                        candidateCount: 1, // ✅ Solo una respuesta
-                        stopSequences: [], // ✅ Sin secuencias de parada
-                    },
-                    // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA CONEXIONES ESPIRITUALES
-                    safetySettings: [
-                        {
-                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                        },
-                        {
-                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                        },
-                        {
-                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                        },
-                        {
-                            category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                            threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                        },
-                    ],
-                });
                 const contextPrompt = this.createAnimalGuideContext(guideData, conversationHistory);
-                // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
                 const fullPrompt = `${contextPrompt}
 
 ⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
@@ -66,45 +42,88 @@ Usuario: "${userMessage}"
 
 Respuesta del guía espiritual (asegúrate de completar TODA tu guía antes de terminar):`;
                 console.log(`Generando lectura de animal interior...`);
-                // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
-                let attempts = 0;
-                const maxAttempts = 3;
+                // ✅ SISTEMA DE FALLBACK: Intentar con múltiples modelos
                 let text = "";
-                while (attempts < maxAttempts) {
+                let usedModel = "";
+                let allModelErrors = [];
+                for (const modelName of this.MODELS_FALLBACK) {
+                    console.log(`\n🔄 Trying model: ${modelName}`);
                     try {
-                        const result = yield model.generateContent(fullPrompt);
-                        const response = result.response;
-                        text = response.text();
-                        // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
-                        if (text && text.trim().length >= 100) {
-                            break; // Respuesta válida, salir del loop
+                        const model = this.genAI.getGenerativeModel({
+                            model: modelName,
+                            generationConfig: {
+                                temperature: 0.85,
+                                topK: 50,
+                                topP: 0.92,
+                                maxOutputTokens: 512,
+                                candidateCount: 1,
+                                stopSequences: [],
+                            },
+                            safetySettings: [
+                                {
+                                    category: generative_ai_1.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                                    threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                },
+                                {
+                                    category: generative_ai_1.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                                    threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                },
+                                {
+                                    category: generative_ai_1.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                                    threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                },
+                                {
+                                    category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                                    threshold: generative_ai_1.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                                },
+                            ],
+                        });
+                        // ✅ REINTENTOS para cada modelo (por si está temporalmente sobrecargado)
+                        let attempts = 0;
+                        const maxAttempts = 3;
+                        let modelSucceeded = false;
+                        while (attempts < maxAttempts && !modelSucceeded) {
+                            attempts++;
+                            console.log(`  Attempt ${attempts}/${maxAttempts} with ${modelName}...`);
+                            try {
+                                const result = yield model.generateContent(fullPrompt);
+                                const response = result.response;
+                                text = response.text();
+                                // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+                                if (text && text.trim().length >= 80) {
+                                    console.log(`  ✅ Success with ${modelName} on attempt ${attempts}`);
+                                    usedModel = modelName;
+                                    modelSucceeded = true;
+                                    break; // Salir del while de reintentos
+                                }
+                                console.warn(`  ⚠️ Response too short, retrying...`);
+                                yield new Promise((resolve) => setTimeout(resolve, 500));
+                            }
+                            catch (attemptError) {
+                                console.warn(`  ❌ Attempt ${attempts} failed:`, attemptError.message);
+                                if (attempts >= maxAttempts) {
+                                    allModelErrors.push(`${modelName}: ${attemptError.message}`);
+                                }
+                                yield new Promise((resolve) => setTimeout(resolve, 500));
+                            }
                         }
-                        attempts++;
-                        console.warn(`Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`);
-                        if (attempts >= maxAttempts) {
-                            throw new Error("No se pudo generar una respuesta válida después de varios intentos");
+                        // Si este modelo tuvo éxito, salir del loop de modelos
+                        if (modelSucceeded) {
+                            break;
                         }
-                        // Esperar un poco antes de reintentar
-                        yield new Promise((resolve) => setTimeout(resolve, 500));
                     }
-                    catch (innerError) {
-                        attempts++;
-                        // Si es error 503 (overloaded) y no es el último intento
-                        if (innerError.status === 503 && attempts < maxAttempts) {
-                            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
-                            console.warn(`Error 503 - Servicio sobrecargado. Esperando ${delay}ms...`);
-                            yield new Promise((resolve) => setTimeout(resolve, delay));
-                            continue;
-                        }
-                        if (attempts >= maxAttempts) {
-                            throw innerError;
-                        }
-                        console.warn(`Intento ${attempts} falló:`, innerError.message);
-                        yield new Promise((resolve) => setTimeout(resolve, 500));
+                    catch (modelError) {
+                        console.error(`  ❌ Model ${modelName} failed completely:`, modelError.message);
+                        allModelErrors.push(`${modelName}: ${modelError.message}`);
+                        // Esperar un poco antes de intentar con el siguiente modelo
+                        yield new Promise((resolve) => setTimeout(resolve, 1000));
+                        continue;
                     }
                 }
+                // ✅ Si todos los modelos fallaron
                 if (!text || text.trim() === "") {
-                    throw new Error("Respuesta vacía de Gemini después de múltiples intentos");
+                    console.error("❌ All models failed. Errors:", allModelErrors);
+                    throw new Error(`Todos los modelos de IA no están disponibles actualmente. Intentados: ${this.MODELS_FALLBACK.join(", ")}. Por favor, inténtalo de nuevo en un momento.`);
                 }
                 // ✅ ASEGURAR RESPUESTA COMPLETA Y BIEN FORMATEADA
                 text = this.ensureCompleteResponse(text);
@@ -117,7 +136,7 @@ Respuesta del guía espiritual (asegúrate de completar TODA tu guía antes de t
                     response: text.trim(),
                     timestamp: new Date().toISOString(),
                 };
-                console.log(`Lectura de animal interior generada exitosamente (${text.length} caracteres)`);
+                console.log(`✅ Lectura de animal interior generada exitosamente con ${usedModel} (${text.length} caracteres)`);
                 res.json(chatResponse);
             }
             catch (error) {
@@ -319,7 +338,7 @@ Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conec
         }
     }
     handleError(error, res) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
         console.error("Error en AnimalInteriorController:", error);
         let statusCode = 500;
         let errorMessage = "Error interno del servidor";
@@ -351,6 +370,11 @@ Recuerda: Eres una guía espiritual que ayuda a las personas a descubrir y conec
             statusCode = 401;
             errorMessage = "Error de autenticación con el servicio de IA.";
             errorCode = "AUTH_ERROR";
+        }
+        else if ((_e = error.message) === null || _e === void 0 ? void 0 : _e.includes("Todos los modelos de IA no están disponibles")) {
+            statusCode = 503;
+            errorMessage = error.message;
+            errorCode = "ALL_MODELS_UNAVAILABLE";
         }
         const errorResponse = {
             success: false,

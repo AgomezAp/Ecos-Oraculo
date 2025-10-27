@@ -34,8 +34,6 @@ const sugerencia_1 = __importDefault(require("../routes/sugerencia"));
 const monei_1 = __importDefault(require("../routes/monei"));
 const analytics_1 = __importDefault(require("../routes/analytics"));
 const sugerencia_2 = require("./sugerencia");
-const datos_routes_1 = __importDefault(require("../routes/datos.routes"));
-const datos_1 = require("./datos");
 // Cargar variables de entorno
 dotenv_1.default.config();
 class Server {
@@ -53,7 +51,6 @@ class Server {
                 yield analytics_usuario_1.AnalyticsUsuario.sync({ alter: true });
                 yield service_popularity_1.ServicePopularity.sync({ alter: true });
                 yield sugerencia_2.Sugerencia.sync({ alter: true });
-                yield datos_1.Datos.sync({ alter: true });
                 console.log("✅ Conexión a base de datos establecida correctamente");
             }
             catch (error) {
@@ -90,7 +87,6 @@ class Server {
         this.app.use(monei_1.default);
         this.app.use(analytics_1.default);
         this.app.use(sugerencia_1.default);
-        this.app.use(datos_routes_1.default);
         // Health check endpoint
         this.app.get("/health", (req, res) => {
             res.json({

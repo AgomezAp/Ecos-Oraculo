@@ -5,6 +5,8 @@ import {
   ElementRef,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
@@ -13,12 +15,15 @@ import { environment } from '../../environments/environmets.prod';
 import { HttpClient } from '@angular/common/http';
 import { AnalyticsService } from '../../services/analytics.service';
 import { SugerenciasService } from '../../services/sugerencias.service';
+import { LoggerService } from '../../services/logger.service';
 import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-bienvenida',
-  imports: [MatIconModule, CommonModule,FormsModule],
+  imports: [MatIconModule, CommonModule, FormsModule],
   templateUrl: './bienvenida.component.html',
   styleUrl: './bienvenida.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BienvenidaComponent implements AfterViewInit, OnInit {
   @ViewChild('backgroundVideo') backgroundVideo!: ElementRef<HTMLVideoElement>;
@@ -37,7 +42,9 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
     private http: HttpClient,
     private analyticsService: AnalyticsService,
     private sugerenciasService: SugerenciasService,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private logger: LoggerService,
+    private cdr: ChangeDetectorRef
     ) {}
 
   ngAfterViewInit() {
@@ -57,7 +64,7 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
             await video.play();
           } catch (error) {
             // Si falla, intentar con click simulado
-            console.log('Autoplay bloqueado, intentando alternativa');
+            this.logger.log('Autoplay bloqueado, intentando alternativa');
             video.muted = true;
             video.play();
           }
@@ -97,7 +104,7 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
         this.sessionStartTime
       );
     } catch (error) {
-      console.error('❌ Error enviando analytics:', error);
+      this.logger.error('Error enviando analytics:', error);
     }
   }
   calculateSessionDuration(): number {
@@ -169,10 +176,10 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('Video reproduciéndose automáticamente');
+            this.logger.log('Video reproduciéndose automáticamente');
           })
           .catch((error) => {
-            console.log(
+            this.logger.log(
               'Autoplay falló, intentando con interacción del usuario:',
               error
             );
@@ -195,12 +202,12 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
     document.addEventListener('touchstart', playOnInteraction);
   }
   initializeCookies() {
-    console.log('🔍 === INICIANDO SISTEMA DE COOKIES ===');
+    this.logger.info('Iniciando sistema de cookies');
 
     try {
       const consent = this.cookieService.get('cookieConsent');
       this.showCookieBanner = !consent || consent === '';
-      console.log('¿Mostrar banner?', this.showCookieBanner);
+      this.logger.log('¿Mostrar banner?', this.showCookieBanner);
 
       if (consent === 'accepted') {
         this.loadUserData();
@@ -208,7 +215,7 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
         this.trackVisit();
       }
     } catch (error) {
-      console.error('❌ Error en initializeCookies:', error);
+      this.logger.error('Error en initializeCookies:', error);
     }
   }
 
@@ -251,14 +258,14 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
     this.enableAnalytics();
     this.sendAnalytics(); // 👈 Usa el método refactorizado
 
-    console.log('✅ Cookies aceptadas - Analytics iniciado');
+    this.logger.info('Cookies aceptadas - Analytics iniciado');
   }
 
   // ✅ Rechazar cookies
   rejectCookies() {
     this.cookieService.set('cookieConsent', 'rejected', 365);
     this.showCookieBanner = false;
-    console.log('Cookies rechazadas');
+    this.logger.log('Cookies rechazadas');
   }
 
   navigateTo(route: string): void {
@@ -279,9 +286,10 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
         this.sessionStartTime
       );
     } catch (error) {
-      console.error('Error enviando page analytics:', error);
+      this.logger.error('Error enviando page analytics:', error);
     }
   }
+  
   private saveAnalyticsLocally(data: any) {
     try {
       let localAnalytics = JSON.parse(
@@ -289,34 +297,36 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
       );
       localAnalytics.push(data);
       localStorage.setItem('pendingAnalytics', JSON.stringify(localAnalytics));
-      console.log('💾 Analytics guardados localmente como backup');
+      this.logger.log('Analytics guardados localmente como backup');
     } catch (error) {
-      console.error('Error guardando analytics localmente:', error);
+      this.logger.error('Error guardando analytics localmente:', error);
     }
   }
+  
   async sendPendingAnalytics() {
     try {
       await this.analyticsService.sendPendingAnalytics();
     } catch (error) {
-      console.error('Error enviando analytics pendientes:', error);
+      this.logger.error('Error enviando analytics pendientes:', error);
     }
   }
 
   // ✅ Funciones auxiliares
   private showWelcomeBackMessage() {
     // Mostrar mensaje de bienvenida personalizado
-    console.log(
+    this.logger.log(
       `¡Bienvenido de vuelta! Esta es tu visita número ${this.visitCount}`
     );
   }
+  
   private highlightZodiacContent() {
     // Destacar contenido relacionado con el signo zodiacal
-    console.log(`Personalizando para signo: ${this.userZodiacSign}`);
+    this.logger.log(`Personalizando para signo: ${this.userZodiacSign}`);
   }
 
   private enableAnalytics() {
     // Habilitar Google Analytics u otras herramientas
-    console.log('Analytics habilitado');
+    this.logger.info('Analytics habilitado');
   }
     async enviarSugerencia() {
     // Validar input
@@ -332,34 +342,38 @@ export class BienvenidaComponent implements AfterViewInit, OnInit {
 
     // Enviar sugerencia
     this.enviandoSugerencia = true;
+    this.cdr.markForCheck();
     
     try {
       const response = await this.sugerenciasService.enviarSugerencia(this.sugerenciaTexto).toPromise();
       
       if (response?.success) {
-        this.mostrarMensajeSugerencia(response.message, 'success');
+        this.mostrarMensajeSugerencia('✅ ¡Sugerencia enviada con éxito!', 'success');
         this.sugerenciaTexto = ''; // Limpiar input
       } else {
         this.mostrarMensajeSugerencia('Error al enviar sugerencia', 'error');
       }
       
     } catch (error) {
-      console.error('Error enviando sugerencia:', error);
+      this.logger.error('Error enviando sugerencia:', error);
       this.mostrarMensajeSugerencia(
         typeof error === 'string' ? error : 'Error de conexión. Intenta nuevamente.',
         'error'
       );
     } finally {
       this.enviandoSugerencia = false;
+      this.cdr.markForCheck();
     }
   }
     // Mostrar mensaje de confirmación
   private mostrarMensajeSugerencia(texto: string, tipo: 'success' | 'error') {
     this.mensajeSugerencia = { texto, tipo };
+    this.cdr.markForCheck();
     
     // Ocultar mensaje después de 4 segundos
     setTimeout(() => {
       this.mensajeSugerencia = null;
+      this.cdr.markForCheck();
     }, 4000);
   }
 

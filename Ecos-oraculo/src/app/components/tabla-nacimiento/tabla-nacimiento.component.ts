@@ -9,6 +9,8 @@ import {
   OnInit,
   Optional,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -80,6 +82,7 @@ interface AstrologerInfo {
   ],
   templateUrl: './tabla-nacimiento.component.html',
   styleUrl: './tabla-nacimiento.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TablaNacimientoComponent
   implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit
@@ -157,7 +160,8 @@ export class TablaNacimientoComponent
     @Optional() public dialogRef: MatDialogRef<TablaNacimientoComponent>,
     private http: HttpClient,
     private tablaNacimientoService: TablaNacimientoService,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef
   ) {}
   ngAfterViewInit(): void {
     this.setVideosSpeed(0.6); // 0.5 = más lento, 1 = normal
@@ -453,6 +457,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
             // Mostrar modal de datos
             setTimeout(() => {
               this.showDataModal = true;
+              this.cdr.markForCheck();
             }, 100);
           }, 2000);
         } else if (!this.firstQuestionAsked) {
@@ -461,6 +466,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         }
 
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         this.isLoading = false;
@@ -475,6 +481,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         };
         this.messages.push(errorMsg);
         this.saveMessagesToSession();
+        this.cdr.markForCheck();
       },
     });
   }
@@ -1105,6 +1112,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       ) {
         console.log('✅ Mostrando ruleta natal - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta natal en este momento');
       }
@@ -1144,6 +1152,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta natal manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta natal - sin tiradas disponibles'
@@ -1259,6 +1268,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     );
 
     this.showFortuneWheel = true;
+    this.cdr.markForCheck();
     console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 

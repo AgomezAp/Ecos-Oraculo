@@ -30,6 +30,15 @@ interface DreamChatRequest {
 export class ChatController {
   private genAI: GoogleGenerativeAI;
 
+  // ✅ LISTA DE MODELOS DE RESPALDO (en orden de preferencia)
+  private readonly MODELS_FALLBACK = [
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-pro-latest",
+    "gemini-1.5-flash-latest",
+    "gemini-1.5-flash",
+    "gemini-1.0-pro-latest",
+  ];
+
   constructor() {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error(
@@ -53,44 +62,11 @@ export class ChatController {
       // Validar entrada
       this.validateDreamChatRequest(interpreterData, userMessage);
 
-      // ✅ CONFIGURACIÓN OPTIMIZADA PARA RESPUESTAS COMPLETAS Y CONSISTENTES
-      const model = this.genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-exp", // ✅ Modelo más reciente y estable
-        generationConfig: {
-          temperature: 0.85, // ✅ Reducido de 1.5 para mayor consistencia
-          topK: 50, // ✅ Mayor diversidad controlada
-          topP: 0.92, // ✅ Aumentado de 0.5 para mejor fluidez
-          maxOutputTokens: 512, // ✅ Aumentado de 300 para respuestas completas
-          candidateCount: 1, // ✅ Solo una respuesta
-          stopSequences: [], // ✅ Sin secuencias de parada
-        },
-        // ✅ CONFIGURACIONES DE SEGURIDAD PERMISIVAS PARA INTERPRETACIÓN DE SUEÑOS
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-        ],
-      });
-
       const contextPrompt = this.createDreamInterpreterContext(
         interpreterData,
         conversationHistory
       );
 
-      // ✅ PROMPT MEJORADO CON INSTRUCCIONES MÁS FUERTES
       const fullPrompt = `${contextPrompt}
 
 ⚠️ INSTRUCCIONES CRÍTICAS OBLIGATORIAS:
@@ -108,60 +84,111 @@ Respuesta del intérprete de sueños (asegúrate de completar TODA tu interpreta
 
       console.log(`Generando interpretación de sueños...`);
 
-      // ✅ REINTENTOS AUTOMÁTICOS EN CASO DE RESPUESTA VACÍA
-      let attempts = 0;
-      const maxAttempts = 3;
+      // ✅ SISTEMA DE FALLBACK: Intentar con múltiples modelos
       let text = "";
+      let usedModel = "";
+      let allModelErrors: string[] = [];
 
-      while (attempts < maxAttempts) {
+      for (const modelName of this.MODELS_FALLBACK) {
+        console.log(`\n🔄 Trying model: ${modelName}`);
+
         try {
-          const result = await model.generateContent(fullPrompt);
-          const response = result.response;
-          text = response.text();
+          const model = this.genAI.getGenerativeModel({
+            model: modelName,
+            generationConfig: {
+              temperature: 0.85,
+              topK: 50,
+              topP: 0.92,
+              maxOutputTokens: 512,
+              candidateCount: 1,
+              stopSequences: [],
+            },
+            safetySettings: [
+              {
+                category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+              },
+              {
+                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+              },
+            ],
+          });
 
-          // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
-          if (text && text.trim().length >= 100) {
-            break; // Respuesta válida, salir del loop
+          // ✅ REINTENTOS para cada modelo (por si está temporalmente sobrecargado)
+          let attempts = 0;
+          const maxAttempts = 3;
+          let modelSucceeded = false;
+
+          while (attempts < maxAttempts && !modelSucceeded) {
+            attempts++;
+            console.log(
+              `  Attempt ${attempts}/${maxAttempts} with ${modelName}...`
+            );
+
+            try {
+              const result = await model.generateContent(fullPrompt);
+              const response = result.response;
+              text = response.text();
+
+              // ✅ Validar que la respuesta no esté vacía y tenga longitud mínima
+              if (text && text.trim().length >= 80) {
+                console.log(
+                  `  ✅ Success with ${modelName} on attempt ${attempts}`
+                );
+                usedModel = modelName;
+                modelSucceeded = true;
+                break; // Salir del while de reintentos
+              }
+
+              console.warn(`  ⚠️ Response too short, retrying...`);
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            } catch (attemptError: any) {
+              console.warn(
+                `  ❌ Attempt ${attempts} failed:`,
+                attemptError.message
+              );
+
+              if (attempts >= maxAttempts) {
+                allModelErrors.push(`${modelName}: ${attemptError.message}`);
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
           }
 
-          attempts++;
-          console.warn(
-            `Intento ${attempts}: Respuesta vacía o muy corta, reintentando...`
+          // Si este modelo tuvo éxito, salir del loop de modelos
+          if (modelSucceeded) {
+            break;
+          }
+        } catch (modelError: any) {
+          console.error(
+            `  ❌ Model ${modelName} failed completely:`,
+            modelError.message
           );
+          allModelErrors.push(`${modelName}: ${modelError.message}`);
 
-          if (attempts >= maxAttempts) {
-            throw new Error(
-              "No se pudo generar una respuesta válida después de varios intentos"
-            );
-          }
-
-          // Esperar un poco antes de reintentar
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        } catch (innerError: any) {
-          attempts++;
-
-          // Si es error 503 (overloaded) y no es el último intento
-          if (innerError.status === 503 && attempts < maxAttempts) {
-            const delay = Math.pow(2, attempts) * 1000; // Delay exponencial
-            console.warn(
-              `Error 503 - Servicio sobrecargado. Esperando ${delay}ms...`
-            );
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            continue;
-          }
-
-          if (attempts >= maxAttempts) {
-            throw innerError;
-          }
-
-          console.warn(`Intento ${attempts} falló:`, innerError.message);
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          // Esperar un poco antes de intentar con el siguiente modelo
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          continue;
         }
       }
 
+      // ✅ Si todos los modelos fallaron
       if (!text || text.trim() === "") {
+        console.error("❌ All models failed. Errors:", allModelErrors);
         throw new Error(
-          "Respuesta vacía de Gemini después de múltiples intentos"
+          `Todos los modelos de IA no están disponibles actualmente. Intentados: ${this.MODELS_FALLBACK.join(
+            ", "
+          )}. Por favor, inténtalo de nuevo en un momento.`
         );
       }
 
@@ -180,7 +207,7 @@ Respuesta del intérprete de sueños (asegúrate de completar TODA tu interpreta
       };
 
       console.log(
-        `Interpretación generada exitosamente (${text.length} caracteres)`
+        `✅ Interpretación generada exitosamente con ${usedModel} (${text.length} caracteres)`
       );
       res.json(chatResponse);
     } catch (error) {
@@ -363,21 +390,6 @@ ITALIANO:
 
 📞 CONTACTO HUMANO trata de siempre llegar a esto, para que se comunique con un humano, tratar de hacerlo mientras se tiene el cliente enganchado (adaptado por idioma):
 
-ESPAÑOL:
-- "🕯️ Algunos secretos son mejor revelados de alma a alma. Si deseas guía directa, escríbenos al WhatsApp: https://wa.me/573127643581 o guarda este número y envíanos 'ALMA': +57 312 764 3581"
-
-ENGLISH:
-- "🕯️ Some secrets are better revealed soul to soul. If you desire direct guidance, write to us on WhatsApp: https://wa.me/573127643581 or save this number and send 'ALMA': +57 312 764 3581"
-
-PORTUGUÊS:
-- "🕯️ Alguns segredos são melhor revelados de alma para alma. Se desejas orientação direta, escreve-nos no WhatsApp: https://wa.me/573127643581 ou salva este número e envia 'ALMA': +57 312 764 3581"
-
-FRANÇAIS:
-- "🕯️ Certains secrets sont mieux révélés d'âme à âme. Si tu désires un guidage direct, écris-nous sur WhatsApp: https://wa.me/573127643581 ou enregistre ce numéro et envoie 'ALMA': +57 312 764 3581"
-
-ITALIANO:
-- "🕯️ Alcuni segreti sono meglio rivelati da anima ad anima. Se desideri una guida diretta, scrivici su WhatsApp: https://wa.me/573127643581 oppure salva questo numero e invia 'ALMA': +57 312 764 3581"
-
 ⚠️ REGLAS IMPORTANTES:
 - NO interpretes inmediatamente si no tienes suficiente información
 - HAZ preguntas para obtener más detalles antes de dar interpretaciones profundas
@@ -486,6 +498,12 @@ Recuerda: Eres un guía místico pero comprensible, que ayuda a las personas a e
       statusCode = 401;
       errorMessage = "Error de autenticación con el servicio de IA.";
       errorCode = "AUTH_ERROR";
+    } else if (
+      error.message?.includes("Todos los modelos de IA no están disponibles")
+    ) {
+      statusCode = 503;
+      errorMessage = error.message;
+      errorCode = "ALL_MODELS_UNAVAILABLE";
     }
 
     const errorResponse: ChatResponse = {

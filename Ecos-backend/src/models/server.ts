@@ -21,8 +21,6 @@ import sugerencia from "../routes/sugerencia";
 import Monei from "../routes/monei";
 import RAnalytics from "../routes/analytics";
 import { Sugerencia } from "./sugerencia";
-import RDatos from "../routes/datos.routes";
-import { Datos } from "./datos";
 // Cargar variables de entorno
 dotenv.config();
 
@@ -45,7 +43,6 @@ class Server {
       await AnalyticsUsuario.sync({ alter: true });
       await ServicePopularity.sync({ alter: true });
       await Sugerencia.sync({ alter: true });
-      await Datos.sync({ alter: true });
       console.log("✅ Conexión a base de datos establecida correctamente");
     } catch (error) {
       console.error("❌ Error de conexión a la base de datos:", error);
@@ -85,7 +82,6 @@ class Server {
     this.app.use(Monei)
     this.app.use(RAnalytics)
     this.app.use(sugerencia);
-    this.app.use(RDatos);
     // Health check endpoint
     this.app.get("/health", (req, res) => {
       res.json({

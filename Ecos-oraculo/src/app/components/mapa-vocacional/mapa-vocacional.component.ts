@@ -7,6 +7,8 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -105,6 +107,7 @@ interface AnalysisResult {
   ],
   templateUrl: './mapa-vocacional.component.html',
   styleUrl: './mapa-vocacional.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapaVocacionalComponent
   implements OnInit, OnDestroy, AfterViewChecked, AfterViewInit
@@ -189,7 +192,8 @@ export class MapaVocacionalComponent
   constructor(
     private vocationalService: MapaVocacionalService,
     private http: HttpClient,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef
   ) {}
   ngAfterViewInit(): void {
     this.setVideosSpeed(0.67); // 0.5 = más lento, 1 = normal
@@ -501,6 +505,7 @@ export class MapaVocacionalComponent
               // Mostrar modal de datos
               setTimeout(() => {
                 this.showDataModal = true;
+                this.cdr.markForCheck();
               }, 100);
             }, 2000);
           } else if (!this.firstQuestionAsked) {
@@ -509,6 +514,7 @@ export class MapaVocacionalComponent
           }
 
           this.saveMessagesToSession();
+          this.cdr.markForCheck();
         },
         error: (error) => {
           this.isLoading = false;
@@ -521,6 +527,7 @@ export class MapaVocacionalComponent
             isUser: false,
           });
           this.saveMessagesToSession();
+          this.cdr.markForCheck();
         },
       });
   }
@@ -711,6 +718,7 @@ export class MapaVocacionalComponent
       ) {
         console.log('✅ Mostrando ruleta vocacional - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck();
       } else {
         console.log('❌ No se puede mostrar ruleta vocacional en este momento');
       }
@@ -750,6 +758,7 @@ export class MapaVocacionalComponent
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta vocacional manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck();
     } else {
       console.log(
         '❌ No se puede activar ruleta vocacional - sin tiradas disponibles'
@@ -863,6 +872,7 @@ export class MapaVocacionalComponent
     );
 
     this.showFortuneWheel = true;
+    this.cdr.markForCheck();
     console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 
@@ -1059,9 +1069,11 @@ export class MapaVocacionalComponent
       next: (questions) => {
         this.assessmentQuestions = questions;
         this.updateProgress();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error loading questions:', error);
+        this.cdr.markForCheck();
       },
     });
   }
@@ -1132,9 +1144,11 @@ export class MapaVocacionalComponent
         this.assessmentResults = results;
         this.hasAssessmentResults = true;
         this.switchTab('results');
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error analyzing assessment:', error);
+        this.cdr.markForCheck();
       },
     });
   }
@@ -1321,9 +1335,8 @@ export class MapaVocacionalComponent
     this.currentTab = 'chat';
 
     // 12. Reinicializar mensaje de bienvenida
-    setTimeout(() => {
-      this.initializeWelcomeMessage();
-      console.log('✅ Reset completo del chat vocacional completado');
-    }, 100);
+    this.initializeWelcomeMessage();
+    this.cdr.markForCheck();
+    console.log('✅ Reset completo del chat vocacional completado');
   }
 }

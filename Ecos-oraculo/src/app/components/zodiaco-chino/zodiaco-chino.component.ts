@@ -6,6 +6,8 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -79,6 +81,7 @@ interface ZodiacAnimal {
   ],
   templateUrl: './zodiaco-chino.component.html',
   styleUrl: './zodiaco-chino.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ZodiacoChinoComponent
   implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit
@@ -148,7 +151,8 @@ export class ZodiacoChinoComponent
     private fb: FormBuilder,
     private zodiacoChinoService: ZodiacoChinoService,
     private http: HttpClient,
-    private elRef: ElementRef<HTMLElement>
+    private elRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef
   ) {
     // Configuración del formulario para horóscopo
     this.userForm = this.fb.group({
@@ -766,6 +770,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             this.isFormCompleted = true;
             this.showDataForm = false;
             this.saveHoroscopeMessagesToSession();
+            this.cdr.markForCheck();
           } else {
             this.handleError('Error en la respuesta de la astróloga');
           }
@@ -776,6 +781,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             'Error conectando con la astróloga: ' +
               (error.error?.error || error.message)
           );
+          this.cdr.markForCheck();
         },
       });
     }
@@ -874,6 +880,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
               // Mostrar modal de datos
               setTimeout(() => {
                 this.showDataModal = true;
+                this.cdr.markForCheck();
               }, 100);
             }, 2000);
           } else if (!this.firstQuestionAsked) {
@@ -882,6 +889,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           }
 
           this.saveHoroscopeMessagesToSession();
+          this.cdr.markForCheck();
         } else {
           this.handleError('Error en la respuesta de la astróloga');
         }
@@ -893,6 +901,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           'Error conectando con la astróloga: ' +
             (error.error?.error || error.message)
         );
+        this.cdr.markForCheck();
       },
     });
   }
@@ -1129,10 +1138,9 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     });
 
     // 12. Reinicializar mensaje de bienvenida
-    setTimeout(() => {
-      this.initializeHoroscopeWelcomeMessage();
-      console.log('✅ Reset completo del chat horoscópico completado');
-    }, 100);
+    this.initializeHoroscopeWelcomeMessage();
+    this.cdr.markForCheck();
+    console.log('✅ Reset completo del chat horoscópico completado');
   }
   onUserDataSubmitted(userData: any): void {
     console.log('📥 Datos del usuario recibidos en horóscopo:', userData);
@@ -1239,6 +1247,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       ) {
         console.log('✅ Mostrando ruleta horoscópica - usuario puede girar');
         this.showFortuneWheel = true;
+        this.cdr.markForCheck(); // ✅ Forzar detección de cambios
       } else {
         console.log(
           '❌ No se puede mostrar ruleta horoscópica en este momento'
@@ -1279,6 +1288,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     if (FortuneWheelComponent.canShowWheel()) {
       console.log('✅ Activando ruleta horoscópica manualmente');
       this.showFortuneWheel = true;
+      this.cdr.markForCheck(); // ✅ Forzar detección de cambios
     } else {
       console.log(
         '❌ No se puede activar ruleta horoscópica - sin tiradas disponibles'
@@ -1396,6 +1406,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     );
 
     this.showFortuneWheel = true;
+    this.cdr.markForCheck(); // ✅ Forzar detección de cambios
     console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 
