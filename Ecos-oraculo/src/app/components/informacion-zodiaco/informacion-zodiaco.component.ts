@@ -146,7 +146,7 @@ export class InformacionZodiacoComponent
     */
   // Configuración de Stripe
   private stripePublishableKey =
-    ' pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
   private backendUrl = environment.apiUrl;
 
   astrologerInfo = {
@@ -845,14 +845,25 @@ export class InformacionZodiacoComponent
         );
       }
       this.clientSecret = response.clientSecret;
+      console.log('🔑 clientSecret obtenido:', this.clientSecret);
+
+      console.log('🔍 Verificando this.stripe:', this.stripe);
+      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
+        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
+        console.log('✅ Elements creado:', this.elements);
+        
         this.paymentElement = this.elements.create('payment');
+        console.log('✅ Payment element creado:', this.paymentElement);
+        
         this.isProcessingPayment = false;
+        this.cdr.markForCheck();
+        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
@@ -863,12 +874,18 @@ export class InformacionZodiacoComponent
           if (paymentElementContainer && this.paymentElement) {
             console.log('✅ Montando payment element astral...');
             this.paymentElement.mount(paymentElementContainer);
+            console.log('🎉 Payment element montado exitosamente!');
           } else {
             console.error('❌ Contenedor del elemento de pago no encontrado.');
+            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
+            this.cdr.markForCheck();
           }
         }, 100);
       } else {
+        console.error('❌ Stripe o clientSecret no disponibles:');
+        console.error('   - this.stripe:', this.stripe);
+        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
@@ -880,6 +897,7 @@ export class InformacionZodiacoComponent
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
       this.isProcessingPayment = false;
+      this.cdr.markForCheck();
     }
   }
   async handlePaymentSubmit(): Promise<void> {
