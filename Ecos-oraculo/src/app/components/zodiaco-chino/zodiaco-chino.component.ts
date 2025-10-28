@@ -749,6 +749,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   startConsultation(): void {
     if (this.userForm.valid && !this.isLoading) {
       this.isLoading = true;
+      this.cdr.markForCheck(); // ✅ Detectar cambio de loading
 
       const formData = this.userForm.value;
 
@@ -852,6 +853,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.currentMessage = '';
     this.isLoading = true;
     this.isTyping = true;
+    this.cdr.markForCheck(); // ✅ Detectar cambios de estado
 
     // Agregar mensaje del usuario
     this.addMessage('user', message);
@@ -874,6 +876,8 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       next: (response) => {
         this.isLoading = false;
         this.isTyping = false;
+        this.cdr.markForCheck(); // ✅ Detectar fin de loading
+        
         if (response.success && response.response) {
           const messageId = Date.now().toString();
 
@@ -999,6 +1003,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.conversationHistory.push(newMessage);
     this.shouldScrollToBottom = true;
     this.saveHoroscopeMessagesToSession();
+    this.cdr.markForCheck(); // ✅ CRÍTICO: Detectar cambios en mensajes
   }
 
   private scrollToBottom(): void {
