@@ -144,7 +144,7 @@ export class ZodiacoChinoComponent
   */
   // Configuración de Stripe
   private stripePublishableKey =
-    ' pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -635,18 +635,23 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           console.log('¡Pago exitoso para horóscopo!');
           this.hasUserPaidForHoroscope = true;
           sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('horoscopeBlockedMessageId');
 
           this.addMessage(
             'master',
-            '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y la influencia celestial revelarán todos sus misterios en tu horóscopo personal. ¿Qué otro aspecto de tu signo zodiacal te gustaría explorar?'
+            '🔮 ¡Pago confirmado! Ahora puedes acceder a toda la sabiduría astrológica. Los secretos de las estrellas y la influencia celestial revelarán todos sus misterios en tu horóscopo personal.'
           );
+          this.saveHoroscopeMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem(
             'pendingHoroscopeMessage'
           );
@@ -657,14 +662,13 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             );
             sessionStorage.removeItem('pendingHoroscopeMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processHoroscopeUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
 
           this.shouldAutoScroll = true;
-          this.saveHoroscopeMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

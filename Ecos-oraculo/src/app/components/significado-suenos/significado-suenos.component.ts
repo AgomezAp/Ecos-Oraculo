@@ -113,11 +113,11 @@ export class SignificadoSuenosComponent
   private readonly minTextareaHeight = 45;
   private readonly maxTextareaHeight = 120;
   /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
-          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC
   */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   interpreterData: DreamInterpreterData = {
@@ -952,36 +952,39 @@ export class SignificadoSuenosComponent
           console.log('¡Pago exitoso para interpretación de sueños!');
           this.hasUserPaidForDreams = true;
           sessionStorage.setItem('hasUserPaidForDreams', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('blockedMessageId');
 
           const confirmationMsg: ConversationMessage = {
             role: 'interpreter',
             message:
-              '✨ ¡Pago confirmado! Ahora puedes interpretar todos los sueños que desees. Los misterios oníricos están a tu disposición. ¿Qué otro sueño te gustaría que analice?',
+              '✨ ¡Pago confirmado! Ahora puedes interpretar todos los sueños que desees. Los misterios oníricos están a tu disposición.',
             timestamp: new Date(),
           };
           this.messages.push(confirmationMsg);
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem('pendingUserMessage');
           if (pendingMessage) {
             console.log('📝 Procesando mensaje pendiente:', pendingMessage);
             sessionStorage.removeItem('pendingUserMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
 
           // ✅ ACTIVAR AUTO-SCROLL para mensaje de confirmación
           this.shouldAutoScroll = true;
-
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

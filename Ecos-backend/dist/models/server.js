@@ -83,7 +83,6 @@ class Server {
         this.app.use(calculadora_amor_1.default);
         this.app.use(Pagos_1.default);
         this.app.use(recolecta_1.default);
-        this.app.use(Monei);
         this.app.use(analytics_1.default);
         this.app.use(sugerencia_1.default);
         // Health check endpoint

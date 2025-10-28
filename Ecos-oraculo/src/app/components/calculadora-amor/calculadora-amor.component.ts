@@ -125,9 +125,12 @@ export class CalculadoraAmorComponent
     },
   ];
   private wheelTimer: any;
+    /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   // Formulario reactivo
@@ -982,21 +985,26 @@ export class CalculadoraAmorComponent
           console.log('¡Pago exitoso para amor!');
           this.hasUserPaidForLove = true;
           sessionStorage.setItem('hasUserPaidForLove', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('loveBlockedMessageId');
 
           const confirmationMsg: ConversationMessage = {
             role: 'love_expert',
             message:
-              '✨ ¡Pago confirmado! Ahora puedes acceder a todas las lecturas de compatibilidad amorosa que desees. Los secretos del amor verdadero se revelarán ante ti. ¿Qué otro aspecto romántico te gustaría explorar? 💕',
+              '✨ ¡Pago confirmado! Ahora puedes acceder a todas las lecturas de compatibilidad amorosa que desees. Los secretos del amor verdadero se revelarán ante ti. 💕',
             timestamp: new Date(),
           };
           this.conversationHistory.push(confirmationMsg);
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem('pendingLoveMessage');
           if (pendingMessage) {
             console.log(
@@ -1005,14 +1013,13 @@ export class CalculadoraAmorComponent
             );
             sessionStorage.removeItem('pendingLoveMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processLoveUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
 
           this.shouldAutoScroll = true;
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

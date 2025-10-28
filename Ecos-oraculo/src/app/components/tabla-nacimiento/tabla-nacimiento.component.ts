@@ -150,9 +150,11 @@ export class TablaNacimientoComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-  /* pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC */
+  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -786,9 +788,7 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
           console.log('¡Pago exitoso para consultas de tabla de nacimiento!');
           this.hasUserPaid = true;
           sessionStorage.setItem('hasUserPaidBirthChart', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('birthChartBlockedMessageId');
           this.shouldScrollToBottom = true;
@@ -796,12 +796,19 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
           this.addMessage({
             sender: 'Maestra Emma',
             content:
-              '🌟 ✨ ¡Pago confirmado! Las puertas del conocimiento celestial se han abierto completamente para ti. Ahora puedes explorar todos los misterios de tu carta natal sin límites. ¡Que las estrellas te guíen hacia la sabiduría! ¿Sobre qué aspecto específico de tu configuración astral te gustaría profundizar?',
+              '🌟 ✨ ¡Pago confirmado! Las puertas del conocimiento celestial se han abierto completamente para ti. Ahora puedes explorar todos los misterios de tu carta natal sin límites.',
             timestamp: new Date(),
             isUser: false,
           });
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem(
             'pendingBirthChartMessage'
           );
@@ -812,13 +819,11 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
             );
             sessionStorage.removeItem('pendingBirthChartMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processBirthChartUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
-
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

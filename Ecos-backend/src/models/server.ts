@@ -78,7 +78,6 @@ class Server {
     this.app.use(calculadoraAmor);
     this.app.use(RPagos);
     this.app.use(Recolecta);
-    this.app.use(Monei)
     this.app.use(RAnalytics)
     this.app.use(sugerencia);
     // Health check endpoint

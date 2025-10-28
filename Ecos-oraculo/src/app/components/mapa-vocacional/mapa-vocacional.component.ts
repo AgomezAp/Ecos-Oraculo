@@ -171,9 +171,11 @@ export class MapaVocacionalComponent
   ];
   private wheelTimer: any;
   // AGREGADO - Configuración de Stripe
-  /* 'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL'; */
+  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   // Datos personales
@@ -932,21 +934,26 @@ export class MapaVocacionalComponent
           console.log('¡Pago exitoso para consultas vocacionales!');
           this.hasUserPaidForVocational = true;
           sessionStorage.setItem('hasUserPaidForVocational', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('vocationalBlockedMessageId');
 
           this.addMessage({
             sender: this.counselorInfo.name,
             content:
-              '✨ ¡Pago confirmado! Ahora puedes acceder a toda mi experiencia en orientación vocacional. Continuemos explorando tu camino profesional ideal. ¿En qué aspecto de tu futuro profesional te gustaría profundizar?',
+              '✨ ¡Pago confirmado! Ahora puedes acceder a toda mi experiencia en orientación vocacional. Continuemos explorando tu camino profesional ideal.',
             timestamp: new Date(),
             isUser: false,
           });
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem(
             'pendingVocationalMessage'
           );
@@ -957,14 +964,13 @@ export class MapaVocacionalComponent
             );
             sessionStorage.removeItem('pendingVocationalMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
 
           this.shouldAutoScroll = true;
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

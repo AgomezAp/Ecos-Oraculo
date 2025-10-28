@@ -125,10 +125,12 @@ export class LecturaNumerologiaComponent
   private wheelTimer: any;
   // NUEVA PROPIEDAD para controlar mensajes bloqueados
   blockedMessageId: string | null = null;
-  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';*/
+  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   // Datos personales
@@ -912,21 +914,26 @@ export class LecturaNumerologiaComponent
           console.log('¡Pago exitoso para numerología!');
           this.hasUserPaidForNumerology = true;
           sessionStorage.setItem('hasUserPaidForNumerology', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('numerologyBlockedMessageId');
 
           const confirmationMsg: ConversationMessage = {
             role: 'numerologist',
             message:
-              '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados revelarán todos sus secretos. ¿Qué otro aspecto numerológico te gustaría explorar?',
+              '✨ ¡Pago confirmado! Ahora puedes acceder a todas las interpretaciones numerológicas que desees. Los números sagrados revelarán todos sus secretos.',
             timestamp: new Date(),
           };
           this.messages.push(confirmationMsg);
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem(
             'pendingNumerologyMessage'
           );
@@ -937,15 +944,14 @@ export class LecturaNumerologiaComponent
             );
             sessionStorage.removeItem('pendingNumerologyMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.currentMessage = pendingMessage;
               this.sendMessage();
-            }, 1000);
+            }, 300);
           }
 
           this.shouldAutoScroll = true;
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

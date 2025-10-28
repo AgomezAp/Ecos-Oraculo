@@ -146,7 +146,7 @@ export class InformacionZodiacoComponent
     */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   astrologerInfo = {
@@ -934,21 +934,26 @@ export class InformacionZodiacoComponent
           console.log('¡Pago exitoso para consultas astrales!');
           this.hasUserPaidForAstrology = true;
           sessionStorage.setItem('hasUserPaidForAstrology', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('blockedAstrologyMessageId');
 
           const confirmationMsg = {
             isUser: false,
             content:
-              '✨ ¡Pago confirmado! Ahora puedes consultar los astros ilimitadamente. Los misterios del zodíaco están a tu disposición. ¿Qué otro aspecto astral te gustaría explorar?',
+              '✨ ¡Pago confirmado! Ahora puedes consultar los astros ilimitadamente. Los misterios del zodíaco están a tu disposición.',
             timestamp: new Date(),
           };
           this.messages.push(confirmationMsg);
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem(
             'pendingAstrologyMessage'
           );
@@ -959,14 +964,13 @@ export class InformacionZodiacoComponent
             );
             sessionStorage.removeItem('pendingAstrologyMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
 
           this.shouldAutoScroll = true;
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =

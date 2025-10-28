@@ -115,9 +115,11 @@ export class AnimalInteriorComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-  /* 'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhl' */
+  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
+  */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -572,19 +574,23 @@ export class AnimalInteriorComponent
       console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
-        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
+        console.log(
+          '✅ Stripe y clientSecret disponibles, creando elements...'
+        );
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
         console.log('✅ Elements creado:', this.elements);
-        
+
         this.paymentElement = this.elements.create('payment');
         console.log('✅ Payment element creado:', this.paymentElement);
-        
+
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
+        console.log(
+          '⏸️ isProcessingPayment = false, esperando actualización del DOM...'
+        );
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
@@ -656,9 +662,7 @@ export class AnimalInteriorComponent
           console.log('¡Pago exitoso para consultas de animal interior!');
           this.hasUserPaid = true;
           sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
-          this.showPaymentModal = false;
-          this.paymentElement?.destroy();
-
+          
           this.blockedMessageId = null;
           sessionStorage.removeItem('animalInteriorBlockedMessageId');
           this.shouldScrollToBottom = true;
@@ -666,12 +670,19 @@ export class AnimalInteriorComponent
           this.addMessage({
             sender: 'Xamán Olivia',
             content:
-              '🦉 ✨ ¡Pago confirmado! Los espíritus animales han bendecido nuestra conexión. Ahora puedes acceder a toda la sabiduría del reino animal sin límites. ¡Que la magia ancestral te acompañe! ¿Qué aspecto de tu animal interior te gustaría explorar más profundamente?',
+              '🦉 ✨ ¡Pago confirmado! Los espíritus animales han bendecido nuestra conexión. Ahora puedes acceder a toda la sabiduría del reino animal sin límites.',
             timestamp: new Date(),
             isUser: false,
           });
+          this.saveMessagesToSession();
 
-          // ✅ NUEVO: Procesar mensaje pendiente si existe
+          // ✅ CERRAR MODAL INMEDIATAMENTE después de confirmar pago
+          this.showPaymentModal = false;
+          this.isProcessingPayment = false;
+          this.paymentElement?.destroy();
+          this.cdr.markForCheck(); // ← Forzar actualización UI para cerrar modal
+
+          // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem('pendingAnimalMessage');
           if (pendingMessage) {
             console.log(
@@ -680,13 +691,11 @@ export class AnimalInteriorComponent
             );
             sessionStorage.removeItem('pendingAnimalMessage');
 
-            // Procesar el mensaje pendiente después de un pequeño delay
+            // Procesar después de que el modal se haya cerrado
             setTimeout(() => {
               this.processUserMessage(pendingMessage);
-            }, 1000);
+            }, 300);
           }
-
-          this.saveMessagesToSession();
           break;
         case 'processing':
           this.paymentError =
