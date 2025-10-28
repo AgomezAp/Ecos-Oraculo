@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  ChangeDetectorRef,
 } from '@angular/core';
 export interface Prize {
   id: string;
@@ -50,6 +51,8 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
   hasUsedDailyFreeSpIn: boolean = false;
   nextFreeSpinTime: Date | null = null;
   spinCooldownTimer: any;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.segmentAngle = 360 / this.prizes.length;
@@ -203,6 +206,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
       this.isSpinning = true;
       this.canSpinWheel = false;
       this.selectedPrize = null;
+      this.cdr.markForCheck(); // ✅ Detectar cambios
 
       // ✅ USAR TIRADA INMEDIATAMENTE (ESTO DISMINUYE EL CONTADOR)
       this.handleSpinUsage();
@@ -241,6 +245,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
       this.wheelSpinning = false;
       this.isSpinning = false;
       this.selectedPrize = wonPrize;
+      this.cdr.markForCheck(); // ✅ Detectar cambios CRÍTICO
 
       console.log('🏆 Premio seleccionado final:', this.selectedPrize);
 
@@ -261,6 +266,8 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
 
       // ✅ EMITIR EVENTO DEL PREMIO
       this.onPrizeWon.emit(wonPrize);
+      
+      this.cdr.markForCheck(); // ✅ Detectar cambios finales
 
       console.log('✅ Spin completado exitosamente');
     } catch (error) {
@@ -270,6 +277,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
       this.wheelSpinning = false;
       this.isSpinning = false;
       this.selectedPrize = null;
+      this.cdr.markForCheck(); // ✅ Detectar cambios en error
 
       // Restaurar disponibilidad
       this.checkSpinAvailability();
@@ -281,6 +289,8 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
 
         // ✅ VERIFICACIÓN FINAL DE DISPONIBILIDAD
         this.checkSpinAvailability();
+        
+        this.cdr.markForCheck(); // ✅ Detectar cambios al liberar
 
         console.log('📊 Estado FINAL FINAL:', {
           wheelSpins: this.getWheelSpinsCount(),
@@ -464,6 +474,8 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
 
     // ✅ VERIFICAR DISPONIBILIDAD ACTUALIZADA
     this.checkSpinAvailability();
+    
+    this.cdr.markForCheck(); // ✅ Detectar cambios
 
     console.log('Estado después de continuar:', {
       canSpinWheel: this.canSpinWheel,
@@ -547,6 +559,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
           this.canSpinWheel = true;
           this.nextFreeSpinTime = null;
           clearInterval(this.spinCooldownTimer);
+          this.cdr.markForCheck(); // ✅ Detectar cambios cuando termina cooldown
         }
       }, 1000);
     }
@@ -556,6 +569,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
   closeWheel() {
     this.onWheelClosed.emit();
     this.resetWheel();
+    this.cdr.markForCheck(); // ✅ Detectar cambios al cerrar
   }
 
   // ✅ RESET WHEEL
@@ -564,6 +578,7 @@ export class FortuneWheelComponent implements OnInit, OnDestroy {
     this.wheelSpinning = false;
     this.isSpinning = false;
     this.isProcessingClick = false;
+    this.cdr.markForCheck(); // ✅ Detectar cambios al resetear
   }
 
   // ✅ MÉTODO PARA CERRAR DESDE TEMPLATE

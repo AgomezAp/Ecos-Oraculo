@@ -31,7 +31,6 @@ const page_views_1 = require("./page_views");
 const analytics_usuario_1 = require("./analytics_usuario");
 const service_popularity_1 = require("./service_popularity");
 const sugerencia_1 = __importDefault(require("../routes/sugerencia"));
-const monei_1 = __importDefault(require("../routes/monei"));
 const analytics_1 = __importDefault(require("../routes/analytics"));
 const sugerencia_2 = require("./sugerencia");
 // Cargar variables de entorno
@@ -84,7 +83,7 @@ class Server {
         this.app.use(calculadora_amor_1.default);
         this.app.use(Pagos_1.default);
         this.app.use(recolecta_1.default);
-        this.app.use(monei_1.default);
+        this.app.use(Monei);
         this.app.use(analytics_1.default);
         this.app.use(sugerencia_1.default);
         // Health check endpoint

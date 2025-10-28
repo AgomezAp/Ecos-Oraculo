@@ -18,7 +18,6 @@ import { PageAnalytics } from "./page_views";
 import { AnalyticsUsuario } from "./analytics_usuario";
 import { ServicePopularity } from "./service_popularity";
 import sugerencia from "../routes/sugerencia";
-import Monei from "../routes/monei";
 import RAnalytics from "../routes/analytics";
 import { Sugerencia } from "./sugerencia";
 // Cargar variables de entorno
