@@ -17,7 +17,13 @@
   --animal-border: rgba(139, 69, 19, 0.3);
   --animal-glow: rgba(34, 139, 34, 0.3);
 }
-
+html, body {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 .close-chat-btn {
   position: absolute;
   top: 16px;
@@ -72,32 +78,30 @@
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .oracle-container {
   min-height: 100vh;
+  max-height: 100vh;
   width: 100%;
-  /* Remover la imagen de fondo estática */
-  /* background-image: url("/Oráculo 6 Animal C.webp"); */
-  /* background-size: cover; */
-  /* background-position: center; */
-  /* background-repeat: no-repeat; */
-  /* background-attachment: fixed; */
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding: 15px;
   overflow: hidden;
-  z-index: 1; /* Asegurar que esté sobre el video */
+  z-index: 1;
 }
 
 .content-with-navbar {
   position: relative;
   z-index: 2;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Contenedor principal con z-index alto */

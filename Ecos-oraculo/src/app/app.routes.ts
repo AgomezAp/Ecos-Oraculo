@@ -1,22 +1,4 @@
 import { Routes } from '@angular/router';
-import { BienvenidaComponent } from './components/bienvenida/bienvenida.component';
-import { CalculadoraAmorComponent } from './components/calculadora-amor/calculadora-amor.component';
-import { SignificadoSuenosComponent } from './components/significado-suenos/significado-suenos.component';
-import { InformacionZodiacoComponent } from './components/informacion-zodiaco/informacion-zodiaco.component';
-import { MapaVocacionalComponent } from './components/mapa-vocacional/mapa-vocacional.component';
-import { AnimalInteriorComponent } from './components/animal-interior/animal-interior.component';
-import { TablaNacimientoComponent } from './components/tabla-nacimiento/tabla-nacimiento.component';
-import { ZodiacoChinoComponent } from './components/zodiaco-chino/zodiaco-chino.component';
-import { LecturaNumerologiaComponent } from './components/lectura-numerologia/lectura-numerologia.component';
-import { WelcomeComponent } from './components/tarot/welcome/welcome.component';
-import { CardsComponent } from './components/tarot/cards/cards.component';
-import { DescriptionComponent } from './components/tarot/description/description.component';
-import { AdditionalInfoComponent } from './components/tarot/additional-info/additional-info.component';
-import { ParticlesComponent } from './shared/particles/particles.component';
-import { AgradecimientoComponent } from './components/tarot/agradecimiento/agradecimiento.component';
-import { TerminosCondicionesComponent } from './components/tarot/terminos-condiciones/terminos-condiciones.component';
-import { TerminosCondicionesEcos } from './components/terminos-condiciones/terminos-condiciones.component';
-import { CookiesComponent } from './components/cookies/cookies.component';
 
 export const routes: Routes = [
   {
@@ -26,78 +8,50 @@ export const routes: Routes = [
   },
   {
     path: 'bienvenida',
-    component: BienvenidaComponent,
+    loadComponent: () => import('./components/bienvenida/bienvenida.component').then(m => m.BienvenidaComponent),
   },
   {
     path: 'significado-sueños',
-    component: SignificadoSuenosComponent,
+    loadComponent: () => import('./components/significado-suenos/significado-suenos.component').then(m => m.SignificadoSuenosComponent),
   },
   {
     path: 'Informacion-zodiaco',
-    component: InformacionZodiacoComponent,
+    loadComponent: () => import('./components/informacion-zodiaco/informacion-zodiaco.component').then(m => m.InformacionZodiacoComponent),
   },
   {
     path: 'lectura-numerologia',
-    component: LecturaNumerologiaComponent,
+    loadComponent: () => import('./components/lectura-numerologia/lectura-numerologia.component').then(m => m.LecturaNumerologiaComponent),
   },
   {
     path: 'mapa-vocacional',
-    component: MapaVocacionalComponent,
+    loadComponent: () => import('./components/mapa-vocacional/mapa-vocacional.component').then(m => m.MapaVocacionalComponent),
   },
   {
     path: 'animal-interior',
-    component: AnimalInteriorComponent,
+    loadComponent: () => import('./components/animal-interior/animal-interior.component').then(m => m.AnimalInteriorComponent),
   },
   {
     path: 'tabla-nacimiento',
-    component: TablaNacimientoComponent,
+    loadComponent: () => import('./components/tabla-nacimiento/tabla-nacimiento.component').then(m => m.TablaNacimientoComponent),
   },
   {
     path: 'horoscopo',
-    component: ZodiacoChinoComponent,
+    loadComponent: () => import('./components/zodiaco-chino/zodiaco-chino.component').then(m => m.ZodiacoChinoComponent),
   },
   {
     path: 'calculadora-amor',
-    component: CalculadoraAmorComponent,
-  },
-  {
-    path: 'calculadora-amor',
-    component: CalculadoraAmorComponent,
-  },
-  {
-    path: 'lectura-oraculo',
-    component: WelcomeComponent,
-  },
-  {
-    path: 'cartas/:theme',
-    component: CardsComponent,
-  },
-  {
-    path: 'descripcion-cartas',
-    component: DescriptionComponent,
-  },
-  {
-    path: 'informacion',
-    component: AdditionalInfoComponent,
+    loadComponent: () => import('./components/calculadora-amor/calculadora-amor.component').then(m => m.CalculadoraAmorComponent),
   },
   {
     path: 'particulas',
-    component: ParticlesComponent,
+    loadComponent: () => import('./shared/particles/particles.component').then(m => m.ParticlesComponent),
   },
   {
-    path: 'agradecimiento',
-    component: AgradecimientoComponent,
+    path: 'terminos-condiciones-ecos',
+    loadComponent: () => import('./components/terminos-condiciones/terminos-condiciones.component').then(m => m.TerminosCondicionesEcos),
   },
   {
-    path: 'terminos-y-condiciones',
-    component: TerminosCondicionesComponent,
+    path: 'politicas-cookies',
+    loadComponent: () => import('./components/cookies/cookies.component').then(m => m.CookiesComponent),
   },
-  {
-    path:'terminos-condiciones-ecos',
-    component: TerminosCondicionesEcos
-  },
-  {
-    path:'politicas-cookies',
-    component:CookiesComponent
-  }
 ];
