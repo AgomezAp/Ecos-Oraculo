@@ -19,8 +19,8 @@ Sugerencia.init({
         type: sequelize_1.DataTypes.TEXT,
         allowNull: false,
         validate: {
-            len: [1, 1000] // Entre 1 y 1000 caracteres
-        }
+            len: [1, 1000], // Entre 1 y 1000 caracteres
+        },
     },
     fecha: {
         type: sequelize_1.DataTypes.DATE,
@@ -36,10 +36,10 @@ Sugerencia.init({
         allowNull: true,
     },
     estado: {
-        type: sequelize_1.DataTypes.ENUM('pendiente', 'leida', 'respondida'),
+        type: sequelize_1.DataTypes.ENUM("pendiente", "leida", "respondida"),
         allowNull: false,
-        defaultValue: 'pendiente',
-    }
+        defaultValue: "pendiente",
+    },
 }, {
     sequelize: connection_1.default,
     tableName: "sugerencias",

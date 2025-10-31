@@ -19,8 +19,8 @@ class SugerenciasController {
     // Configurar transporter de email
     static createEmailTransporter() {
         return nodemailer_1.default.createTransport({
-            host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.EMAIL_PORT || '587'),
+            host: process.env.EMAIL_HOST || "smtp.gmail.com",
+            port: parseInt(process.env.EMAIL_PORT || "587"),
             secure: false, // true para 465, false para otros puertos
             auth: {
                 user: process.env.EMAIL_USER,
@@ -33,11 +33,12 @@ class SugerenciasController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const transporter = SugerenciasController.createEmailTransporter();
-                const destinatario = process.env.EMAIL_SUGERENCIAS || 'sugerencias@ecosdeloraculo.com';
+                const destinatario = process.env.EMAIL_SUGERENCIAS ||
+                    "agomez.desarrollo@andrespublicidadtg.com";
                 const mailOptions = {
                     from: `"Ecos del Oráculo - Sugerencias" <${process.env.EMAIL_USER}>`,
                     to: destinatario,
-                    subject: '📝 Nueva Sugerencia Recibida - Ecos del Oráculo',
+                    subject: "📝 Nueva Sugerencia Recibida - Ecos del Oráculo",
                     html: `
                     <!DOCTYPE html>
                     <html>
@@ -80,19 +81,19 @@ NUEVA SUGERENCIA RECIBIDA
 Contenido: ${sugerencia}
 
 Información adicional:
-- Fecha: ${new Date().toLocaleString('es-ES')}
-- IP: ${ip || 'No disponible'}
-- Navegador: ${userAgent || 'No disponible'}
+- Fecha: ${new Date().toLocaleString("es-ES")}
+- IP: ${ip || "No disponible"}
+- Navegador: ${userAgent || "No disponible"}
 
 ---
 Este correo fue enviado automáticamente desde Ecos del Oráculo
                 `,
                 };
                 yield transporter.sendMail(mailOptions);
-                console.log('✅ Email de sugerencia enviado exitosamente a:', destinatario);
+                console.log("✅ Email de sugerencia enviado exitosamente a:", destinatario);
             }
             catch (error) {
-                console.error('❌ Error al enviar email de sugerencia:', error);
+                console.error("❌ Error al enviar email de sugerencia:", error);
                 // No lanzamos el error para que la sugerencia se guarde aunque falle el email
             }
         });
@@ -106,17 +107,17 @@ Este correo fue enviado automáticamente desde Ecos del Oráculo
                 if (!sugerencia || sugerencia.trim().length === 0) {
                     return res.status(400).json({
                         success: false,
-                        message: 'La sugerencia no puede estar vacía'
+                        message: "La sugerencia no puede estar vacía",
                     });
                 }
                 if (sugerencia.length > 1000) {
                     return res.status(400).json({
                         success: false,
-                        message: 'La sugerencia no puede exceder 1000 caracteres'
+                        message: "La sugerencia no puede exceder 1000 caracteres",
                     });
                 }
-                const ip = req.ip || req.socket.remoteAddress || 'Desconocida';
-                const userAgent = req.get('User-Agent') || 'Desconocido';
+                const ip = req.ip || req.socket.remoteAddress || "Desconocida";
+                const userAgent = req.get("User-Agent") || "Desconocido";
                 // Crear sugerencia en la base de datos
                 const nuevaSugerencia = yield sugerencia_1.Sugerencia.create({
                     sugerencia: sugerencia.trim(),
@@ -124,23 +125,23 @@ Este correo fue enviado automáticamente desde Ecos del Oráculo
                     user_agent: userAgent,
                 });
                 // Enviar email de notificación (asíncrono, no bloqueante)
-                SugerenciasController.enviarEmailSugerencia(sugerencia.trim(), ip, userAgent).catch(err => {
-                    console.error('Error en envío de email (no bloqueante):', err);
+                SugerenciasController.enviarEmailSugerencia(sugerencia.trim(), ip, userAgent).catch((err) => {
+                    console.error("Error en envío de email (no bloqueante):", err);
                 });
                 res.status(201).json({
                     success: true,
-                    message: '¡Sugerencia enviada exitosamente!',
+                    message: "¡Sugerencia enviada exitosamente!",
                     data: {
                         id: nuevaSugerencia.id,
-                        fecha: nuevaSugerencia.fecha
-                    }
+                        fecha: nuevaSugerencia.fecha,
+                    },
                 });
             }
             catch (error) {
-                console.error('Error al crear sugerencia:', error);
+                console.error("Error al crear sugerencia:", error);
                 res.status(500).json({
                     success: false,
-                    message: 'Error interno del servidor'
+                    message: "Error interno del servidor",
                 });
             }
         });
@@ -158,21 +159,22 @@ Este correo fue enviado automáticamente desde Ecos del Oráculo
                     where: whereCondition,
                     limit: parseInt(limit),
                     offset: parseInt(offset),
-                    order: [['fecha', 'DESC']]
+                    order: [["fecha", "DESC"]],
                 });
                 res.json({
                     success: true,
                     data: sugerencias.rows,
                     total: sugerencias.count,
-                    currentPage: Math.floor(parseInt(offset) / parseInt(limit)) + 1,
-                    totalPages: Math.ceil(sugerencias.count / parseInt(limit))
+                    currentPage: Math.floor(parseInt(offset) / parseInt(limit)) +
+                        1,
+                    totalPages: Math.ceil(sugerencias.count / parseInt(limit)),
                 });
             }
             catch (error) {
-                console.error('Error al obtener sugerencias:', error);
+                console.error("Error al obtener sugerencias:", error);
                 res.status(500).json({
                     success: false,
-                    message: 'Error al obtener sugerencias'
+                    message: "Error al obtener sugerencias",
                 });
             }
         });
@@ -186,20 +188,20 @@ Este correo fue enviado automáticamente desde Ecos del Oráculo
                 if (!sugerencia) {
                     return res.status(404).json({
                         success: false,
-                        message: 'Sugerencia no encontrada'
+                        message: "Sugerencia no encontrada",
                     });
                 }
-                yield sugerencia.update({ estado: 'leida' });
+                yield sugerencia.update({ estado: "leida" });
                 res.json({
                     success: true,
-                    message: 'Sugerencia marcada como leída'
+                    message: "Sugerencia marcada como leída",
                 });
             }
             catch (error) {
-                console.error('Error al actualizar sugerencia:', error);
+                console.error("Error al actualizar sugerencia:", error);
                 res.status(500).json({
                     success: false,
-                    message: 'Error al actualizar sugerencia'
+                    message: "Error al actualizar sugerencia",
                 });
             }
         });
