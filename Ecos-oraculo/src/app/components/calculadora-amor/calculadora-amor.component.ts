@@ -171,7 +171,6 @@ export class CalculadoraAmorComponent
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
-      console.error('Error loading Stripe.js:', error);
       this.paymentError =
         'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
@@ -179,26 +178,14 @@ export class CalculadoraAmorComponent
     this.hasUserPaidForLove =
       sessionStorage.getItem('hasUserPaidForLove') === 'true';
 
-    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
-    console.log(
-      '🔍 Cargando datos del usuario desde sessionStorage para amor...'
-    );
     const savedUserData = sessionStorage.getItem('userData');
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log(
-          '✅ Datos del usuario restaurados para amor:',
-          this.userData
-        );
       } catch (error) {
-        console.error('❌ Error al parsear datos del usuario:', error);
         this.userData = null;
       }
     } else {
-      console.log(
-        'ℹ️ No hay datos del usuario guardados en sessionStorage para amor'
-      );
       this.userData = null;
     }
 
@@ -210,16 +197,6 @@ export class CalculadoraAmorComponent
 
     this.loadLoveExpertInfo();
     this.subscribeToCompatibilityData();
-    console.log('🎰 Verificando ruleta del amor...');
-    console.log(
-      '- conversationHistory.length:',
-      this.conversationHistory.length
-    );
-    console.log(
-      '- FortuneWheelComponent.canShowWheel():',
-      FortuneWheelComponent.canShowWheel()
-    );
-
     // ✅ TAMBIÉN VERIFICAR PARA MENSAJES RESTAURADOS
     if (
       this.conversationHistory.length > 0 &&
@@ -245,9 +222,7 @@ export class CalculadoraAmorComponent
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
         this.hasStartedConversation = true;
-        console.log('✅ Mensajes de amor restaurados desde sessionStorage');
       } catch (error) {
-        console.error('Error al restaurar mensajes:', error);
         this.clearSessionData();
         this.initializeLoveWelcomeMessage();
       }
@@ -274,9 +249,6 @@ export class CalculadoraAmorComponent
     if (FortuneWheelComponent.canShowWheel()) {
       this.showLoveWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta del amor - sin tiradas disponibles'
-      );
     }
   }
   private checkPaymentStatus(): void {
@@ -287,15 +259,12 @@ export class CalculadoraAmorComponent
     );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-      console.log('🔍 Verificando estado del pago de amor...');
-
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent) {
             switch (paymentIntent.status) {
               case 'succeeded':
-                console.log('✅ Pago de amor confirmado desde URL');
                 this.hasUserPaidForLove = true;
                 sessionStorage.setItem('hasUserPaidForLove', 'true');
                 this.blockedMessageId = null;
@@ -325,24 +294,19 @@ export class CalculadoraAmorComponent
                 break;
 
               case 'processing':
-                console.log('⏳ Pago en procesamiento');
                 break;
 
               case 'requires_payment_method':
-                console.log('❌ Pago falló');
                 this.clearSessionData();
                 break;
             }
           }
         })
         .catch((error: any) => {
-          console.error('Error verificando el pago:', error);
         });
     }
   }
   openDataModalForPayment(): void {
-    console.log('🔓 Abriendo modal de datos para desbloquear mensaje');
-
     // Cerrar otros modales que puedan estar abiertos
     this.showFortuneWheel = false;
     this.showPaymentModal = false;
@@ -354,7 +318,6 @@ export class CalculadoraAmorComponent
     setTimeout(() => {
       this.showDataModal = true;
       this.cdr.markForCheck();
-      console.log('📝 Modal de datos abierto para desbloqueo');
     }, 100);
   }
   ngAfterViewChecked(): void {
@@ -388,7 +351,6 @@ export class CalculadoraAmorComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -433,7 +395,6 @@ export class CalculadoraAmorComponent
           this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error('Error al cargar información del experto:', error);
           this.cdr.markForCheck();
         },
       });
@@ -534,15 +495,9 @@ export class CalculadoraAmorComponent
     if (!this.hasUserPaidForLove && this.firstQuestionAsked) {
       // Verificar si tiene consultas amorosas gratis disponibles
       if (this.hasFreeLoveConsultationsAvailable()) {
-        console.log('🎁 Usando consulta amorosa gratis del premio');
         this.useFreeLoveConsultation();
         // Continuar con el mensaje sin bloquear
       } else {
-        // Si no tiene consultas gratis, mostrar modal de datos
-        console.log(
-          '💳 No hay consultas amorosas gratis - mostrando modal de datos'
-        );
-
         // Cerrar otros modales primero
         this.showFortuneWheel = false;
         this.showPaymentModal = false;
@@ -556,7 +511,6 @@ export class CalculadoraAmorComponent
         setTimeout(() => {
           this.showDataModal = true;
           this.cdr.markForCheck();
-          console.log('📝 showDataModal establecido a:', this.showDataModal);
         }, 100);
 
         return; // Salir aquí para no procesar el mensaje aún
@@ -632,9 +586,6 @@ export class CalculadoraAmorComponent
               sessionStorage.setItem('loveBlockedMessageId', messageId);
 
               setTimeout(() => {
-                console.log(
-                  '🔒 Mensaje amoroso bloqueado - mostrando modal de datos'
-                );
                 this.saveStateBeforePayment();
 
                 // Cerrar otros modales
@@ -661,7 +612,6 @@ export class CalculadoraAmorComponent
         error: (error: any) => {
           this.isLoading = false;
           this.isTyping = false;
-          console.error('Error:', error);
           this.handleError('Error de conexión. Por favor, inténtalo de nuevo.');
           this.cdr.markForCheck();
         },
@@ -669,7 +619,6 @@ export class CalculadoraAmorComponent
   }
 
   private saveStateBeforePayment(): void {
-    console.log('💾 Guardando estado de amor antes del pago...');
     this.saveMessagesToSession();
     sessionStorage.setItem(
       'loveFirstQuestionAsked',
@@ -691,7 +640,6 @@ export class CalculadoraAmorComponent
       }));
       sessionStorage.setItem('loveMessages', JSON.stringify(messagesToSave));
     } catch (error) {
-      console.error('Error guardando mensajes:', error);
     }
   }
 
@@ -707,7 +655,6 @@ export class CalculadoraAmorComponent
   }
 
   async promptForPayment(): Promise<void> {
-    console.log('💳 EJECUTANDO promptForPayment() para amor');
 
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
@@ -718,7 +665,6 @@ export class CalculadoraAmorComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo elemento anterior:', error);
       }
       this.paymentElement = undefined;
     }
@@ -728,29 +674,17 @@ export class CalculadoraAmorComponent
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log(
-          '🔍 userData no está en memoria, cargando desde sessionStorage para amor...'
-        );
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           try {
             this.userData = JSON.parse(savedUserData);
-            console.log(
-              '✅ Datos cargados desde sessionStorage para amor:',
-              this.userData
-            );
           } catch (error) {
-            console.error('❌ Error al parsear datos guardados:', error);
             this.userData = null;
           }
         }
       }
 
-      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
-      console.log('🔍 Validando userData completo para amor:', this.userData);
-
       if (!this.userData) {
-        console.error('❌ No hay userData disponible para amor');
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
@@ -764,14 +698,7 @@ export class CalculadoraAmorComponent
       // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
-/* 
-      console.log('🔍 Validando campos individuales para amor:');
-      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌'); */
-
       if (!nombre || !email || !telefono) {
-        console.error('❌ Faltan campos requeridos para el pago del amor');
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
@@ -792,12 +719,6 @@ export class CalculadoraAmorComponent
         email: email,
         phone: telefono,
       };
-
-      console.log(
-        '📤 Enviando request de payment intent para amor con datos del cliente...'
-      );
-      console.log('👤 Datos del cliente enviados:', customerInfo);
-
       const requestBody = { items, customerInfo };
 
       const response = await this.http
@@ -807,7 +728,6 @@ export class CalculadoraAmorComponent
         )
         .toPromise();
 
-      console.log('📥 Respuesta de payment intent:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -815,13 +735,8 @@ export class CalculadoraAmorComponent
         );
       }
       this.clientSecret = response.clientSecret;
-      console.log('🔑 clientSecret obtenido:', this.clientSecret);
-
-      console.log('🔍 Verificando this.stripe:', this.stripe);
-      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
-        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: {
@@ -835,43 +750,30 @@ export class CalculadoraAmorComponent
             },
           },
         });
-        console.log('✅ Elements creado:', this.elements);
         
         this.paymentElement = this.elements.create('payment');
-        console.log('✅ Payment element creado:', this.paymentElement);
 
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container-love'
           );
-          console.log('🎯 Contenedor encontrado:', paymentElementContainer);
 
           if (paymentElementContainer && this.paymentElement) {
-            console.log('✅ Montando payment element...');
             this.paymentElement.mount(paymentElementContainer);
-            console.log('🎉 Payment element montado exitosamente!');
           } else {
-            console.error('❌ Contenedor del elemento de pago no encontrado.');
-            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
             this.cdr.markForCheck();
           }
         }, 100);
       } else {
-        console.error('❌ Stripe o clientSecret no disponibles:');
-        console.error('   - this.stripe:', this.stripe);
-        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
       }
     } catch (error: any) {
-      console.error('❌ Error al preparar el pago:', error);
-      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -982,7 +884,6 @@ export class CalculadoraAmorComponent
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':
-          console.log('¡Pago exitoso para amor!');
           this.hasUserPaidForLove = true;
           sessionStorage.setItem('hasUserPaidForLove', 'true');
           
@@ -1007,10 +908,6 @@ export class CalculadoraAmorComponent
           // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem('pendingLoveMessage');
           if (pendingMessage) {
-            console.log(
-              '📝 Procesando mensaje de amor pendiente:',
-              pendingMessage
-            );
             sessionStorage.removeItem('pendingLoveMessage');
 
             // Procesar después de que el modal se haya cerrado
@@ -1054,7 +951,6 @@ export class CalculadoraAmorComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -1153,7 +1049,6 @@ export class CalculadoraAmorComponent
         minute: '2-digit',
       });
     } catch (error) {
-      console.error('Error formateando timestamp:', error);
       return 'N/A';
     }
   }
@@ -1175,7 +1070,6 @@ export class CalculadoraAmorComponent
         element.scrollTop = element.scrollHeight;
       }
     } catch (err) {
-      console.error('Error scrolling to bottom:', err);
     }
   }
 
@@ -1253,7 +1147,6 @@ export class CalculadoraAmorComponent
         minute: '2-digit',
       });
     } catch (error) {
-      console.error('Error formateando timestamp:', error);
       return 'N/A';
     }
   }
@@ -1281,13 +1174,7 @@ export class CalculadoraAmorComponent
     return formattedContent;
   }
 
-  closeModal(): void {
-    console.log('Cerrando modal de calculadora de amor');
-  }
-
   onUserDataSubmitted(userData: any): void {
-    console.log('📥 Datos del usuario recibidos en amor:', userData);
-    console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
     const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
@@ -1296,7 +1183,6 @@ export class CalculadoraAmorComponent
     );
 
     if (missingFields.length > 0) {
-      console.error('❌ Faltan campos obligatorios para amor:', missingFields);
       alert(
         `Para proceder con el pago, necesitas completar: ${missingFields.join(
           ', '
@@ -1319,19 +1205,10 @@ export class CalculadoraAmorComponent
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log(
-        '✅ Datos guardados en sessionStorage para amor:',
-        this.userData
-      );
 
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-      console.log(
-        '🔍 Verificación - Datos en sessionStorage para amor:',
-        verificacion ? JSON.parse(verificacion) : 'No encontrados'
-      );
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -1341,23 +1218,14 @@ export class CalculadoraAmorComponent
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-    console.log('📤 Enviando datos al backend desde amor...');
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log(
-          '✅ Datos enviados correctamente al backend desde amor:',
-          response
-        );
 
         // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
         this.promptForPayment();
       },
       error: (error) => {
-        console.error('❌ Error enviando datos al backend desde amor:', error);
-
-        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
-        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         this.promptForPayment();
       },
     });
@@ -1372,31 +1240,21 @@ export class CalculadoraAmorComponent
       clearTimeout(this.wheelTimer);
     }
 
-    console.log('⏰ Timer amoroso configurado para', delayMs, 'ms');
-
     this.wheelTimer = setTimeout(() => {
-      console.log('🎰 Verificando si puede mostrar ruleta del amor...');
-      console.log('- canShowWheel:', FortuneWheelComponent.canShowWheel());
-      console.log('- !showPaymentModal:', !this.showPaymentModal);
-      console.log('- !showDataModal:', !this.showDataModal);
-
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
         !this.showDataModal
       ) {
-        console.log('✅ Mostrando ruleta del amor - usuario puede girar');
         this.showFortuneWheel = true;
         this.cdr.markForCheck();
       } else {
-        console.log('❌ No se puede mostrar ruleta del amor en este momento');
       }
     }, delayMs);
   }
 
   // ✅ MANEJAR PREMIO GANADO
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio amoroso ganado:', prize);
 
     const prizeMessage: ConversationMessage = {
       role: 'love_expert',
@@ -1422,10 +1280,8 @@ export class CalculadoraAmorComponent
         break;
       // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
-        console.log('🔄 Otra oportunidad amorosa concedida');
         break;
       default:
-        console.warn('⚠️ Premio amoroso desconocido:', prize);
     }
   }
 
@@ -1436,12 +1292,10 @@ export class CalculadoraAmorComponent
     );
     const newTotal = current + count;
     sessionStorage.setItem('freeLoveConsultations', newTotal.toString());
-    console.log(`🎁 Agregadas ${count} consultas amorosas. Total: ${newTotal}`);
 
     if (this.blockedMessageId && !this.hasUserPaidForLove) {
       this.blockedMessageId = null;
       sessionStorage.removeItem('loveBlockedMessageId');
-      console.log('🔓 Mensaje amoroso desbloqueado con consulta gratuita');
     }
   }
 
@@ -1460,7 +1314,6 @@ export class CalculadoraAmorComponent
     if (freeConsultations > 0) {
       const remaining = freeConsultations - 1;
       sessionStorage.setItem('freeLoveConsultations', remaining.toString());
-      console.log(`🎁 Consulta amorosa gratis usada. Restantes: ${remaining}`);
 
       // Mostrar mensaje informativo
       const prizeMsg: ConversationMessage = {
@@ -1476,27 +1329,20 @@ export class CalculadoraAmorComponent
 
   // ✅ CERRAR RULETA
   onWheelClosed(): void {
-    console.log('🎰 Cerrando ruleta del amor');
     this.showFortuneWheel = false;
   }
 
   // ✅ ACTIVAR RULETA MANUALMENTE
   triggerLoveWheel(): void {
-    console.log('🎰 Intentando activar ruleta del amor manualmente...');
 
     if (this.showPaymentModal || this.showDataModal) {
-      console.log('❌ No se puede mostrar - hay otros modales abiertos');
       return;
     }
 
     if (FortuneWheelComponent.canShowWheel()) {
-      console.log('✅ Activando ruleta del amor manualmente');
       this.showFortuneWheel = true;
       this.cdr.markForCheck();
     } else {
-      console.log(
-        '❌ No se puede activar ruleta del amor - sin tiradas disponibles'
-      );
       alert(
         'No tienes tiradas disponibles. ' +
           FortuneWheelComponent.getSpinStatus()

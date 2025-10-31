@@ -100,8 +100,6 @@ export class RecolectaDatosComponent {
     this.dataFormErrors = {};
     let isValid = true;
 
-    console.log('🔍 Validando userData:', this.userData); // DEBUG
-
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!this.userData.email || !this.userData.email.toString().trim()) {
@@ -129,21 +127,12 @@ export class RecolectaDatosComponent {
     // ✅ Validar teléfono
     if (!this.userData.telefono || !this.userData.telefono.toString().trim()) {
       this.dataFormErrors['telefono'] = 'El teléfono es obligatorio';
-      console.log('❌ Teléfono vacío o no existe');
       isValid = false;
     } else if (this.userData.telefono.toString().trim().length < 9) {
       this.dataFormErrors['telefono'] =
         'El teléfono debe tener al menos 9 dígitos';
-      console.log(
-        '❌ Teléfono muy corto:',
-        this.userData.telefono.toString().trim().length
-      );
       isValid = false;
     } else {
-      console.log(
-        '✅ Teléfono válido:',
-        this.userData.telefono.toString().trim()
-      );
     }
 
     // Validar dirección
@@ -174,10 +163,6 @@ export class RecolectaDatosComponent {
       isValid = false;
     }
 
-    console.log('🔍 Resultado de validación:', {
-      isValid,
-      errores: this.dataFormErrors,
-    });
 
     return isValid;
   }
@@ -188,14 +173,11 @@ export class RecolectaDatosComponent {
   }
 
   async submitUserData(): Promise<void> {
-    console.log('🔍 Iniciando submitUserData...'); // DEBUG
-    console.log('🔍 Estado actual de userData:', this.userData); // DEBUG EXTRA
 
     this.attemptedDataSubmission = true;
 
     // Validar formulario
     if (!this.validateUserData()) {
-      console.log('❌ Validación fallida:', this.dataFormErrors); // DEBUG
       return;
     }
 
@@ -205,19 +187,15 @@ export class RecolectaDatosComponent {
 
     if (!this.aceptaTerminos) {
       this.showTerminosError = true;
-      console.log('❌ Términos no aceptados'); // DEBUG
       return;
     }
 
     if (!this.datosVeridicos) {
       this.showDatosVeridicosError = true;
-      console.log('❌ Datos verídicos no confirmados'); // DEBUG
       return;
     }
 
     this.isValidatingData = true;
-    console.log('✅ Todas las validaciones pasaron, enviando datos...'); // DEBUG
-
     try {
       // ✅ LIMPIAR Y NORMALIZAR DATOS ANTES DE ENVIAR
       const datosToSend: Datos = {
@@ -237,12 +215,6 @@ export class RecolectaDatosComponent {
         telefono: (this.userData.telefono || '').toString().trim(), // ✅ RESTAURADO
       };
 
-      console.log('📤 Datos a enviar (limpios):', datosToSend); // DEBUG
-      console.log('📞 Teléfono específico:', {
-        original: this.userData.telefono,
-        limpio: datosToSend.telefono,
-        longitud: datosToSend.telefono.length,
-      }); // DEBUG TELÉFONO
 
       // ✅ VALIDAR UNA VEZ MÁS LOS CAMPOS CRÍTICOS
       const camposCriticos = ['nombre', 'email', 'telefono', 'NIF', 'direccion', 'codigo_postal'];
@@ -251,10 +223,6 @@ export class RecolectaDatosComponent {
       );
 
       if (faltantes.length > 0) {
-        console.error(
-          '❌ Faltan campos críticos después de la limpieza:',
-          faltantes
-        );
         this.dataFormErrors[
           'general'
         ] = `Faltan campos obligatorios: ${faltantes.join(', ')}`;
@@ -264,41 +232,24 @@ export class RecolectaDatosComponent {
 
       // Guardar en sessionStorage
       sessionStorage.setItem('userData', JSON.stringify(datosToSend));
-      console.log('💾 Datos guardados en sessionStorage');
 
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
       const datosGuardados = verificacion ? JSON.parse(verificacion) : null;
-      console.log('🔍 Verificación sessionStorage:', datosGuardados);
-      console.log('📞 Teléfono en sessionStorage:', datosGuardados?.telefono);
 
       // Llamar al servicio
       this.recolecta.createProduct(datosToSend).subscribe({
         next: (response: Datos) => {
-          console.log('✅ Respuesta del backend:', response); // DEBUG
           this.isValidatingData = false;
           this.onDataSubmitted.emit(datosToSend); // ✅ EMITIR datosToSend en lugar de response
         },
         error: (error: any) => {
-          console.error('❌ Error del backend:', error); // DEBUG
-          console.error('❌ Error completo:', {
-            message: error.message,
-            status: error.status,
-            statusText: error.statusText,
-            url: error.url,
-            error: error.error,
-          });
 
-          // ✅ AUN ASÍ EMITIR LOS DATOS PARA CONTINUAR CON EL PAGO
-          console.log(
-            '⚠️ Error del backend, pero continuando con los datos locales'
-          );
           this.isValidatingData = false;
           this.onDataSubmitted.emit(datosToSend); // ✅ EMITIR datos locales
         },
       });
     } catch (error) {
-      console.error('❌ Error inesperado:', error); // DEBUG
       this.dataFormErrors['general'] =
         'Error inesperado. Por favor, inténtalo de nuevo.';
       this.isValidatingData = false;

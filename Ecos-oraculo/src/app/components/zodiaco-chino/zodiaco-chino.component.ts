@@ -184,7 +184,6 @@ export class ZodiacoChinoComponent
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
-      console.error('Error loading Stripe.js:', error);
       this.paymentError =
         'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
@@ -194,25 +193,14 @@ export class ZodiacoChinoComponent
       sessionStorage.getItem('hasUserPaidForHoroscope') === 'true';
 
     // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
-    console.log(
-      '🔍 Cargando datos del usuario desde sessionStorage para horóscopo...'
-    );
     const savedUserData = sessionStorage.getItem('userData');
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log(
-          '✅ Datos del usuario restaurados para horóscopo:',
-          this.userData
-        );
       } catch (error) {
-        console.error('❌ Error al parsear datos del usuario:', error);
         this.userData = null;
       }
     } else {
-      console.log(
-        'ℹ️ No hay datos del usuario guardados en sessionStorage para horóscopo'
-      );
       this.userData = null;
     }
 
@@ -255,11 +243,7 @@ export class ZodiacoChinoComponent
         }));
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
-        console.log(
-          '✅ Mensajes del horóscopo restaurados desde sessionStorage'
-        );
       } catch (error) {
-        console.error('Error al restaurar mensajes del horóscopo:', error);
         this.clearHoroscopeSessionData();
         this.initializeHoroscopeWelcomeMessage();
       }
@@ -282,9 +266,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     if (FortuneWheelComponent.canShowWheel()) {
       this.showHoroscopeWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta horoscópica - sin tiradas disponibles'
-      );
     }
   }
   ngAfterViewChecked(): void {
@@ -310,7 +291,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago del horóscopo:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -325,7 +305,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-      console.log('🔍 Verificando estado del pago del horóscopo...');
 
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
@@ -333,7 +312,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           if (paymentIntent) {
             switch (paymentIntent.status) {
               case 'succeeded':
-                console.log('✅ Pago del horóscopo confirmado desde URL');
                 this.hasUserPaidForHoroscope = true;
                 sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
                 this.blockedMessageId = null;
@@ -359,18 +337,15 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
                 break;
 
               case 'processing':
-                console.log('⏳ Pago del horóscopo en procesamiento');
                 break;
 
               case 'requires_payment_method':
-                console.log('❌ Pago del horóscopo falló');
                 this.clearHoroscopeSessionData();
                 break;
             }
           }
         })
         .catch((error: any) => {
-          console.error('Error verificando el pago del horóscopo:', error);
         });
     }
   }
@@ -386,7 +361,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         JSON.stringify(messagesToSave)
       );
     } catch (error) {
-      console.error('Error guardando mensajes del horóscopo:', error);
     }
   }
 
@@ -398,7 +372,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   private saveHoroscopeStateBeforePayment(): void {
-    console.log('💾 Guardando estado del horóscopo antes del pago...');
     this.saveHoroscopeMessagesToSession();
     sessionStorage.setItem(
       'horoscopeFirstQuestionAsked',
@@ -419,7 +392,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   async promptForHoroscopePayment(): Promise<void> {
-    console.log('💳 EJECUTANDO promptForPayment() para horóscopo');
 
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
@@ -430,10 +402,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log(
-          'Error destruyendo elemento anterior del horóscopo:',
-          error
-        );
       }
       this.paymentElement = undefined;
     }
@@ -443,32 +411,18 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log(
-          '🔍 userData no está en memoria, cargando desde sessionStorage para horóscopo...'
-        );
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           try {
             this.userData = JSON.parse(savedUserData);
-            console.log(
-              '✅ Datos cargados desde sessionStorage para horóscopo:',
-              this.userData
-            );
           } catch (error) {
-            console.error('❌ Error al parsear datos guardados:', error);
             this.userData = null;
           }
         }
       }
 
-      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
-      console.log(
-        '🔍 Validando userData completo para horóscopo:',
-        this.userData
-      );
 
       if (!this.userData) {
-        console.error('❌ No hay userData disponible para horóscopo');
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
@@ -484,7 +438,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       const telefono = this.userData.telefono?.toString().trim();
 
       if (!nombre || !email || !telefono) {
-        console.error('❌ Faltan campos requeridos para el pago del horóscopo');
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
@@ -506,11 +459,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         phone: telefono,
       };
 
-      console.log(
-        '📤 Enviando request de payment intent para horóscopo con datos del cliente...'
-      );
-      console.log('👤 Datos del cliente enviados:', customerInfo);
-
       const requestBody = { items, customerInfo };
 
       const response = await this.http
@@ -520,7 +468,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         )
         .toPromise();
 
-      console.log('📥 Respuesta de payment intent del horóscopo:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -528,13 +475,8 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         );
       }
       this.clientSecret = response.clientSecret;
-      console.log('🔑 clientSecret obtenido:', this.clientSecret);
-
-      console.log('🔍 Verificando this.stripe:', this.stripe);
-      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
-        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: {
@@ -550,48 +492,30 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             },
           },
         });
-        console.log('✅ Elements creado:', this.elements);
         
         this.paymentElement = this.elements.create('payment');
-        console.log('✅ Payment element creado:', this.paymentElement);
 
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container-horoscope'
           );
-          console.log(
-            '🎯 Contenedor del horóscopo encontrado:',
-            paymentElementContainer
-          );
 
           if (paymentElementContainer && this.paymentElement) {
-            console.log('✅ Montando payment element del horóscopo...');
             this.paymentElement.mount(paymentElementContainer);
-            console.log('🎉 Payment element montado exitosamente!');
           } else {
-            console.error(
-              '❌ Contenedor del elemento de pago del horóscopo no encontrado.'
-            );
-            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
             this.cdr.markForCheck();
           }
         }, 100);
       } else {
-        console.error('❌ Stripe o clientSecret no disponibles:');
-        console.error('   - this.stripe:', this.stripe);
-        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles para horóscopo.'
         );
       }
     } catch (error: any) {
-      console.error('❌ Error al preparar el pago del horóscopo:', error);
-      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago del horóscopo. Por favor, inténtalo de nuevo.';
@@ -632,7 +556,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':
-          console.log('¡Pago exitoso para horóscopo!');
           this.hasUserPaidForHoroscope = true;
           sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
           
@@ -656,10 +579,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             'pendingHoroscopeMessage'
           );
           if (pendingMessage) {
-            console.log(
-              '📝 Procesando mensaje de horóscopo pendiente:',
-              pendingMessage
-            );
             sessionStorage.removeItem('pendingHoroscopeMessage');
 
             // Procesar después de que el modal se haya cerrado
@@ -704,7 +623,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago del horóscopo:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -725,7 +643,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         this.masterInfo = info;
       },
       error: (error) => {
-        console.error('Error cargando información del maestro:', error);
         // Información predeterminada en caso de error
         this.masterInfo = {
           success: true,
@@ -820,14 +737,10 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       if (!this.hasUserPaidForHoroscope && this.firstQuestionAsked) {
         // Verificar si tiene consultas horoscópicas gratis disponibles
         if (this.hasFreeHoroscopeConsultationsAvailable()) {
-          console.log('🎁 Usando consulta horoscópica gratis del premio');
           this.useFreeHoroscopeConsultation();
           // Continuar con el mensaje sin bloquear
         } else {
           // Si no tiene consultas gratis NI acceso premium, mostrar modal de datos
-          console.log(
-            '💳 No hay consultas horoscópicas gratis ni acceso premium - mostrando modal de datos'
-          );
 
           // Cerrar otros modales primero
           this.showFortuneWheel = false;
@@ -842,7 +755,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
           setTimeout(() => {
             this.showDataModal = true;
             this.cdr.markForCheck();
-            console.log('📝 showDataModal establecido a:', this.showDataModal);
           }, 100);
 
           return; // Salir aquí para no procesar el mensaje aún
@@ -897,9 +809,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             sessionStorage.setItem('horoscopeBlockedMessageId', messageId);
 
             setTimeout(() => {
-              console.log(
-                '🔒 Mensaje horoscópico bloqueado - mostrando modal de datos'
-              );
               this.saveHoroscopeStateBeforePayment();
 
               // Cerrar otros modales
@@ -1016,7 +925,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         this.messagesContainer.nativeElement.scrollTop =
           this.messagesContainer.nativeElement.scrollHeight;
       } catch (err) {
-        console.error('Error scrolling to bottom:', err);
       }
     }
   }
@@ -1064,11 +972,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     return `${message.role}-${message.timestamp}-${index}`;
   }
 
-  closeModal(): void {
-    // Implementar lógica de cierre de modal si es necesario
-    console.log('Cerrar modal');
-  }
-
   // Auto-resize del textarea
   autoResize(event: any): void {
     const textarea = event.target;
@@ -1101,7 +1004,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.initializeHoroscopeWelcomeMessage();
   }
   resetChat(): void {
-    console.log('🔄 Iniciando reset completo del chat horoscópico...');
 
     // 1. Reset de arrays y mensajes
     this.conversationHistory = [];
@@ -1137,7 +1039,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -1170,11 +1071,8 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     // 12. Reinicializar mensaje de bienvenida
     this.initializeHoroscopeWelcomeMessage();
     this.cdr.markForCheck();
-    console.log('✅ Reset completo del chat horoscópico completado');
   }
   onUserDataSubmitted(userData: any): void {
-    console.log('📥 Datos del usuario recibidos en horóscopo:', userData);
-    console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
     const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido' - ahora está unificado con nombre
@@ -1183,10 +1081,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     );
 
     if (missingFields.length > 0) {
-      console.error(
-        '❌ Faltan campos obligatorios para horóscopo:',
-        missingFields
-      );
       alert(
         `Para proceder con el pago, necesitas completar: ${missingFields.join(
           ', '
@@ -1209,19 +1103,9 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log(
-        '✅ Datos guardados en sessionStorage para horóscopo:',
-        this.userData
-      );
-
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-      console.log(
-        '🔍 Verificación - Datos en sessionStorage para horóscopo:',
-        verificacion ? JSON.parse(verificacion) : 'No encontrados'
-      );
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -1231,26 +1115,16 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-    console.log('📤 Enviando datos al backend desde horóscopo...');
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log(
-          '✅ Datos enviados correctamente al backend desde horóscopo:',
-          response
-        );
 
         // ✅ LLAMAR A promptForHoroscopePayment QUE INICIALIZA STRIPE
         this.promptForHoroscopePayment();
       },
       error: (error) => {
-        console.error(
-          '❌ Error enviando datos al backend desde horóscopo:',
-          error
-        );
 
         // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
-        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         this.promptForHoroscopePayment();
       },
     });
@@ -1264,29 +1138,21 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       clearTimeout(this.wheelTimer);
     }
 
-    console.log('⏰ Timer horoscópico configurado para', delayMs, 'ms');
 
     this.wheelTimer = setTimeout(() => {
-      console.log('🎰 Verificando si puede mostrar ruleta horoscópica...');
-
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
         !this.showDataModal
       ) {
-        console.log('✅ Mostrando ruleta horoscópica - usuario puede girar');
         this.showFortuneWheel = true;
         this.cdr.markForCheck(); // ✅ Forzar detección de cambios
       } else {
-        console.log(
-          '❌ No se puede mostrar ruleta horoscópica en este momento'
-        );
       }
     }, delayMs);
   }
 
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio horoscópico ganado:', prize);
 
     const prizeMessage: ChatMessage = {
       role: 'master',
@@ -1302,26 +1168,19 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   onWheelClosed(): void {
-    console.log('🎰 Cerrando ruleta horoscópica');
     this.showFortuneWheel = false;
   }
 
   triggerHoroscopeWheel(): void {
-    console.log('🎰 Intentando activar ruleta horoscópica manualmente...');
 
     if (this.showPaymentModal || this.showDataModal) {
-      console.log('❌ No se puede mostrar - hay otros modales abiertos');
       return;
     }
 
     if (FortuneWheelComponent.canShowWheel()) {
-      console.log('✅ Activando ruleta horoscópica manualmente');
       this.showFortuneWheel = true;
       this.cdr.markForCheck(); // ✅ Forzar detección de cambios
     } else {
-      console.log(
-        '❌ No se puede activar ruleta horoscópica - sin tiradas disponibles'
-      );
       alert(
         'No tienes tiradas disponibles. ' +
           FortuneWheelComponent.getSpinStatus()
@@ -1339,7 +1198,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         this.addFreeHoroscopeConsultations(3);
         break;
       case '2': // 1 Análisis Premium - ACCESO COMPLETO
-        console.log('🌟 Premio Premium ganado - Acceso ilimitado concedido');
         this.hasUserPaidForHoroscope = true;
         sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
 
@@ -1347,7 +1205,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         if (this.blockedMessageId) {
           this.blockedMessageId = null;
           sessionStorage.removeItem('horoscopeBlockedMessageId');
-          console.log('🔓 Mensaje desbloqueado con acceso premium');
         }
 
         // Agregar mensaje especial para este premio
@@ -1363,10 +1220,8 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         break;
       // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
-        console.log('🔄 Otra oportunidad horoscópica concedida');
         break;
       default:
-        console.warn('⚠️ Premio horoscópico desconocido:', prize);
     }
   }
 
@@ -1376,14 +1231,10 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     );
     const newTotal = current + count;
     sessionStorage.setItem('freeHoroscopeConsultations', newTotal.toString());
-    console.log(
-      `🎁 Agregadas ${count} consultas horoscópicas. Total: ${newTotal}`
-    );
 
     if (this.blockedMessageId && !this.hasUserPaidForHoroscope) {
       this.blockedMessageId = null;
       sessionStorage.removeItem('horoscopeBlockedMessageId');
-      console.log('🔓 Mensaje horoscópico desbloqueado con consulta gratuita');
     }
   }
 
@@ -1405,9 +1256,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         'freeHoroscopeConsultations',
         remaining.toString()
       );
-      console.log(
-        `🎁 Consulta horoscópica gratis usada. Restantes: ${remaining}`
-      );
 
       const prizeMsg: ChatMessage = {
         role: 'master',
@@ -1420,26 +1268,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     }
   }
 
-  debugHoroscopeWheel(): void {
-    console.log('=== DEBUG RULETA HOROSCÓPICA ===');
-    console.log('showFortuneWheel:', this.showFortuneWheel);
-    console.log(
-      'FortuneWheelComponent.canShowWheel():',
-      FortuneWheelComponent.canShowWheel()
-    );
-    console.log('showPaymentModal:', this.showPaymentModal);
-    console.log('showDataModal:', this.showDataModal);
-    console.log(
-      'freeHoroscopeConsultations:',
-      sessionStorage.getItem('freeHoroscopeConsultations')
-    );
-
-    this.showFortuneWheel = true;
-    this.cdr.markForCheck(); // ✅ Forzar detección de cambios
-    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
-  }
-
-  // ✅ MÉTODO AUXILIAR para el template
   getHoroscopeConsultationsCount(): number {
     return parseInt(
       sessionStorage.getItem('freeHoroscopeConsultations') || '0'

@@ -141,26 +141,14 @@ export class AnimalInteriorComponent
     this.hasUserPaid =
       sessionStorage.getItem('hasUserPaidAnimalInterior') === 'true';
 
-    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
-    console.log(
-      '🔍 Cargando datos del usuario desde sessionStorage para animal interior...'
-    );
     const savedUserData = sessionStorage.getItem('userData');
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log(
-          '✅ Datos del usuario restaurados para animal interior:',
-          this.userData
-        );
       } catch (error) {
-        console.error('❌ Error al parsear datos del usuario:', error);
         this.userData = null;
       }
     } else {
-      console.log(
-        'ℹ️ No hay datos del usuario guardados en sessionStorage para animal interior'
-      );
       this.userData = null;
     }
 
@@ -183,7 +171,6 @@ export class AnimalInteriorComponent
         this.blockedMessageId = savedBlockedMessageId || null;
         this.lastMessageCount = this.chatMessages.length;
       } catch (error) {
-        console.error('Error al restaurar mensajes de animal interior:', error);
         // Limpiar datos corruptos
         this.initializeWelcomeMessage();
       }
@@ -213,9 +200,6 @@ export class AnimalInteriorComponent
     if (FortuneWheelComponent.canShowWheel()) {
       this.showAnimalWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
-      );
     }
   }
   ngAfterViewChecked(): void {
@@ -255,7 +239,6 @@ export class AnimalInteriorComponent
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
-            console.log('✅ Pago animal interior confirmado desde URL');
             this.hasUserPaid = true;
             sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
             this.blockedMessageId = null;
@@ -286,7 +269,6 @@ export class AnimalInteriorComponent
           }
         })
         .catch((error) => {
-          console.error('Error verificando el pago animal interior:', error);
         });
     }
   }
@@ -298,14 +280,9 @@ export class AnimalInteriorComponent
     if (!this.hasUserPaid && this.firstQuestionAsked) {
       // Verificar si tiene consultas animales gratis disponibles
       if (this.hasFreeAnimalConsultationsAvailable()) {
-        console.log('🎁 Usando consulta animal gratis del premio');
         this.useFreeAnimalConsultation();
         // Continuar con el mensaje sin bloquear
       } else {
-        // Si no tiene consultas gratis, mostrar modal de datos
-        console.log(
-          '💳 No hay consultas animales gratis - mostrando modal de datos'
-        );
 
         // Cerrar otros modales primero
         this.showFortuneWheel = false;
@@ -320,7 +297,6 @@ export class AnimalInteriorComponent
         setTimeout(() => {
           this.showDataModal = true;
           this.cdr.markForCheck();
-          console.log('📝 showDataModal establecido a:', this.showDataModal);
         }, 100);
 
         return; // Salir aquí para no procesar el mensaje aún
@@ -380,9 +356,6 @@ export class AnimalInteriorComponent
             this.blockedMessageId = messageId;
             sessionStorage.setItem('animalInteriorBlockedMessageId', messageId);
             setTimeout(() => {
-              console.log(
-                '🔒 Mensaje animal bloqueado - mostrando modal de datos'
-              );
               this.saveStateBeforePayment();
 
               // Cerrar otros modales
@@ -461,7 +434,6 @@ export class AnimalInteriorComponent
   }
 
   async promptForPayment(): Promise<void> {
-    console.log('💳 EJECUTANDO promptForPayment() para animal interior');
 
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
@@ -472,7 +444,6 @@ export class AnimalInteriorComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo elemento anterior:', error);
       }
       this.paymentElement = undefined;
     }
@@ -482,32 +453,17 @@ export class AnimalInteriorComponent
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log(
-          '🔍 userData no está en memoria, cargando desde sessionStorage para animal interior...'
-        );
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           try {
             this.userData = JSON.parse(savedUserData);
-            console.log(
-              '✅ Datos cargados desde sessionStorage para animal interior:',
-              this.userData
-            );
           } catch (error) {
-            console.error('❌ Error al parsear datos guardados:', error);
             this.userData = null;
           }
         }
       }
 
-      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
-      console.log(
-        '🔍 Validando userData completo para animal interior:',
-        this.userData
-      );
-
       if (!this.userData) {
-        console.error('❌ No hay userData disponible para animal interior');
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
@@ -522,9 +478,6 @@ export class AnimalInteriorComponent
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
       if (!nombre || !email || !telefono) {
-        console.error(
-          '❌ Faltan campos requeridos para el pago de animal interior'
-        );
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
@@ -546,11 +499,6 @@ export class AnimalInteriorComponent
         phone: telefono,
       };
 
-      console.log(
-        '📤 Enviando request de payment intent para animal interior con datos del cliente...'
-      );
-      console.log('👤 Datos del cliente enviados:', customerInfo);
-
       const requestBody = { items, customerInfo };
 
       const response = await this.http
@@ -560,7 +508,6 @@ export class AnimalInteriorComponent
         )
         .toPromise();
 
-      console.log('📥 Respuesta de payment intent:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -568,58 +515,35 @@ export class AnimalInteriorComponent
         );
       }
       this.clientSecret = response.clientSecret;
-      console.log('🔑 clientSecret obtenido:', this.clientSecret);
-
-      console.log('🔍 Verificando this.stripe:', this.stripe);
-      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
-        console.log(
-          '✅ Stripe y clientSecret disponibles, creando elements...'
-        );
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
-        console.log('✅ Elements creado:', this.elements);
 
         this.paymentElement = this.elements.create('payment');
-        console.log('✅ Payment element creado:', this.paymentElement);
-
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log(
-          '⏸️ isProcessingPayment = false, esperando actualización del DOM...'
-        );
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container-animal'
           );
-          console.log('🎯 Contenedor encontrado:', paymentElementContainer);
 
           if (paymentElementContainer && this.paymentElement) {
-            console.log('✅ Montando payment element animal interior...');
             this.paymentElement.mount(paymentElementContainer);
-            console.log('🎉 Payment element montado exitosamente!');
           } else {
-            console.error('❌ Contenedor del elemento de pago no encontrado.');
-            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
             this.cdr.markForCheck();
           }
         }, 100);
       } else {
-        console.error('❌ Stripe o clientSecret no disponibles:');
-        console.error('   - this.stripe:', this.stripe);
-        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
       }
     } catch (error: any) {
-      console.error('❌ Error al preparar el pago de animal interior:', error);
-      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -659,7 +583,6 @@ export class AnimalInteriorComponent
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':
-          console.log('¡Pago exitoso para consultas de animal interior!');
           this.hasUserPaid = true;
           sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
           
@@ -685,10 +608,6 @@ export class AnimalInteriorComponent
           // ✅ DESPUÉS procesar mensaje pendiente (esto mostrará el indicador de carga normal)
           const pendingMessage = sessionStorage.getItem('pendingAnimalMessage');
           if (pendingMessage) {
-            console.log(
-              '📝 Procesando mensaje animal pendiente:',
-              pendingMessage
-            );
             sessionStorage.removeItem('pendingAnimalMessage');
 
             // Procesar después de que el modal se haya cerrado
@@ -860,15 +779,9 @@ export class AnimalInteriorComponent
     if (FortuneWheelComponent.canShowWheel()) {
       this.showAnimalWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta animal - sin tiradas disponibles'
-      );
     }
   }
   onUserDataSubmitted(userData: any): void {
-    console.log('📥 Datos del usuario recibidos en animal interior:', userData);
-    console.log('📋 Campos disponibles:', Object.keys(userData));
-
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
     const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
@@ -876,10 +789,6 @@ export class AnimalInteriorComponent
     );
 
     if (missingFields.length > 0) {
-      console.error(
-        '❌ Faltan campos obligatorios para animal interior:',
-        missingFields
-      );
       alert(
         `Para proceder con el pago, necesitas completar: ${missingFields.join(
           ', '
@@ -902,19 +811,9 @@ export class AnimalInteriorComponent
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log(
-        '✅ Datos guardados en sessionStorage para animal interior:',
-        this.userData
-      );
-
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-      console.log(
-        '🔍 Verificación - Datos en sessionStorage para animal interior:',
-        verificacion ? JSON.parse(verificacion) : 'No encontrados'
-      );
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -924,26 +823,13 @@ export class AnimalInteriorComponent
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-    console.log('📤 Enviando datos al backend desde animal interior...');
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log(
-          '✅ Datos enviados correctamente al backend desde animal interior:',
-          response
-        );
-
         // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
         this.promptForPayment();
       },
       error: (error) => {
-        console.error(
-          '❌ Error enviando datos al backend desde animal interior:',
-          error
-        );
-
-        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
-        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         this.promptForPayment();
       },
     });
@@ -957,28 +843,22 @@ export class AnimalInteriorComponent
       clearTimeout(this.wheelTimer);
     }
 
-    console.log('⏰ Timer animal espiritual configurado para', delayMs, 'ms');
 
     this.wheelTimer = setTimeout(() => {
-      console.log('🎰 Verificando si puede mostrar ruleta animal...');
 
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
         !this.showDataModal
       ) {
-        console.log('✅ Mostrando ruleta animal - usuario puede girar');
         this.showFortuneWheel = true;
         this.cdr.markForCheck();
       } else {
-        console.log('❌ No se puede mostrar ruleta animal en este momento');
       }
     }, delayMs);
   }
 
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio espiritual animal ganado:', prize);
-
     const prizeMessage: ChatMessage = {
       sender: 'Xamán Olivia',
       content: `🦉 ¡Los espíritus animales han hablado! Has ganado: **${prize.name}** ${prize.icon}\n\nLos antiguos guardianes del reino animal han decidido bendecirte con este regalo sagrado. La energía espiritual fluye a través de ti, conectándote más profundamente con tu animal interior. ¡Que la sabiduría ancestral te guíe!`,
@@ -994,26 +874,19 @@ export class AnimalInteriorComponent
   }
 
   onWheelClosed(): void {
-    console.log('🎰 Cerrando ruleta animal espiritual');
     this.showFortuneWheel = false;
   }
 
   triggerAnimalWheel(): void {
-    console.log('🎰 Intentando activar ruleta animal manualmente...');
 
     if (this.showPaymentModal || this.showDataModal) {
-      console.log('❌ No se puede mostrar - hay otros modales abiertos');
       return;
     }
 
     if (FortuneWheelComponent.canShowWheel()) {
-      console.log('✅ Activando ruleta animal manualmente');
       this.showFortuneWheel = true;
       this.cdr.markForCheck();
     } else {
-      console.log(
-        '❌ No se puede activar ruleta animal - sin tiradas disponibles'
-      );
       alert(
         'No tienes tiradas disponibles. ' +
           FortuneWheelComponent.getSpinStatus()
@@ -1031,7 +904,6 @@ export class AnimalInteriorComponent
         this.addFreeAnimalConsultations(3);
         break;
       case '2': // 1 Guía Premium - ACCESO COMPLETO
-        console.log('🦋 Premio Premium ganado - Acceso ilimitado concedido');
         this.hasUserPaid = true;
         sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
 
@@ -1039,7 +911,6 @@ export class AnimalInteriorComponent
         if (this.blockedMessageId) {
           this.blockedMessageId = null;
           sessionStorage.removeItem('animalInteriorBlockedMessageId');
-          console.log('🔓 Mensaje desbloqueado con acceso premium animal');
         }
 
         // Agregar mensaje especial para este premio
@@ -1056,10 +927,8 @@ export class AnimalInteriorComponent
         break;
       // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
-        console.log('🔄 Otra oportunidad espiritual concedida');
         break;
       default:
-        console.warn('⚠️ Premio animal desconocido:', prize);
     }
   }
   private addFreeAnimalConsultations(count: number): void {
@@ -1068,12 +937,10 @@ export class AnimalInteriorComponent
     );
     const newTotal = current + count;
     sessionStorage.setItem('freeAnimalConsultations', newTotal.toString());
-    console.log(`🎁 Agregadas ${count} consultas animales. Total: ${newTotal}`);
 
     if (this.blockedMessageId && !this.hasUserPaid) {
       this.blockedMessageId = null;
       sessionStorage.removeItem('animalInteriorBlockedMessageId');
-      console.log('🔓 Mensaje animal desbloqueado con consulta gratuita');
     }
   }
 
@@ -1092,7 +959,6 @@ export class AnimalInteriorComponent
     if (freeConsultations > 0) {
       const remaining = freeConsultations - 1;
       sessionStorage.setItem('freeAnimalConsultations', remaining.toString());
-      console.log(`🎁 Consulta animal gratis usada. Restantes: ${remaining}`);
 
       const prizeMsg: ChatMessage = {
         sender: 'Xamán Olivia',
@@ -1104,24 +970,5 @@ export class AnimalInteriorComponent
       this.shouldScrollToBottom = true;
       this.saveMessagesToSession();
     }
-  }
-
-  debugAnimalWheel(): void {
-    console.log('=== DEBUG RULETA ANIMAL ===');
-    console.log('showFortuneWheel:', this.showFortuneWheel);
-    console.log(
-      'FortuneWheelComponent.canShowWheel():',
-      FortuneWheelComponent.canShowWheel()
-    );
-    console.log('showPaymentModal:', this.showPaymentModal);
-    console.log('showDataModal:', this.showDataModal);
-    console.log(
-      'freeAnimalConsultations:',
-      sessionStorage.getItem('freeAnimalConsultations')
-    );
-
-    this.showFortuneWheel = true;
-    this.cdr.markForCheck();
-    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
   }
 }

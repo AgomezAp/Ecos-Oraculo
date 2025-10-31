@@ -84,15 +84,11 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    console.log('🔧 Inicializando componente de cartas...');
-    console.log('🔗 Backend URL:', this.backendUrl);
 
     // ✅ CARGAR STRIPE
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
-      console.log('✅ Stripe cargado correctamente');
     } catch (error) {
-      console.error('❌ Error cargando Stripe:', error);
       this.paymentError = 'No se pudo cargar el sistema de pago.';
     }
 
@@ -101,13 +97,10 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log('✅ Datos del usuario cargados:', this.userData);
       } catch (error) {
-        console.error('❌ Error parseando userData:', error);
         this.userData = null;
       }
     }
-    console.log('🎬 CardsComponent iniciado');
 
     // ✅ OBTENER TEMA DE 3 FUENTES (prioridad)
     this.route.params.subscribe((params) => {
@@ -120,13 +113,8 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.theme = urlTheme || serviceTheme || storageTheme || '';
 
-      console.log('📍 Tema desde URL:', urlTheme);
-      console.log('📍 Tema desde servicio:', serviceTheme);
-      console.log('📍 Tema desde localStorage:', storageTheme);
-      console.log('✅ Tema final usado:', this.theme);
 
       if (!this.theme) {
-        console.error('❌ No se encontró tema. Redirigiendo...');
         alert('Por favor selecciona un tema primero');
         this.router.navigate(['/welcome']);
         return;
@@ -138,21 +126,14 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initializeCards();
   }
   private loadCards(): void {
-    console.log('🃏 Cargando cartas para tema:', this.theme);
 
     // ✅ OBTENER CARTAS DEL SERVICIO CON EL TEMA
     let cardsFromService = this.cardService.getSelectedCards();
 
-    console.log('📦 Cartas desde servicio:', cardsFromService.length);
 
     // ✅ SI NO HAY CARTAS, OBTENERLAS POR TEMA
     if (!cardsFromService || cardsFromService.length === 0) {
-      console.warn(
-        '⚠️ No hay cartas en servicio, obteniendo por tema:',
-        this.theme
-      );
       cardsFromService = this.cardService.getCardsByTheme(this.theme);
-      console.log('📦 Cartas obtenidas por tema:', cardsFromService.length);
     }
 
     // ✅ VALIDAR QUE LAS CARTAS TENGAN DESCRIPCIONES
@@ -161,7 +142,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         const hasDescriptions =
           card.descriptions && card.descriptions.length > 0;
         if (!hasDescriptions) {
-          console.error('❌ Carta sin descripciones:', card);
         }
         return hasDescriptions;
       })
@@ -176,10 +156,8 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         selected: false,
       }));
 
-    console.log('✅ Cartas finales cargadas:', this.cards.length);
 
     if (this.cards.length === 0) {
-      console.error('❌ No hay cartas disponibles');
       alert('No se pudieron cargar las cartas. Intenta de nuevo.');
       this.router.navigate(['/welcome']);
     }
@@ -189,7 +167,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo payment element:', error);
       }
       this.paymentElement = undefined;
     }
@@ -635,7 +612,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.paymentError = error.message || 'Error procesando el pago';
       this.isProcessingPayment = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      console.log('✅ Pago exitoso!');
 
       // ✅ CAMBIAR ESTADO
       this.isProcessingPayment = false;
@@ -654,7 +630,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo payment element:', error);
       }
       this.paymentElement = undefined;
     }
@@ -680,7 +655,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -705,8 +679,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onUserDataSubmitted(userData: any): void {
-    console.log('📥 Datos recibidos del formulario:', userData);
-    console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS OBLIGATORIOS
     const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
@@ -715,7 +687,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     if (missingFields.length > 0) {
-      console.error('❌ Faltan campos obligatorios:', missingFields);
       alert(`Completa estos campos: ${missingFields.join(', ')}`);
       this.showDataModal = true;
       return;
@@ -733,9 +704,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     // ✅ GUARDAR EN sessionStorage
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log('✅ Datos guardados en sessionStorage');
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -754,7 +723,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async promptForPayment(): Promise<void> {
-    console.log('💳 === INICIANDO PROCESO DE PAGO ===');
 
     this.showPaymentModal = true;
     this.paymentError = null;
@@ -765,7 +733,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('⚠️ Error destruyendo elemento anterior:', error);
       }
       this.paymentElement = undefined;
     }
@@ -773,11 +740,9 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log('🔍 Cargando userData desde sessionStorage...');
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           this.userData = JSON.parse(savedUserData);
-          console.log('✅ userData cargado:', this.userData);
         }
       }
 
@@ -792,10 +757,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
 
-      console.log('🔍 Campos validados:');
-      console.log('  ✓ nombre:', nombre);
-      console.log('  ✓ email:', email);
-      console.log('  ✓ telefono:', telefono);
 
       if (!nombre || !email || !telefono) {
         throw new Error('Faltan campos obligatorios del cliente');
@@ -808,14 +769,10 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         phone: telefono,
       };
 
-      console.log('👤 customerInfo creado:', customerInfo);
-
+      
       // ✅ CREAR PAYLOAD
       const items = [{ id: 'tarot_reading_description', amount: 400 }];
       const requestBody = { items, customerInfo };
-
-      console.log('📦 Payload completo:', JSON.stringify(requestBody, null, 2));
-      console.log('📍 Enviando a:', `${this.backendUrl}create-payment-intent`);
 
       // ✅ HACER PETICIÓN
       const response = await this.http
@@ -828,17 +785,12 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
         )
         .toPromise();
 
-      console.log('✅ Respuesta del servidor:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error('No se recibió clientSecret del servidor');
       }
 
       this.clientSecret = response.clientSecret;
-      console.log(
-        '🔑 clientSecret obtenido:',
-        this.clientSecret.substring(0, 20) + '...'
-      );
 
       // ✅ CREAR STRIPE ELEMENTS
       if (!this.stripe) {
@@ -851,7 +803,6 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.paymentElement = this.elements.create('payment');
-      console.log('✅ Payment element creado');
 
       // ✅ CAMBIAR ESTADO ANTES DE MONTAR
       this.isProcessingPayment = false;
@@ -859,26 +810,14 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       // ✅ MONTAR EL ELEMENTO
       setTimeout(() => {
         const container = document.getElementById('payment-element-container');
-        console.log(
-          '🎯 Buscando contenedor...',
-          container ? 'ENCONTRADO ✅' : 'NO ENCONTRADO ❌'
-        );
 
         if (container && this.paymentElement) {
           this.paymentElement.mount(container);
-          console.log('✅ Payment element montado exitosamente');
         } else {
-          console.error('❌ No se pudo montar el payment element');
           this.paymentError = 'No se pudo cargar el formulario de pago';
         }
       }, 150);
     } catch (error: any) {
-      console.error('❌ === ERROR EN PROCESO DE PAGO ===');
-      console.error('❌ Error completo:', error);
-      console.error('❌ Status:', error.status);
-      console.error('❌ Message:', error.message);
-      console.error('❌ Error details:', error.error);
-
       this.paymentError =
         error.error?.error || error.message || 'Error al inicializar el pago';
       this.isProcessingPayment = false;

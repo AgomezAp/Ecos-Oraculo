@@ -175,7 +175,6 @@ export class InformacionZodiacoComponent
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
-      console.error('Error loading Stripe.js:', error);
       this.paymentError =
         'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
@@ -183,26 +182,14 @@ export class InformacionZodiacoComponent
     this.hasUserPaidForAstrology =
       sessionStorage.getItem('hasUserPaidForAstrology') === 'true';
 
-    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
-    console.log(
-      '🔍 Cargando datos del usuario desde sessionStorage para astrología...'
-    );
     const savedUserData = sessionStorage.getItem('userData');
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log(
-          '✅ Datos del usuario restaurados para astrología:',
-          this.userData
-        );
       } catch (error) {
-        console.error('❌ Error al parsear datos del usuario:', error);
         this.userData = null;
       }
     } else {
-      console.log(
-        'ℹ️ No hay datos del usuario guardados en sessionStorage para astrología'
-      );
       this.userData = null;
     }
 
@@ -224,11 +211,7 @@ export class InformacionZodiacoComponent
         this.firstQuestionAsked = savedFirstQuestion === 'true';
         this.blockedMessageId = savedBlockedMessageId || null;
         this.hasStartedConversation = true;
-        console.log(
-          '✅ Mensajes de astrología restaurados desde sessionStorage'
-        );
       } catch (error) {
-        console.error('Error al restaurar mensajes:', error);
         this.clearSessionData();
         this.startConversation();
       }
@@ -258,7 +241,6 @@ export class InformacionZodiacoComponent
           if (paymentIntent) {
             switch (paymentIntent.status) {
               case 'succeeded':
-                console.log('✅ Pago astral confirmado desde URL');
                 this.hasUserPaidForAstrology = true;
                 sessionStorage.setItem('hasUserPaidForAstrology', 'true');
                 this.blockedMessageId = null;
@@ -287,18 +269,15 @@ export class InformacionZodiacoComponent
                 break;
 
               case 'processing':
-                console.log('⏳ Pago astral en procesamiento');
                 break;
 
               case 'requires_payment_method':
-                console.log('❌ Pago astral falló');
                 this.clearSessionData();
                 break;
             }
           }
         })
         .catch((error) => {
-          console.error('Error verificando el pago astral:', error);
         });
     }
   }
@@ -315,7 +294,6 @@ export class InformacionZodiacoComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -329,26 +307,20 @@ export class InformacionZodiacoComponent
       clearTimeout(this.wheelTimer);
     }
 
-    console.log('⏰ Timer configurado para', delayMs, 'ms');
 
     this.wheelTimer = setTimeout(() => {
-      console.log('🎰 Verificando si puede mostrar ruleta...');
-
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
         !this.showDataModal
       ) {
-        console.log('✅ Mostrando ruleta astral - usuario puede girar');
         this.showFortuneWheel = true;
         this.cdr.markForCheck();
       } else {
-        console.log('❌ No se puede mostrar ruleta astral en este momento');
       }
     }, delayMs);
   }
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio astral ganado:', prize);
 
     // Mostrar mensaje del astrólogo sobre el premio
     const prizeMessage = {
@@ -366,26 +338,19 @@ export class InformacionZodiacoComponent
     this.processAstralPrize(prize);
   }
   onWheelClosed(): void {
-    console.log('🎰 Cerrando ruleta astral');
     this.showFortuneWheel = false;
   }
 
   triggerFortuneWheel(): void {
-    console.log('🎰 Intentando activar ruleta astral manualmente...');
 
     if (this.showPaymentModal || this.showDataModal) {
-      console.log('❌ No se puede mostrar - hay otros modales abiertos');
       return;
     }
 
     if (FortuneWheelComponent.canShowWheel()) {
-      console.log('✅ Activando ruleta astral manualmente');
       this.showFortuneWheel = true;
       this.cdr.markForCheck();
     } else {
-      console.log(
-        '❌ No se puede activar ruleta astral - sin tiradas disponibles'
-      );
       alert(
         'No tienes tiradas disponibles. ' +
           FortuneWheelComponent.getSpinStatus()
@@ -401,7 +366,6 @@ export class InformacionZodiacoComponent
         this.addFreeAstrologyConsultations(3);
         break;
       case '2': // 1 Lectura Premium - ACCESO COMPLETO
-        console.log('✨ Premio Premium ganado - Acceso ilimitado concedido');
         this.hasUserPaidForAstrology = true;
         sessionStorage.setItem('hasUserPaidForAstrology', 'true');
 
@@ -409,7 +373,6 @@ export class InformacionZodiacoComponent
         if (this.blockedMessageId) {
           this.blockedMessageId = null;
           sessionStorage.removeItem('blockedAstrologyMessageId');
-          console.log('🔓 Mensaje desbloqueado con acceso premium astral');
         }
 
         // Agregar mensaje especial para este premio
@@ -425,10 +388,8 @@ export class InformacionZodiacoComponent
         break;
       // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
-        console.log('🔄 Otra oportunidad astral concedida');
         break;
       default:
-        console.warn('⚠️ Premio astral desconocido:', prize);
     }
   }
   private addFreeAstrologyConsultations(count: number): void {
@@ -437,13 +398,11 @@ export class InformacionZodiacoComponent
     );
     const newTotal = current + count;
     sessionStorage.setItem('freeAstrologyConsultations', newTotal.toString());
-    console.log(`🎁 Agregadas ${count} consultas astrales. Total: ${newTotal}`);
 
     // Si había un mensaje bloqueado, desbloquearlo
     if (this.blockedMessageId && !this.hasUserPaidForAstrology) {
       this.blockedMessageId = null;
       sessionStorage.removeItem('blockedAstrologyMessageId');
-      console.log('🔓 Mensaje astral desbloqueado con consulta gratuita');
     }
   }
 
@@ -465,7 +424,6 @@ export class InformacionZodiacoComponent
         'freeAstrologyConsultations',
         remaining.toString()
       );
-      console.log(`🎁 Consulta astral gratis usada. Restantes: ${remaining}`);
 
       // Mostrar mensaje informativo
       const prizeMsg = {
@@ -515,9 +473,6 @@ export class InformacionZodiacoComponent
     if (FortuneWheelComponent.canShowWheel()) {
       this.showWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta astral - sin tiradas disponibles'
-      );
     }
   }
 
@@ -529,14 +484,9 @@ export class InformacionZodiacoComponent
       if (!this.hasUserPaidForAstrology && this.firstQuestionAsked) {
         // Verificar si tiene consultas astrales gratis disponibles
         if (this.hasFreeAstrologyConsultationsAvailable()) {
-          console.log('🎁 Usando consulta astral gratis del premio');
           this.useFreeAstrologyConsultation();
           // Continuar con el mensaje sin bloquear
         } else {
-          // Si no tiene consultas gratis, mostrar modal de datos
-          console.log(
-            '💳 No hay consultas astrales gratis - mostrando modal de datos'
-          );
 
           // Cerrar otros modales primero
           this.showFortuneWheel = false;
@@ -551,7 +501,6 @@ export class InformacionZodiacoComponent
           setTimeout(() => {
             this.showDataModal = true;
             this.cdr.markForCheck();
-            console.log('📝 showDataModal establecido a:', this.showDataModal);
           }, 100);
 
           return; // Salir aquí para no procesar el mensaje aún
@@ -603,9 +552,6 @@ export class InformacionZodiacoComponent
           sessionStorage.setItem('blockedAstrologyMessageId', messageId);
 
           setTimeout(() => {
-            console.log(
-              '🔒 Mensaje astral bloqueado - mostrando modal de datos'
-            );
             this.saveStateBeforePayment();
 
             // Cerrar otros modales
@@ -628,8 +574,6 @@ export class InformacionZodiacoComponent
       },
       error: (error: any) => {
         this.isLoading = false;
-        console.error('Error al obtener respuesta astrológica:', error);
-
         const errorMsg = {
           isUser: false,
           content:
@@ -677,7 +621,6 @@ export class InformacionZodiacoComponent
         }
       }),
       catchError((error: any) => {
-        console.error('Error en el servicio de astrología:', error);
         return of(
           '🌟 Las estrellas están temporalmente nubladas. Los astros me susurran que debo recargar mis energías cósmicas. Por favor, intenta nuevamente en unos momentos.'
         );
@@ -686,7 +629,6 @@ export class InformacionZodiacoComponent
   }
 
   private saveStateBeforePayment(): void {
-    console.log('💾 Guardando estado astral antes del pago...');
     this.saveMessagesToSession();
     sessionStorage.setItem(
       'firstAstrologyQuestionAsked',
@@ -714,7 +656,6 @@ export class InformacionZodiacoComponent
         JSON.stringify(messagesToSave)
       );
     } catch (error) {
-      console.error('Error guardando mensajes astrales:', error);
     }
   }
 
@@ -732,8 +673,6 @@ export class InformacionZodiacoComponent
   }
 
   async promptForPayment(): Promise<void> {
-    console.log('💳 EJECUTANDO promptForPayment() para astrología');
-
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
@@ -743,7 +682,6 @@ export class InformacionZodiacoComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo elemento anterior:', error);
       }
       this.paymentElement = undefined;
     }
@@ -753,32 +691,17 @@ export class InformacionZodiacoComponent
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log(
-          '🔍 userData no está en memoria, cargando desde sessionStorage para astrología...'
-        );
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           try {
             this.userData = JSON.parse(savedUserData);
-            console.log(
-              '✅ Datos cargados desde sessionStorage para astrología:',
-              this.userData
-            );
           } catch (error) {
-            console.error('❌ Error al parsear datos guardados:', error);
             this.userData = null;
           }
         }
       }
 
-      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
-      console.log(
-        '🔍 Validando userData completo para astrología:',
-        this.userData
-      );
-
       if (!this.userData) {
-        console.error('❌ No hay userData disponible para astrología');
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
@@ -793,14 +716,8 @@ export class InformacionZodiacoComponent
       const email = this.userData.email?.toString().trim();
       const telefono = this.userData.telefono?.toString().trim();
 
-      console.log('🔍 Validando campos individuales para astrología:');
-      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      // console.log('  - apellido:', `"${apellido}"`, apellido ? '✅' : '❌'); // ❌ ELIMINADO
-      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
 
       if (!nombre || !email || !telefono) { // ❌ QUITADO !apellido
-        console.error('❌ Faltan campos requeridos para el pago de astrología');
         const faltantes = [];
         if (!nombre) faltantes.push('nombre');
         // if (!apellido) faltantes.push('apellido'); // ❌ ELIMINADO
@@ -823,11 +740,6 @@ export class InformacionZodiacoComponent
         phone: telefono,
       };
 
-      console.log(
-        '📤 Enviando request de payment intent para astrología con datos del cliente...'
-      );
-      console.log('👤 Datos del cliente enviados:', customerInfo);
-
       const requestBody = { items, customerInfo };
 
       const response = await this.http
@@ -837,7 +749,6 @@ export class InformacionZodiacoComponent
         )
         .toPromise();
 
-      console.log('📥 Respuesta de payment intent:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -845,54 +756,36 @@ export class InformacionZodiacoComponent
         );
       }
       this.clientSecret = response.clientSecret;
-      console.log('🔑 clientSecret obtenido:', this.clientSecret);
-
-      console.log('🔍 Verificando this.stripe:', this.stripe);
-      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
 
       if (this.stripe && this.clientSecret) {
-        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
-        console.log('✅ Elements creado:', this.elements);
         
         this.paymentElement = this.elements.create('payment');
-        console.log('✅ Payment element creado:', this.paymentElement);
         
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container'
           );
-          console.log('🎯 Contenedor encontrado:', paymentElementContainer);
 
           if (paymentElementContainer && this.paymentElement) {
-            console.log('✅ Montando payment element astral...');
             this.paymentElement.mount(paymentElementContainer);
-            console.log('🎉 Payment element montado exitosamente!');
           } else {
-            console.error('❌ Contenedor del elemento de pago no encontrado.');
-            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
             this.cdr.markForCheck();
           }
         }, 100);
       } else {
-        console.error('❌ Stripe o clientSecret no disponibles:');
-        console.error('   - this.stripe:', this.stripe);
-        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
       }
     } catch (error: any) {
-      console.error('❌ Error al preparar el pago astral:', error);
-      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -931,7 +824,6 @@ export class InformacionZodiacoComponent
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':
-          console.log('¡Pago exitoso para consultas astrales!');
           this.hasUserPaidForAstrology = true;
           sessionStorage.setItem('hasUserPaidForAstrology', 'true');
           
@@ -958,10 +850,6 @@ export class InformacionZodiacoComponent
             'pendingAstrologyMessage'
           );
           if (pendingMessage) {
-            console.log(
-              '📝 Procesando mensaje astral pendiente:',
-              pendingMessage
-            );
             sessionStorage.removeItem('pendingAstrologyMessage');
 
             // Procesar después de que el modal se haya cerrado
@@ -1005,7 +893,6 @@ export class InformacionZodiacoComponent
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error al destruir elemento de pago:', error);
       } finally {
         this.paymentElement = undefined;
       }
@@ -1051,7 +938,6 @@ export class InformacionZodiacoComponent
         element.scrollTop = element.scrollHeight;
       }
     } catch (err) {
-      console.error('Error scrolling to bottom:', err);
     }
   }
   formatMessage(content: string): string {
@@ -1077,24 +963,7 @@ export class InformacionZodiacoComponent
     return formattedContent;
   }
 
-  // Métodos específicos del zodíaco - implementa según tu lógica
-  getZodiacSymbol(sign: string): string {
-    // Implementar lógica para símbolos del zodíaco
-    return '♈'; // Ejemplo
-  }
-
-  getZodiacElement(sign: string): string {
-    // Implementar lógica para elementos
-    return 'Fuego'; // Ejemplo
-  }
-
-  getZodiacModality(sign: string): string {
-    // Implementar lógica para modalidades
-    return 'Cardinal'; // Ejemplo
-  }
   onUserDataSubmitted(userData: any): void {
-    console.log('📥 Datos del usuario recibidos en astrología:', userData);
-    console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
     const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
@@ -1103,10 +972,6 @@ export class InformacionZodiacoComponent
     );
 
     if (missingFields.length > 0) {
-      console.error(
-        '❌ Faltan campos obligatorios para astrología:',
-        missingFields
-      );
       alert(
         `Para proceder con el pago, necesitas completar: ${missingFields.join(
           ', '
@@ -1129,19 +994,10 @@ export class InformacionZodiacoComponent
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log(
-        '✅ Datos guardados en sessionStorage para astrología:',
-        this.userData
-      );
 
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-      console.log(
-        '🔍 Verificación - Datos en sessionStorage para astrología:',
-        verificacion ? JSON.parse(verificacion) : 'No encontrados'
-      );
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -1151,26 +1007,15 @@ export class InformacionZodiacoComponent
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-    console.log('📤 Enviando datos al backend desde astrología...');
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log(
-          '✅ Datos enviados correctamente al backend desde astrología:',
-          response
-        );
 
         // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
         this.promptForPayment();
       },
       error: (error) => {
-        console.error(
-          '❌ Error enviando datos al backend desde astrología:',
-          error
-        );
 
-        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
-        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         this.promptForPayment();
       },
     });

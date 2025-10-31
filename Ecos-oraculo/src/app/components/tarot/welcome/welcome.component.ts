@@ -92,7 +92,6 @@ export class WelcomeComponent implements OnInit {
    * @param {string} theme - El tema seleccionado
    */
   startTarot(theme: string): void {
-    console.log('🎯 Tema seleccionado:', theme);
 
     this.selectedTheme = theme;
     this.isLoading = true;
@@ -110,10 +109,6 @@ export class WelcomeComponent implements OnInit {
         .filter((card: any) => {
           const hasDescriptions = card.descriptions[theme]?.length > 0;
           if (!hasDescriptions) {
-            console.warn(
-              `⚠️ Carta sin descripciones para tema "${theme}":`,
-              card.name
-            );
           }
           return hasDescriptions;
         })
@@ -122,14 +117,8 @@ export class WelcomeComponent implements OnInit {
           descriptions: card.descriptions[theme],
         }));
 
-      console.log(
-        '📦 Cartas filtradas para tema:',
-        theme,
-        selectedCardData.length
-      );
 
       if (selectedCardData.length === 0) {
-        console.error('❌ No se encontraron cartas para el tema:', theme);
         alert(`No hay cartas disponibles para el tema "${theme}"`);
         this.isLoading = false;
         return;
@@ -138,7 +127,6 @@ export class WelcomeComponent implements OnInit {
       this.cardService.setSelectedCards(selectedCardData);
 
       setTimeout(() => {
-        console.log('🚀 Navegando a /cartas con tema:', theme);
         this.router.navigate(['/cartas', theme]);
       }, 300);
     }, 200);
@@ -154,7 +142,6 @@ export class WelcomeComponent implements OnInit {
         (window as any).webkitAudioContext)();
       // Implementar sonidos suaves si lo deseas
     } catch (e) {
-      console.log('Audio no disponible');
     }
   }
 

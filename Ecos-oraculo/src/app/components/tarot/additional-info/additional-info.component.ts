@@ -60,7 +60,6 @@ export class AdditionalInfoComponent implements OnInit, AfterViewInit {
 
     if (recopilaData) {
       this.recopila = JSON.parse(recopilaData);
-      console.log('Card Details:', this.recopila);
     }
   }
   volverAlInicio() {
@@ -75,7 +74,6 @@ export class AdditionalInfoComponent implements OnInit, AfterViewInit {
       this.animateFormElements();
       this.setupMagicalEffects();
     } else {
-      console.warn('GSAP no está disponible');
       // Usar animaciones CSS como fallback
       this.applyFallbackAnimations();
     }
@@ -302,11 +300,9 @@ export class AdditionalInfoComponent implements OnInit, AfterViewInit {
 
     this.datosService.registrar(datos).subscribe(
       (response: any) => {
-        console.log('Datos enviados:', response);
         this.showSuccessAnimation();
       },
       (error: any) => {
-        console.error('Error al enviar los datos:', error);
         this.showErrorAnimation();
       }
     );
@@ -340,12 +336,10 @@ export class AdditionalInfoComponent implements OnInit, AfterViewInit {
 
     this.http.post(url, datosMod).subscribe(
       (response) => {
-        console.log('Respuesta del servidor:', response);
         this.hideLoader(); // 👉 ocultamos animación de carga
         this.transitionToThankYou(); // 👉 redirige
       },
       (error) => {
-        console.error('Error al realizar el POST:', error);
         this.hideLoader(); // 👉 ocultamos animación en caso de error
         this.showErrorAnimation();
         this.transitionToThankYou();
