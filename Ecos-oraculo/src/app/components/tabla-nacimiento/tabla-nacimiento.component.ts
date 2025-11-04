@@ -154,7 +154,7 @@ export class TablaNacimientoComponent
           pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
   */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -183,7 +183,6 @@ export class TablaNacimientoComponent
     try {
       this.stripe = await loadStripe(this.stripePublishableKey);
     } catch (error) {
-      console.error('Error loading Stripe.js:', error);
       this.paymentError =
         'No se pudo cargar el sistema de pago. Por favor, recarga la página.';
     }
@@ -192,26 +191,14 @@ export class TablaNacimientoComponent
     this.hasUserPaid =
       sessionStorage.getItem('hasUserPaidBirthChart') === 'true';
 
-    // ✅ NUEVO: Cargar datos del usuario desde sessionStorage
-    console.log(
-      '🔍 Cargando datos del usuario desde sessionStorage para tabla de nacimiento...'
-    );
     const savedUserData = sessionStorage.getItem('userData');
     if (savedUserData) {
       try {
         this.userData = JSON.parse(savedUserData);
-        console.log(
-          '✅ Datos del usuario restaurados para tabla de nacimiento:',
-          this.userData
-        );
       } catch (error) {
-        console.error('❌ Error al parsear datos del usuario:', error);
         this.userData = null;
       }
     } else {
-      console.log(
-        'ℹ️ No hay datos del usuario guardados en sessionStorage para tabla de nacimiento'
-      );
       this.userData = null;
     }
 
@@ -245,9 +232,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     if (FortuneWheelComponent.canShowWheel()) {
       this.showBirthChartWheelAfterDelay(3000);
     } else {
-      console.log(
-        '🚫 No se puede mostrar ruleta natal - sin tiradas disponibles'
-      );
     }
   }
   ngAfterViewChecked(): void {
@@ -295,10 +279,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         this.blockedMessageId = savedBlockedMessageId || null;
         this.lastMessageCount = this.messages.length;
       } catch (error) {
-        console.error(
-          'Error al restaurar mensajes de tabla de nacimiento:',
-          error
-        );
         // Limpiar datos corruptos
         this.initializeBirthChartWelcomeMessage();
       }
@@ -312,7 +292,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         this.birthTime = this.chartData.birthTime || '';
         this.birthPlace = this.chartData.birthPlace || '';
       } catch (error) {
-        console.error('Error al restaurar datos de carta natal:', error);
       }
     }
   }
@@ -329,7 +308,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
           if (paymentIntent && paymentIntent.status === 'succeeded') {
-            console.log('✅ Pago carta natal confirmado desde URL');
             this.hasUserPaid = true;
             sessionStorage.setItem('hasUserPaidBirthChart', 'true');
             this.blockedMessageId = null;
@@ -360,7 +338,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
           }
         })
         .catch((error) => {
-          console.error('Error verificando el pago carta natal:', error);
         });
     }
   }
@@ -372,15 +349,9 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       if (!this.hasUserPaid && this.firstQuestionAsked) {
         // Verificar si tiene consultas natales gratis disponibles
         if (this.hasFreeBirthChartConsultationsAvailable()) {
-          console.log('🎁 Usando consulta natal gratis del premio');
           this.useFreeBirthChartConsultation();
           // Continuar con el mensaje sin bloquear
         } else {
-          // Si no tiene consultas gratis, mostrar modal de datos
-          console.log(
-            '💳 No hay consultas natales gratis - mostrando modal de datos'
-          );
-
           // Cerrar otros modales primero
           this.showFortuneWheel = false;
           this.showPaymentModal = false;
@@ -394,7 +365,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
           setTimeout(() => {
             this.showDataModal = true;
             this.cdr.markForCheck();
-            console.log('📝 showDataModal establecido a:', this.showDataModal);
           }, 100);
 
           return; // Salir aquí para no procesar el mensaje aún
@@ -448,9 +418,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
           sessionStorage.setItem('birthChartBlockedMessageId', messageId);
 
           setTimeout(() => {
-            console.log(
-              '🔒 Mensaje natal bloqueado - mostrando modal de datos'
-            );
             this.saveStateBeforePayment();
 
             // Cerrar otros modales
@@ -473,7 +440,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       },
       error: (error: any) => {
         this.isLoading = false;
-        console.error('Error al obtener respuesta de carta natal:', error);
 
         const errorMsg = {
           sender: 'Maestra Emma',
@@ -525,7 +491,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         }
       }),
       catchError((error: any) => {
-        console.error('Error en el servicio de carta natal:', error);
         return of(
           '🌟 Las configuraciones celestiales están temporalmente nubladas. Los astros me susurran que debo recargar mis energías cósmicas. Por favor, intenta nuevamente en unos momentos.'
         );
@@ -582,7 +547,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
   }
 
   async promptForPayment(): Promise<void> {
-    console.log('💳 EJECUTANDO promptForPayment() para tabla de nacimiento');
 
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
@@ -593,7 +557,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       try {
         this.paymentElement.destroy();
       } catch (error) {
-        console.log('Error destruyendo elemento anterior:', error);
       }
       this.paymentElement = undefined;
     }
@@ -603,32 +566,17 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
       // ✅ CARGAR DATOS DESDE sessionStorage SI NO ESTÁN EN MEMORIA
       if (!this.userData) {
-        console.log(
-          '🔍 userData no está en memoria, cargando desde sessionStorage para tabla de nacimiento...'
-        );
         const savedUserData = sessionStorage.getItem('userData');
         if (savedUserData) {
           try {
             this.userData = JSON.parse(savedUserData);
-            console.log(
-              '✅ Datos cargados desde sessionStorage para tabla de nacimiento:',
-              this.userData
-            );
           } catch (error) {
-            console.error('❌ Error al parsear datos guardados:', error);
             this.userData = null;
           }
         }
       }
 
-      // ✅ VALIDAR DATOS ANTES DE CREAR customerInfo
-      console.log(
-        '🔍 Validando userData completo para tabla de nacimiento:',
-        this.userData
-      );
-
       if (!this.userData) {
-        console.error('❌ No hay userData disponible para tabla de nacimiento');
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
         this.isProcessingPayment = false;
@@ -638,24 +586,11 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       }
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
-      const nombre = this.userData.nombre?.toString().trim();
-      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
-      const telefono = this.userData.telefono?.toString().trim();
 
-      console.log('🔍 Validando campos individuales para tabla de nacimiento:');
-      console.log('  - nombre:', `"${nombre}"`, nombre ? '✅' : '❌');
-      console.log('  - email:', `"${email}"`, email ? '✅' : '❌');
-      console.log('  - telefono:', `"${telefono}"`, telefono ? '✅' : '❌');
-
-      if (!nombre || !email || !telefono) {
-        console.error(
-          '❌ Faltan campos requeridos para el pago de tabla de nacimiento'
-        );
+      if ( !email ) {
         const faltantes = [];
-        if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
-        if (!telefono) faltantes.push('teléfono');
 
         this.paymentError = `Faltan datos del cliente: ${faltantes.join(
           ', '
@@ -668,15 +603,8 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: nombre,
         email: email,
-        phone: telefono,
       };
-
-      console.log(
-        '📤 Enviando request de payment intent para tabla de nacimiento con datos del cliente...'
-      );
-      console.log('👤 Datos del cliente enviados:', customerInfo);
 
       const requestBody = { items, customerInfo };
 
@@ -687,7 +615,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         )
         .toPromise();
 
-      console.log('📥 Respuesta de payment intent:', response);
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -696,57 +623,35 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
       }
 
       this.clientSecret = response.clientSecret;
-      console.log('🔑 clientSecret obtenido:', this.clientSecret);
-
-      console.log('🔍 Verificando this.stripe:', this.stripe);
-      console.log('🔍 Verificando this.clientSecret:', this.clientSecret);
-
       if (this.stripe && this.clientSecret) {
-        console.log('✅ Stripe y clientSecret disponibles, creando elements...');
         this.elements = this.stripe.elements({
           clientSecret: this.clientSecret,
           appearance: { theme: 'stripe' },
         });
-        console.log('✅ Elements creado:', this.elements);
 
         this.paymentElement = this.elements.create('payment');
-        console.log('✅ Payment element creado:', this.paymentElement);
         
         this.isProcessingPayment = false;
         this.cdr.markForCheck();
-        console.log('⏸️ isProcessingPayment = false, esperando actualización del DOM...');
 
         setTimeout(() => {
           const paymentElementContainer = document.getElementById(
             'payment-element-container-birth-chart'
           );
-          console.log('🎯 Contenedor encontrado:', paymentElementContainer);
 
           if (paymentElementContainer && this.paymentElement) {
-            console.log('✅ Montando payment element tabla de nacimiento...');
             this.paymentElement.mount(paymentElementContainer);
-            console.log('🎉 Payment element montado exitosamente!');
           } else {
-            console.error('❌ Contenedor del elemento de pago no encontrado.');
-            console.error('❌ paymentElement:', this.paymentElement);
             this.paymentError = 'No se pudo mostrar el formulario de pago.';
             this.cdr.markForCheck();
           }
         }, 100);
       } else {
-        console.error('❌ Stripe o clientSecret no disponibles:');
-        console.error('   - this.stripe:', this.stripe);
-        console.error('   - this.clientSecret:', this.clientSecret);
         throw new Error(
           'Stripe.js o la clave secreta del cliente no están disponibles.'
         );
       }
     } catch (error: any) {
-      console.error(
-        '❌ Error al preparar el pago de tabla de nacimiento:',
-        error
-      );
-      console.error('❌ Detalles del error:', error.error || error);
       this.paymentError =
         error.message ||
         'Error al inicializar el pago. Por favor, inténtalo de nuevo.';
@@ -785,7 +690,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':
-          console.log('¡Pago exitoso para consultas de tabla de nacimiento!');
           this.hasUserPaid = true;
           sessionStorage.setItem('hasUserPaidBirthChart', 'true');
           
@@ -813,10 +717,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
             'pendingBirthChartMessage'
           );
           if (pendingMessage) {
-            console.log(
-              '📝 Procesando mensaje de tabla de nacimiento pendiente:',
-              pendingMessage
-            );
             sessionStorage.removeItem('pendingBirthChartMessage');
 
             // Procesar después de que el modal se haya cerrado
@@ -1031,23 +931,14 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     this.initializeBirthChartWelcomeMessage();
   }
   onUserDataSubmitted(userData: any): void {
-    console.log(
-      '📥 Datos del usuario recibidos en tabla de nacimiento:',
-      userData
-    );
-    console.log('📋 Campos disponibles:', Object.keys(userData));
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
+    const requiredFields = ['email']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
 
     if (missingFields.length > 0) {
-      console.error(
-        '❌ Faltan campos obligatorios para tabla de nacimiento:',
-        missingFields
-      );
       alert(
         `Para proceder con el pago, necesitas completar: ${missingFields.join(
           ', '
@@ -1061,28 +952,16 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
     this.userData = {
       ...userData,
-      nombre: userData.nombre?.toString().trim(),
-      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
-      telefono: userData.telefono?.toString().trim(),
     };
 
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
     try {
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
-      console.log(
-        '✅ Datos guardados en sessionStorage para tabla de nacimiento:',
-        this.userData
-      );
 
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-      console.log(
-        '🔍 Verificación - Datos en sessionStorage para tabla de nacimiento:',
-        verificacion ? JSON.parse(verificacion) : 'No encontrados'
-      );
     } catch (error) {
-      console.error('❌ Error guardando en sessionStorage:', error);
     }
 
     this.showDataModal = false;
@@ -1092,26 +971,12 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-    console.log('📤 Enviando datos al backend desde tabla de nacimiento...');
 
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-        console.log(
-          '✅ Datos enviados correctamente al backend desde tabla de nacimiento:',
-          response
-        );
-
-        // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
         this.promptForPayment();
       },
       error: (error) => {
-        console.error(
-          '❌ Error enviando datos al backend desde tabla de nacimiento:',
-          error
-        );
-
-        // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
-        console.log('⚠️ Continuando con el pago a pesar del error del backend');
         this.promptForPayment();
       },
     });
@@ -1124,28 +989,20 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     if (this.wheelTimer) {
       clearTimeout(this.wheelTimer);
     }
-
-    console.log('⏰ Timer carta natal configurado para', delayMs, 'ms');
-
     this.wheelTimer = setTimeout(() => {
-      console.log('🎰 Verificando si puede mostrar ruleta natal...');
-
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
         !this.showDataModal
       ) {
-        console.log('✅ Mostrando ruleta natal - usuario puede girar');
         this.showFortuneWheel = true;
         this.cdr.markForCheck();
       } else {
-        console.log('❌ No se puede mostrar ruleta natal en este momento');
       }
     }, delayMs);
   }
 
   onPrizeWon(prize: Prize): void {
-    console.log('🎉 Premio celestial ganado:', prize);
 
     const prizeMessage: Message = {
       sender: 'Maestra Emma',
@@ -1162,26 +1019,19 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
   }
 
   onWheelClosed(): void {
-    console.log('🎰 Cerrando ruleta de carta natal');
     this.showFortuneWheel = false;
   }
 
   triggerBirthChartWheel(): void {
-    console.log('🎰 Intentando activar ruleta natal manualmente...');
 
     if (this.showPaymentModal || this.showDataModal) {
-      console.log('❌ No se puede mostrar - hay otros modales abiertos');
       return;
     }
 
     if (FortuneWheelComponent.canShowWheel()) {
-      console.log('✅ Activando ruleta natal manualmente');
       this.showFortuneWheel = true;
       this.cdr.markForCheck();
     } else {
-      console.log(
-        '❌ No se puede activar ruleta natal - sin tiradas disponibles'
-      );
       alert(
         'No tienes tiradas disponibles. ' +
           FortuneWheelComponent.getSpinStatus()
@@ -1198,7 +1048,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         this.addFreeBirthChartConsultations(3);
         break;
       case '2': // 1 Análisis Premium - ACCESO COMPLETO
-        console.log('🌟 Premio Premium ganado - Acceso ilimitado concedido');
         this.hasUserPaid = true;
         sessionStorage.setItem('hasUserPaidBirthChart', 'true');
 
@@ -1206,7 +1055,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         if (this.blockedMessageId) {
           this.blockedMessageId = null;
           sessionStorage.removeItem('birthChartBlockedMessageId');
-          console.log('🔓 Mensaje desbloqueado con acceso premium');
         }
 
         // Agregar mensaje especial para este premio
@@ -1223,10 +1071,8 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         break;
       // ✅ ELIMINADO: case '3' - 2 Consultas Extra
       case '4': // Otra oportunidad
-        console.log('🔄 Otra oportunidad celestial concedida');
         break;
       default:
-        console.warn('⚠️ Premio celestial desconocido:', prize);
     }
   }
   private addFreeBirthChartConsultations(count: number): void {
@@ -1235,14 +1081,10 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     );
     const newTotal = current + count;
     sessionStorage.setItem('freeBirthChartConsultations', newTotal.toString());
-    console.log(
-      `🎁 Agregadas ${count} consultas de carta natal. Total: ${newTotal}`
-    );
 
     if (this.blockedMessageId && !this.hasUserPaid) {
       this.blockedMessageId = null;
       sessionStorage.removeItem('birthChartBlockedMessageId');
-      console.log('🔓 Mensaje natal desbloqueado con consulta gratuita');
     }
   }
 
@@ -1264,7 +1106,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
         'freeBirthChartConsultations',
         remaining.toString()
       );
-      console.log(`🎁 Consulta natal gratis usada. Restantes: ${remaining}`);
 
       const prizeMsg: Message = {
         sender: 'Maestra Emma',
@@ -1278,26 +1119,6 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     }
   }
 
-  debugBirthChartWheel(): void {
-    console.log('=== DEBUG RULETA CARTA NATAL ===');
-    console.log('showFortuneWheel:', this.showFortuneWheel);
-    console.log(
-      'FortuneWheelComponent.canShowWheel():',
-      FortuneWheelComponent.canShowWheel()
-    );
-    console.log('showPaymentModal:', this.showPaymentModal);
-    console.log('showDataModal:', this.showDataModal);
-    console.log(
-      'freeBirthChartConsultations:',
-      sessionStorage.getItem('freeBirthChartConsultations')
-    );
-
-    this.showFortuneWheel = true;
-    this.cdr.markForCheck();
-    console.log('Forzado showFortuneWheel a:', this.showFortuneWheel);
-  }
-
-  // ✅ MÉTODO AUXILIAR para el template
   getBirthChartConsultationsCount(): number {
     return parseInt(
       sessionStorage.getItem('freeBirthChartConsultations') || '0'
@@ -1309,5 +1130,4 @@ Estoy aquí para ayudarte a descifrar los secretos ocultos en tu tabla de nacimi
     return parseInt(value);
   }
 
-  // ✅ MODIFICAR clearChat para incluir datos de la ruleta
 }

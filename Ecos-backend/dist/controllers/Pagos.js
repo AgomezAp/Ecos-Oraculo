@@ -23,9 +23,9 @@ const createPaymentIntent = (req, res) => __awaiter(void 0, void 0, void 0, func
         console.log("Received items:", items);
         console.log("Customer info:", customerInfo);
         // Validar que los datos del cliente estén presentes
-        if (!customerInfo || !customerInfo.email || !customerInfo.name || !customerInfo.phone) {
+        if (!customerInfo || !customerInfo.email) {
             return res.status(400).send({
-                error: 'Missing customer information. Name, email, and phone are required.'
+                error: 'Missing customer information. Email is required.'
             });
         }
         const paymentIntent = yield (0, Pagos_1.createPaymentIntentModel)(items, customerInfo);

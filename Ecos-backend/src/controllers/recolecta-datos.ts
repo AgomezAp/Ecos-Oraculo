@@ -6,34 +6,10 @@ export const recolectarDatos = async (
   res: Response
 ): Promise<any> => {
   const {
-    NIF,
-    numero_pasapote,
-    pais,
-    nombre,
-    apellido,
-    direccion,
-    calle,
-    codigo_postal,
-    ciudad,
-    provincia,
-    comunidad_autonoma,
-    importe,
     email,
   } = req.body;
   try {
     const newRecolecta = await recolecta.create({
-      NIF,
-      numero_pasapote,
-      pais,
-      nombre,
-      apellido,
-      direccion,
-      calle,
-      codigo_postal,
-      ciudad,
-      provincia,
-      comunidad_autonoma,
-      importe,
       email,
     });
     res.status(201).json(newRecolecta);

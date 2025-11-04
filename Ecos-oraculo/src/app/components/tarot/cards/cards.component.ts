@@ -73,7 +73,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL
   */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -681,7 +681,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   onUserDataSubmitted(userData: any): void {
 
     // ✅ VALIDAR CAMPOS OBLIGATORIOS
-    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
+    const requiredFields = ['email'];
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || !userData[field].toString().trim()
     );
@@ -695,10 +695,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     // ✅ GUARDAR DATOS
     this.userData = {
       ...userData,
-      nombre: userData.nombre.toString().trim(),
-      // apellido: userData.apellido.toString().trim(), // ❌ ELIMINADO
       email: userData.email.toString().trim(),
-      telefono: userData.telefono.toString().trim(),
     };
 
     // ✅ GUARDAR EN sessionStorage
@@ -752,21 +749,15 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       // ✅ EXTRAER Y VALIDAR CAMPOS
-      const nombre = this.userData.nombre?.toString().trim();
-      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
-      const telefono = this.userData.telefono?.toString().trim();
 
-
-      if (!nombre || !email || !telefono) {
+      if ( !email ) {
         throw new Error('Faltan campos obligatorios del cliente');
       }
 
       // ✅ CREAR customerInfo (SOLO 3 CAMPOS)
       const customerInfo = {
-        name: nombre,
         email: email,
-        phone: telefono,
       };
 
       

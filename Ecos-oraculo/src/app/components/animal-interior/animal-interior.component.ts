@@ -119,7 +119,7 @@ export class AnimalInteriorComponent
           pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
   */
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -268,8 +268,7 @@ export class AnimalInteriorComponent
             }
           }
         })
-        .catch((error) => {
-        });
+        .catch((error) => {});
     }
   }
   sendMessage(): void {
@@ -283,7 +282,6 @@ export class AnimalInteriorComponent
         this.useFreeAnimalConsultation();
         // Continuar con el mensaje sin bloquear
       } else {
-
         // Cerrar otros modales primero
         this.showFortuneWheel = false;
         this.showPaymentModal = false;
@@ -434,7 +432,6 @@ export class AnimalInteriorComponent
   }
 
   async promptForPayment(): Promise<void> {
-
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
@@ -443,8 +440,7 @@ export class AnimalInteriorComponent
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
-      } catch (error) {
-      }
+      } catch (error) {}
       this.paymentElement = undefined;
     }
 
@@ -473,15 +469,10 @@ export class AnimalInteriorComponent
       }
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
-      const nombre = this.userData.nombre?.toString().trim();
-      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
-      const telefono = this.userData.telefono?.toString().trim();
-      if (!nombre || !email || !telefono) {
+      if (!email) {
         const faltantes = [];
-        if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
-        if (!telefono) faltantes.push('teléfono');
 
         this.paymentError = `Faltan datos del cliente: ${faltantes.join(
           ', '
@@ -494,9 +485,7 @@ export class AnimalInteriorComponent
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: nombre,
         email: email,
-        phone: telefono,
       };
 
       const requestBody = { items, customerInfo };
@@ -507,7 +496,6 @@ export class AnimalInteriorComponent
           requestBody
         )
         .toPromise();
-
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -585,7 +573,7 @@ export class AnimalInteriorComponent
         case 'succeeded':
           this.hasUserPaid = true;
           sessionStorage.setItem('hasUserPaidAnimalInterior', 'true');
-          
+
           this.blockedMessageId = null;
           sessionStorage.removeItem('animalInteriorBlockedMessageId');
           this.shouldScrollToBottom = true;
@@ -783,7 +771,7 @@ export class AnimalInteriorComponent
   }
   onUserDataSubmitted(userData: any): void {
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
+    const requiredFields = ['email'];
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -802,10 +790,7 @@ export class AnimalInteriorComponent
     // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
     this.userData = {
       ...userData,
-      nombre: userData.nombre?.toString().trim(),
-      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
-      telefono: userData.telefono?.toString().trim(),
     };
 
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
@@ -813,8 +798,7 @@ export class AnimalInteriorComponent
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-    } catch (error) {
-    }
+    } catch (error) {}
 
     this.showDataModal = false;
     this.cdr.markForCheck();
@@ -823,7 +807,6 @@ export class AnimalInteriorComponent
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
         // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
@@ -843,9 +826,7 @@ export class AnimalInteriorComponent
       clearTimeout(this.wheelTimer);
     }
 
-
     this.wheelTimer = setTimeout(() => {
-
       if (
         FortuneWheelComponent.canShowWheel() &&
         !this.showPaymentModal &&
@@ -878,7 +859,6 @@ export class AnimalInteriorComponent
   }
 
   triggerAnimalWheel(): void {
-
     if (this.showPaymentModal || this.showDataModal) {
       return;
     }

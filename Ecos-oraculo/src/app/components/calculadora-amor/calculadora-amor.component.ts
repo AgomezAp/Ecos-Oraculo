@@ -125,12 +125,12 @@ export class CalculadoraAmorComponent
     },
   ];
   private wheelTimer: any;
-    /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
           pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
   */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   // Formulario reactivo
@@ -302,8 +302,7 @@ export class CalculadoraAmorComponent
             }
           }
         })
-        .catch((error: any) => {
-        });
+        .catch((error: any) => {});
     }
   }
   openDataModalForPayment(): void {
@@ -482,7 +481,6 @@ export class CalculadoraAmorComponent
       this.saveMessagesToSession();
       this.shouldAutoScroll = true;
     } else {
-      console.error('Error en el cálculo:', response.error);
     }
   }
 
@@ -639,8 +637,7 @@ export class CalculadoraAmorComponent
             : msg.timestamp,
       }));
       sessionStorage.setItem('loveMessages', JSON.stringify(messagesToSave));
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   private clearSessionData(): void {
@@ -655,7 +652,6 @@ export class CalculadoraAmorComponent
   }
 
   async promptForPayment(): Promise<void> {
-
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
@@ -664,8 +660,7 @@ export class CalculadoraAmorComponent
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
-      } catch (error) {
-      }
+      } catch (error) {}
       this.paymentElement = undefined;
     }
 
@@ -694,15 +689,10 @@ export class CalculadoraAmorComponent
       }
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
-      const nombre = this.userData.nombre?.toString().trim();
-      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
-      const telefono = this.userData.telefono?.toString().trim();
-      if (!nombre || !email || !telefono) {
+      if (!email) {
         const faltantes = [];
-        if (!nombre) faltantes.push('nombre');
         if (!email) faltantes.push('email');
-        if (!telefono) faltantes.push('teléfono');
 
         this.paymentError = `Faltan datos del cliente: ${faltantes.join(
           ', '
@@ -715,9 +705,7 @@ export class CalculadoraAmorComponent
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: nombre,
         email: email,
-        phone: telefono,
       };
       const requestBody = { items, customerInfo };
 
@@ -727,7 +715,6 @@ export class CalculadoraAmorComponent
           requestBody
         )
         .toPromise();
-
 
       if (!response || !response.clientSecret) {
         throw new Error(
@@ -750,7 +737,7 @@ export class CalculadoraAmorComponent
             },
           },
         });
-        
+
         this.paymentElement = this.elements.create('payment');
 
         this.isProcessingPayment = false;
@@ -886,7 +873,7 @@ export class CalculadoraAmorComponent
         case 'succeeded':
           this.hasUserPaidForLove = true;
           sessionStorage.setItem('hasUserPaidForLove', 'true');
-          
+
           this.blockedMessageId = null;
           sessionStorage.removeItem('loveBlockedMessageId');
 
@@ -1069,8 +1056,7 @@ export class CalculadoraAmorComponent
         const element = this.scrollContainer.nativeElement;
         element.scrollTop = element.scrollHeight;
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   /**
@@ -1175,9 +1161,8 @@ export class CalculadoraAmorComponent
   }
 
   onUserDataSubmitted(userData: any): void {
-
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
+    const requiredFields = ['email']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -1196,10 +1181,7 @@ export class CalculadoraAmorComponent
     // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
     this.userData = {
       ...userData,
-      nombre: userData.nombre?.toString().trim(),
-      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
-      telefono: userData.telefono?.toString().trim(),
     };
 
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE
@@ -1208,8 +1190,7 @@ export class CalculadoraAmorComponent
 
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-    } catch (error) {
-    }
+    } catch (error) {}
 
     this.showDataModal = false;
     this.cdr.markForCheck();
@@ -1218,10 +1199,8 @@ export class CalculadoraAmorComponent
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-
         // ✅ LLAMAR A promptForPayment QUE INICIALIZA STRIPE
         this.promptForPayment();
       },
@@ -1255,7 +1234,6 @@ export class CalculadoraAmorComponent
 
   // ✅ MANEJAR PREMIO GANADO
   onPrizeWon(prize: Prize): void {
-
     const prizeMessage: ConversationMessage = {
       role: 'love_expert',
       message: `💕 ¡El amor verdadero ha conspirado a tu favor! Has ganado: **${prize.name}** ${prize.icon}\n\nLas fuerzas románticas del universo han decidido bendecirte con este regalo celestial. La energía del amor fluye a través de ti, revelando secretos más profundos sobre la compatibilidad y el romance. ¡Que el amor eterno te acompañe!`,
@@ -1334,7 +1312,6 @@ export class CalculadoraAmorComponent
 
   // ✅ ACTIVAR RULETA MANUALMENTE
   triggerLoveWheel(): void {
-
     if (this.showPaymentModal || this.showDataModal) {
       return;
     }

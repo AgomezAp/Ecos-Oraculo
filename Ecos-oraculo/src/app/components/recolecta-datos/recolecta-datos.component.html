@@ -58,44 +58,6 @@
           </div>
 
           <form class="data-form" (ngSubmit)="submitUserData()">
-            <!-- Datos de identificación -->
-            <div class="form-section">
-              <h4>Datos de Identificación</h4>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="nif">NIE/DNI *:</label>
-                  <input
-                    type="text"
-                    id="nif"
-                    [(ngModel)]="userData.NIF"
-                    name="nif"
-                    placeholder="12345678X"
-                    required
-                    [class.error]="hasError('NIF')"
-                  />
-                  <span *ngIf="hasError('NIF')" class="error-message">{{
-                    dataFormErrors["NIF"]
-                  }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="nombre">Nombre completo *:</label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    [(ngModel)]="userData.nombre"
-                    name="nombre"
-                    placeholder="Nombre y apellidos"
-                    required
-                    [class.error]="hasError('nombre')"
-                  />
-                  <span *ngIf="hasError('nombre')" class="error-message">{{
-                    dataFormErrors["nombre"]
-                  }}</span>
-                </div>
-              </div>
-            </div>
-
             <!-- Datos de contacto -->
             <div class="form-section">
               <h4>Datos de Contacto</h4>
@@ -116,21 +78,6 @@
                   }}</span>
                 </div>
 
-                <div class="form-group">
-                  <label for="telefono">Teléfono *:</label>
-                  <input
-                    type="tel"
-                    id="telefono"
-                    [(ngModel)]="userData.telefono"
-                    name="telefono"
-                    placeholder="+34 123 456 789"
-                    required
-                    [class.error]="hasError('telefono')"
-                  />
-                  <span *ngIf="hasError('telefono')" class="error-message">{{
-                    dataFormErrors["telefono"]
-                  }}</span>
-                </div>
               </div>
 
               <!-- ✅ Checkbox para factura -->
@@ -140,64 +87,6 @@
                 </span>
               </div>
             </div>
-
-            <!-- Datos de dirección -->
-            <div class="form-section">
-              <h4>Dirección</h4>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="direccion">Dirección completa *:</label>
-                  <input
-                    type="text"
-                    id="direccion"
-                    [(ngModel)]="userData.direccion"
-                    name="direccion"
-                    placeholder="Calle, número, piso..."
-                    required
-                    [class.error]="hasError('direccion')"
-                  />
-                  <span *ngIf="hasError('direccion')" class="error-message">{{
-                    dataFormErrors["direccion"]
-                  }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="codigo_postal">Código Postal *:</label>
-                  <input
-                    type="text"
-                    id="codigo_postal"
-                    [(ngModel)]="userData.codigo_postal"
-                    name="codigo_postal"
-                    placeholder="28001"
-                    required
-                    [class.error]="hasError('codigo_postal')"
-                  />
-                  <span *ngIf="hasError('codigo_postal')" class="error-message">{{
-                    dataFormErrors["codigo_postal"]
-                  }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Importe -->
-            <div class="form-section">
-              <h4>Información del Pago</h4>
-              <div class="form-group">
-                <label for="importe">Importe:</label>
-                <input
-                  type="number"
-                  id="importe"
-                  [(ngModel)]="userData.importe"
-                  name="importe"
-                  step="0.01"
-                  placeholder="4.00"
-                  readonly
-                  value="4.00"
-                />
-                <small>Interpretaciones ilimitadas de sueños</small>
-              </div>
-            </div>
-
             <div
               *ngIf="dataFormErrors['general']"
               class="error-message general-error"

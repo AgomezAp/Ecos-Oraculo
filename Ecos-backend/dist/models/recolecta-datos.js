@@ -10,54 +10,6 @@ class recolecta extends sequelize_1.Model {
 }
 exports.recolecta = recolecta;
 recolecta.init({
-    NIF: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    numero_pasapote: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    pais: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    nombre: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    apellido: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    direccion: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    calle: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    codigo_postal: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    ciudad: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    provincia: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    comunidad_autonoma: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    importe: {
-        type: sequelize_1.DataTypes.FLOAT,
-        allowNull: false,
-    },
     email: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,

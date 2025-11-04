@@ -14,9 +14,9 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
     console.log("Customer info:", customerInfo);
     
     // Validar que los datos del cliente estén presentes
-    if (!customerInfo || !customerInfo.email || !customerInfo.name || !customerInfo.phone) {
-      return res.status(400).send({ 
-        error: 'Missing customer information. Name, email, and phone are required.' 
+    if (!customerInfo || !customerInfo.email) {
+      return res.status(400).send({
+        error: 'Missing customer information. Email is required.'
       });
     }
     

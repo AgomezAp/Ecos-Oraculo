@@ -146,7 +146,7 @@ export class InformacionZodiacoComponent
     */
   // Configuración de Stripe
   private stripePublishableKey =
-    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
   private backendUrl = environment.apiUrl;
 
   astrologerInfo = {
@@ -711,18 +711,12 @@ export class InformacionZodiacoComponent
       }
 
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
-      const nombre = this.userData.nombre?.toString().trim();
-      // const apellido = this.userData.apellido?.toString().trim(); // ❌ ELIMINADO
       const email = this.userData.email?.toString().trim();
-      const telefono = this.userData.telefono?.toString().trim();
 
 
-      if (!nombre || !email || !telefono) { // ❌ QUITADO !apellido
+      if (!email ) { // ❌ QUITADO !apellido
         const faltantes = [];
-        if (!nombre) faltantes.push('nombre');
-        // if (!apellido) faltantes.push('apellido'); // ❌ ELIMINADO
         if (!email) faltantes.push('email');
-        if (!telefono) faltantes.push('teléfono');
 
         this.paymentError = `Faltan datos del cliente: ${faltantes.join(
           ', '
@@ -735,9 +729,7 @@ export class InformacionZodiacoComponent
 
       // ✅ CREAR customerInfo SOLO SI TODOS LOS CAMPOS ESTÁN PRESENTES
       const customerInfo = {
-        name: nombre, // ❌ Ya no concatenamos con apellido
         email: email,
-        phone: telefono,
       };
 
       const requestBody = { items, customerInfo };
@@ -966,7 +958,7 @@ export class InformacionZodiacoComponent
   onUserDataSubmitted(userData: any): void {
 
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
-    const requiredFields = ['nombre', 'email', 'telefono']; // ❌ QUITADO 'apellido'
+    const requiredFields = ['email']; // ❌ QUITADO 'apellido'
     const missingFields = requiredFields.filter(
       (field) => !userData[field] || userData[field].toString().trim() === ''
     );
@@ -985,10 +977,7 @@ export class InformacionZodiacoComponent
     // ✅ LIMPIAR Y GUARDAR datos INMEDIATAMENTE en memoria Y sessionStorage
     this.userData = {
       ...userData,
-      nombre: userData.nombre?.toString().trim(),
-      // apellido: userData.apellido?.toString().trim(), // ❌ ELIMINADO
       email: userData.email?.toString().trim(),
-      telefono: userData.telefono?.toString().trim(),
     };
 
     // ✅ GUARDAR EN sessionStorage INMEDIATAMENTE

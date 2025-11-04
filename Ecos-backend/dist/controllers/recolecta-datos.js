@@ -12,21 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllDatos = exports.recolectarDatos = void 0;
 const recolecta_datos_1 = require("../models/recolecta-datos");
 const recolectarDatos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { NIF, numero_pasapote, pais, nombre, apellido, direccion, calle, codigo_postal, ciudad, provincia, comunidad_autonoma, importe, email, } = req.body;
+    const { email, } = req.body;
     try {
         const newRecolecta = yield recolecta_datos_1.recolecta.create({
-            NIF,
-            numero_pasapote,
-            pais,
-            nombre,
-            apellido,
-            direccion,
-            calle,
-            codigo_postal,
-            ciudad,
-            provincia,
-            comunidad_autonoma,
-            importe,
             email,
         });
         res.status(201).json(newRecolecta);

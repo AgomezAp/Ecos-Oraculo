@@ -13,7 +13,7 @@ const calculateOrderAmount = (items: any[]) => {
 
   if (!items || !items.length) {
     console.log("Warning: Empty items array");
-    return 1000; // Default amount in cents (e.g., $10.00)
+    return 400; // Default amount in cents (e.g., $4.00)
   }
 
   items.forEach((item: any) => {
@@ -43,17 +43,10 @@ export const createPaymentIntentModel = async (
     if (customers.data.length > 0) {
       // Cliente existente
       customer = customers.data[0];
-      // Actualizar información si es necesario
-      await stripe.customers.update(customer.id, {
-        name: customerInfo.name,
-        phone: customerInfo.phone,
-      });
     } else {
       // Crear nuevo cliente
       customer = await stripe.customers.create({
-        name: customerInfo.name,
         email: customerInfo.email,
-        phone: customerInfo.phone,
       });
     }
 
@@ -64,9 +57,7 @@ export const createPaymentIntentModel = async (
       customer: customer.id,
       payment_method_types: ["card"],
       metadata: {
-        customerName: customerInfo.name,
         customerEmail: customerInfo.email,
-        customerPhone: customerInfo.phone,
       },
       receipt_email: customerInfo.email,
     });
