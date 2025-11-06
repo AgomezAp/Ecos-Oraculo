@@ -139,12 +139,12 @@ export class ZodiacoChinoComponent
   //Datos para enviar
   showDataModal: boolean = false;
   userData: any = null;
-  /*  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC
-    pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL
-  */
-  // Configuración de Stripe
-  private stripePublishableKey =
-    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+      private stripePublishableKey =
+      'pk_live_51SQ9t3Cjsj9D54SLtf9wIORZHVpk884nE8xgEB722kCqjSjJck4LKtB4Xro48c85qk9AngXkAKI5rsdfylP3Npc500DpVNul7L';
+        
+ 
+/*   private stripePublishableKey =
+    '  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC '; */
   private backendUrl = environment.apiUrl;
 
   constructor(
@@ -305,7 +305,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     );
 
     if (paymentIntent && paymentIntentClientSecret && this.stripe) {
-
       this.stripe
         .retrievePaymentIntent(paymentIntentClientSecret)
         .then(({ paymentIntent }) => {
@@ -345,8 +344,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             }
           }
         })
-        .catch((error: any) => {
-        });
+        .catch((error: any) => {});
     }
   }
 
@@ -360,8 +358,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         'horoscopeMessages',
         JSON.stringify(messagesToSave)
       );
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   private clearHoroscopeSessionData(): void {
@@ -392,7 +389,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   async promptForHoroscopePayment(): Promise<void> {
-
     this.showPaymentModal = true;
     this.cdr.markForCheck(); // ✅ OnPush Change Detection
     this.paymentError = null;
@@ -401,8 +397,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     if (this.paymentElement) {
       try {
         this.paymentElement.destroy();
-      } catch (error) {
-      }
+      } catch (error) {}
       this.paymentElement = undefined;
     }
 
@@ -421,7 +416,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         }
       }
 
-
       if (!this.userData) {
         this.paymentError =
           'No se encontraron los datos del cliente. Por favor, completa el formulario primero.';
@@ -434,7 +428,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       // ✅ VALIDAR CAMPOS INDIVIDUALES CON CONVERSIÓN A STRING
       const email = this.userData.email?.toString().trim();
 
-      if ( !email ) {
+      if (!email) {
         const faltantes = [];
         if (!email) faltantes.push('email');
 
@@ -461,7 +455,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         )
         .toPromise();
 
-
       if (!response || !response.clientSecret) {
         throw new Error(
           'Error al obtener la información de pago del servidor para horóscopo.'
@@ -485,7 +478,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
             },
           },
         });
-        
+
         this.paymentElement = this.elements.create('payment');
 
         this.isProcessingPayment = false;
@@ -551,7 +544,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         case 'succeeded':
           this.hasUserPaidForHoroscope = true;
           sessionStorage.setItem('hasUserPaidForHoroscope', 'true');
-          
+
           this.blockedMessageId = null;
           sessionStorage.removeItem('horoscopeBlockedMessageId');
 
@@ -786,7 +779,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
         this.isLoading = false;
         this.isTyping = false;
         this.cdr.markForCheck(); // ✅ Detectar fin de loading
-        
+
         if (response.success && response.response) {
           const messageId = Date.now().toString();
 
@@ -917,8 +910,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       try {
         this.messagesContainer.nativeElement.scrollTop =
           this.messagesContainer.nativeElement.scrollHeight;
-      } catch (err) {
-      }
+      } catch (err) {}
     }
   }
 
@@ -997,7 +989,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.initializeHoroscopeWelcomeMessage();
   }
   resetChat(): void {
-
     // 1. Reset de arrays y mensajes
     this.conversationHistory = [];
     this.currentMessage = '';
@@ -1066,7 +1057,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.cdr.markForCheck();
   }
   onUserDataSubmitted(userData: any): void {
-
     // ✅ VALIDAR CAMPOS CRÍTICOS ANTES DE PROCEDER
     const requiredFields = ['email'];
     const missingFields = requiredFields.filter(
@@ -1095,8 +1085,7 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
       sessionStorage.setItem('userData', JSON.stringify(this.userData));
       // Verificar que se guardaron correctamente
       const verificacion = sessionStorage.getItem('userData');
-    } catch (error) {
-    }
+    } catch (error) {}
 
     this.showDataModal = false;
     this.cdr.markForCheck();
@@ -1105,15 +1094,12 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     this.sendUserDataToBackend(userData);
   }
   private sendUserDataToBackend(userData: any): void {
-
     this.http.post(`${this.backendUrl}api/recolecta`, userData).subscribe({
       next: (response) => {
-
         // ✅ LLAMAR A promptForHoroscopePayment QUE INICIALIZA STRIPE
         this.promptForHoroscopePayment();
       },
       error: (error) => {
-
         // ✅ AUN ASÍ ABRIR EL MODAL DE PAGO
         this.promptForHoroscopePayment();
       },
@@ -1127,7 +1113,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
     if (this.wheelTimer) {
       clearTimeout(this.wheelTimer);
     }
-
 
     this.wheelTimer = setTimeout(() => {
       if (
@@ -1143,7 +1128,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   onPrizeWon(prize: Prize): void {
-
     const prizeMessage: ChatMessage = {
       role: 'master',
       message: `🔮 ¡Los astros han conspirado a tu favor! Has ganado: **${prize.name}** ${prize.icon}\n\nLas fuerzas celestiales han decidido bendecirte con este regalo sagrado. La energía zodiacal fluye a través de ti, revelando secretos más profundos de tu horóscopo personal. ¡Que la sabiduría astrológica te ilumine!`,
@@ -1162,7 +1146,6 @@ Los doce signos (Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, S
   }
 
   triggerHoroscopeWheel(): void {
-
     if (this.showPaymentModal || this.showDataModal) {
       return;
     }

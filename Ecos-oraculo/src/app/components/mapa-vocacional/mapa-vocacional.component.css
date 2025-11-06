@@ -565,7 +565,7 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background: #926671;
+  background:  #926671;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1071,12 +1071,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 10000; /* Aumentar z-index para estar sobre el video */
+  animation: modal-appear 0.3s ease-out;
   padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto; /* ✅ AGREGAR SCROLL AL OVERLAY */
-  overflow-x: hidden;
+  overflow-y: auto;
 }
+
 @keyframes modal-appear {
   from {
     opacity: 0;
@@ -1099,6 +1100,7 @@
   padding: 0;
   max-width: 480px;
   width: 92%;
+  max-height: calc(100vh - 40px);
   color: white;
   position: relative;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(96, 165, 250, 0.3),
@@ -1106,13 +1108,13 @@
   backdrop-filter: blur(20px);
   border: 2px solid rgba(96, 165, 250, 0.3);
   overflow: hidden;
+  animation: modal-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   margin: auto;
   display: flex;
   flex-direction: column;
-  z-index: 10001;
-  max-height: 90vh; /* ✅ LIMITAR ALTURA MÁXIMA */
-  overflow-y: auto; /* ✅ PERMITIR SCROLL INTERNO */
+  z-index: 10001; /* Asegurar que esté sobre el overlay */
 }
+
 @keyframes modal-scale {
   from {
     transform: scale(0.8) translateY(20px);
@@ -1200,6 +1202,9 @@
   padding: 20px;
   text-align: center;
   position: relative;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(100vh - 160px);
 }
 
 .payment-content::before {
@@ -1473,7 +1478,7 @@
 .chat-messages::-webkit-scrollbar-track,
 .assessment-section::-webkit-scrollbar-track,
 .results-section::-webkit-scrollbar-track {
-  background: #58344e;
+  background:  #58344E;
   border-radius: 3px;
 }
 

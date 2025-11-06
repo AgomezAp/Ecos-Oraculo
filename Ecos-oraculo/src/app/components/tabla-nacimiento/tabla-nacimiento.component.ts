@@ -150,11 +150,12 @@ export class TablaNacimientoComponent
   hasUserPaid: boolean = false;
   firstQuestionAsked: boolean = false;
   blockedMessageId: string | null = null;
-  /*     'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
-          pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC 
-  */
-  private stripePublishableKey =
-    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC';
+      private stripePublishableKey =
+      'pk_live_51SQ9t3Cjsj9D54SLtf9wIORZHVpk884nE8xgEB722kCqjSjJck4LKtB4Xro48c85qk9AngXkAKI5rsdfylP3Npc500DpVNul7L';
+        
+ 
+/*     private stripePublishableKey =
+    '  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC '; */
   private backendUrl = environment.apiUrl;
 
   constructor(

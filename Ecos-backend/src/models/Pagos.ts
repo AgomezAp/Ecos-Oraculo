@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 interface CustomerInfo {
-  name: string;
   email: string;
-  phone: string;
 }
 const stripe = new Stripe(process.env.SECRET_KEY!);
 const calculateOrderAmount = (items: any[]) => {

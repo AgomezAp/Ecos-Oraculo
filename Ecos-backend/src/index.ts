@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 console.log('==========================================');
-console.log('🔧 INICIANDO HAGIOGRAFÍA BACKEND');
+console.log('🔧 INICIANDO ECOS-ORACULO BACKEND');
 console.log('==========================================');
 console.log('📋 Configuración:');
 console.log('  - Puerto:', process.env.PORT || 3001);

@@ -49,7 +49,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 // Cargar variables de entorno
 dotenv_1.default.config();
 console.log('==========================================');
-console.log('🔧 INICIANDO HAGIOGRAFÍA BACKEND');
+console.log('🔧 INICIANDO ECOS-ORACULO BACKEND');
 console.log('==========================================');
 console.log('📋 Configuración:');
 console.log('  - Puerto:', process.env.PORT || 3001);
