@@ -117,7 +117,6 @@ export class AnimalInteriorComponent
   blockedMessageId: string | null = null;
       private stripePublishableKey =
       'pk_live_51SQ9t3Cjsj9D54SLtf9wIORZHVpk884nE8xgEB722kCqjSjJck4LKtB4Xro48c85qk9AngXkAKI5rsdfylP3Npc500DpVNul7L';
-        
  
  /*    private stripePublishableKey =
     '  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC ';
@@ -570,6 +569,7 @@ export class AnimalInteriorComponent
       this.paymentError =
         error.message || 'Ocurrió un error inesperado durante el pago.';
       this.isProcessingPayment = false;
+      this.cdr.markForCheck(); // ✅ Detectar cambio de error y loading
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':

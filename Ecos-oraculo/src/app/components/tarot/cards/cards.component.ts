@@ -7,7 +7,7 @@ import {
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { gsap } from 'gsap';
@@ -68,19 +68,20 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
   clientSecret: string | null = null;
   isProcessingPayment: boolean = false;
   paymentError: string | null = null;
-  /*     private stripePublishableKey =
-      'pk_live_51SQ9t3Cjsj9D54SLtf9wIORZHVpk884nE8xgEB722kCqjSjJck4LKtB4Xro48c85qk9AngXkAKI5rsdfylP3Npc500DpVNul7L';
-        
-  */
-    private stripePublishableKey =
-    '  pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC ';
+  // Stripe configuration
+/*  private stripePublishableKey =
+    'pk_test_51ROf7V4GHJXfRNdQ8ABJKZ7NXz0H9IlQBIxcFTOa6qT55QpqRhI7NIj2VlMUibYoXEGFDXAdalMQmHRP8rp6mUW900RzRJRhlC'; */
+
+  private stripePublishableKey =
+    'pk_live_51S419E5hUE7XrP4NUOjIhnHqmvG3gmEHxwXArkodb2aGD7aBMcBUjBR8QNOgdrRyidxckj2BCVnYMu9ZpkyJuwSS00ru89AmQL';
   private backendUrl = environment.apiUrl;
 
   constructor(
     private cardService: CardService,
     private router: Router,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -611,6 +612,7 @@ export class CardsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (error) {
       this.paymentError = error.message || 'Error procesando el pago';
       this.isProcessingPayment = false;
+      this.cdr.markForCheck(); // ✅ Detectar cambio de error y loading
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
 
       // ✅ CAMBIAR ESTADO

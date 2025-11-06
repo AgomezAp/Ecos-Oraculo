@@ -808,6 +808,7 @@ export class MapaVocacionalComponent
       this.paymentError =
         error.message || 'Ocurrió un error inesperado durante el pago.';
       this.isProcessingPayment = false;
+      this.cdr.markForCheck(); // ✅ Detectar cambio de error y loading
     } else if (paymentIntent) {
       switch (paymentIntent.status) {
         case 'succeeded':

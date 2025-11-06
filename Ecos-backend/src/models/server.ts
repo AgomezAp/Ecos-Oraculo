@@ -14,7 +14,7 @@ import calculadoraAmor from "../routes/calculadora-amor";
 import RPagos from "../routes/Pagos";
 import Recolecta from "../routes/recolecta";
 import { recolecta } from "./recolecta-datos";
-import { PageAnalytics } from "./page_views"; 
+import { PageAnalytics } from "./page_views";
 import { AnalyticsUsuario } from "./analytics_usuario";
 import { ServicePopularity } from "./service_popularity";
 import sugerencia from "../routes/sugerencia";
@@ -49,24 +49,49 @@ class Server {
   }
 
   middlewares() {
-    this.app.use(express.json());
-    this.app.use(
-      cors({
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-      })
-    );
+    // CORS debe ir PRIMERO, antes de cualquier otro middleware
+    this.app.use((req, res, next) => {
+      const allowedOrigins = [
+        "https://ecosdeloraculo.com",
+        "https://www.ecosdeloraculo.com",
+        "http://localhost:4200",
+        "http://localhost:3010",
+      ];
+
+      const origin = req.headers.origin;
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+      }
+
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+      );
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, X-Requested-With"
+      );
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader("Access-Control-Max-Age", "86400"); // 24 horas
+
+      // Manejar preflight requests
+      if (req.method === "OPTIONS") {
+        return res.status(200).end();
+      }
+
+      next();
+    });
+
     this.app.use(express.json({ limit: "10mb" }));
-    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
     // Logging middleware
     this.app.use((req, res, next) => {
       console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+      console.log("Origin:", req.headers.origin);
       next();
     });
   }
-
   routes() {
     this.app.use(interpretadorsueno);
     this.app.use(numerologyRoutes);
@@ -78,7 +103,7 @@ class Server {
     this.app.use(calculadoraAmor);
     this.app.use(RPagos);
     this.app.use(Recolecta);
-    this.app.use(RAnalytics)
+    this.app.use(RAnalytics);
     this.app.use(sugerencia);
     // Health check endpoint
     this.app.get("/health", (req, res) => {

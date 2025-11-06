@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/server.ts
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const numerologia_1 = __importDefault(require("../routes/numerologia"));
 const mapa_vocacional_1 = __importDefault(require("../routes/mapa-vocacional"));
@@ -58,17 +57,34 @@ class Server {
         });
     }
     middlewares() {
-        this.app.use(express_1.default.json());
-        this.app.use((0, cors_1.default)({
-            origin: "*",
-            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-            allowedHeaders: ["Content-Type", "Authorization"],
-        }));
+        // CORS debe ir PRIMERO, antes de cualquier otro middleware
+        this.app.use((req, res, next) => {
+            const allowedOrigins = [
+                "https://ecosdeloraculo.com",
+                "https://www.ecosdeloraculo.com",
+                "http://localhost:4200",
+                "http://localhost:3010",
+            ];
+            const origin = req.headers.origin;
+            if (origin && allowedOrigins.includes(origin)) {
+                res.setHeader("Access-Control-Allow-Origin", origin);
+            }
+            res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+            res.setHeader("Access-Control-Allow-Credentials", "true");
+            res.setHeader("Access-Control-Max-Age", "86400"); // 24 horas
+            // Manejar preflight requests
+            if (req.method === "OPTIONS") {
+                return res.status(200).end();
+            }
+            next();
+        });
         this.app.use(express_1.default.json({ limit: "10mb" }));
-        this.app.use(express_1.default.urlencoded({ extended: true }));
+        this.app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
         // Logging middleware
         this.app.use((req, res, next) => {
             console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+            console.log("Origin:", req.headers.origin);
             next();
         });
     }
