@@ -112,14 +112,6 @@ export const routes: Routes = [
   },
 
   {
-    path: 'particulas',
-    loadComponent: () =>
-      import('./shared/particles/particles.component').then(
-        (m) => m.ParticlesComponent
-      ),
-  },
-
-  {
     path: 'agradecimiento',
     loadComponent: () =>
       import('./components/tarot/agradecimiento/agradecimiento.component').then(
